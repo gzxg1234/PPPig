@@ -1,5 +1,6 @@
 package com.sanron.pppig.base
 
+import android.arch.lifecycle.Observer
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.sanron.pppig.util.showToast
 
 /**
  * Author:sanron
@@ -25,6 +27,15 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment()
     protected abstract fun createViewModel(): M?
 
     protected abstract fun initView()
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel?.apply {
+            toastCmd.observe(this@BaseFragment, Observer {
+                showToast(it!!)
+            })
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (binding == null) {

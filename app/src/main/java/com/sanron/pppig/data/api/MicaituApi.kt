@@ -11,11 +11,11 @@ import retrofit2.http.Path
  * Description:
  */
 interface MicaituApi {
-    @GET("http://m.kkkkmao.com/{type}/index_{page}___{year}___{country}_1.html")
-    fun all(@Path("type") type: String,
+    @GET("http://m.kkkkmao.com/{typeParam}/index_{page}___{year}___{countryParam}_1.html")
+    fun all(@Path("typeParam") type: String,
             @Path("page") page: Int,
             @Path("year") year:String,
-            @Path("country") country: String): Observable<ResponseBody>
+            @Path("countryParam") country: String): Observable<ResponseBody>
     /**
      * 主页
      */

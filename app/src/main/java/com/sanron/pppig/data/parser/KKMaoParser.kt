@@ -98,7 +98,7 @@ class KKMaoParser {
         val doc = Jsoup.parse(html)
         doc?.let {
             //是否有下一页按钮
-            doc.select(".next.pagebk")?.let {
+            doc.select(".next.pagegbk")?.first()?.let {
                 data.hasMore = true
             }
             doc.select(".main.top>.list_vod>#vod_list>li>a")?.forEach {

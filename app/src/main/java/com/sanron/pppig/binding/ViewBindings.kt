@@ -39,38 +39,3 @@ fun setGone(view: View, gone: Boolean) {
     view.visibility = if (gone) View.GONE else View.VISIBLE
 }
 
-@InverseBindingMethods(InverseBindingMethod(type = PiRefreshLayout::class, attribute = "android:refreshing"))
-object ViewBindings {
-    @JvmStatic
-    @InverseBindingAdapter(attribute = "android:refreshing", event = "android:refreshingAttrChanged")
-    fun getRefreshing(view: PiRefreshLayout): Boolean {
-        return view.state == RefreshState.Refreshing
-    }
-
-    @JvmStatic
-    @BindingAdapter(value = ["android:onRefresh", "android:refreshingAttrChanged"], requireAll = false)
-    fun setOnRefreshListener(view: PiRefreshLayout,
-                             onRefreshListener: OnRefreshListener?,
-                             refreshingAttrChanged: InverseBindingListener?) {
-
-        if (refreshingAttrChanged == null) {
-            view.setOnRefreshListener(onRefreshListener)
-        } else {
-            view.setOnRefreshListener {
-                onRefreshListener?.onRefresh(view)
-                refreshingAttrChanged.onChange()
-            }
-        }
-    }
-
-    @JvmStatic
-    @BindingAdapter("android:refreshing")
-    fun setRefreshState(refreshLayout: PiRefreshLayout, refresh: Boolean) {
-        if (refresh) {
-            refreshLayout.autoRefresh()
-        } else {
-            refreshLayout.finishRefresh()
-        }
-    }
-}
-

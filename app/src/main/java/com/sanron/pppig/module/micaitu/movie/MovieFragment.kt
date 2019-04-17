@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.widget.GridLayoutManager
@@ -15,8 +16,11 @@ import android.widget.RadioButton
 import com.sanron.pppig.R
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.databinding.FragmentMovieBinding
-import com.sanron.pppig.util.CLog
+import com.sanron.pppig.util.dp2px
+import com.sanron.pppig.util.gap
+import com.sanron.pppig.util.inflater
 import com.sanron.pppig.util.pauseFrescoOnScroll
+import java.util.*
 
 /**
  *Author:sanron
@@ -39,91 +43,115 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>() {
         return ViewModelProviders.of(this).get(MovieViewModel::class.java)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun initView() {
         val binding = binding!!
         val viewModel = viewModel!!
         binding.apply {
             lifecycleOwner = this@MovieFragment
             model = viewModel
+
+            recyclerView.pauseFrescoOnScroll()
+            recyclerView.layoutManager = GridLayoutManager(context, 3)
+            recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
+
             adapter = MovieAdapter(viewModel!!.data.value)
             adapter.lifecycleOwner = this@MovieFragment
-            adapter.setEnableLoadMore(true)
-            adapter.setOnLoadMoreListener({
-                viewModel.loadData(false)
-            }, recyclerView)
-            recyclerView.pauseFrescoOnScroll()
-            recyclerView.adapter = adapter
-            recyclerView.layoutManager = GridLayoutManager(context, 3)
+            adapter.bindToRecyclerView(recyclerView)
         }
         viewModel.apply {
             data.observe(this@MovieFragment, Observer {
                 adapter.notifyDataSetChanged()
             })
-            hasMore.observe(this@MovieFragment, Observer {
-                if (it == false) {
-                    adapter.loadMoreEnd()
-                }
-            })
-            loading.observe(this@MovieFragment, Observer {
-                if (it == false) {
-                    adapter.loadMoreComplete()
-                }
-            })
+            val updateTagText = {
+                val typeText = "类型:" + binding.root.findViewById<RadioButton>(checkType.value
+                        ?: 0)?.text.toString()
+                val countryText = "国家:" + binding.root.findViewById<RadioButton>(checkCountry.value
+                        ?: 0)?.text.toString()
+                val yearText = "年份:" + binding.root.findViewById<RadioButton>(checkYear.value
+                        ?: 0)?.text.toString()
+                tagsText.value = TextUtils.join(" ", arrayOf(typeText, countryText, yearText))
+                refreshing.value = true
+                loadData(true)
+            }
             checkType.observe(this@MovieFragment, Observer {
-                CLog.d("ss","asdasdasdasdasd")
+                updateTagText()
             })
-//            tagsText.apply {
-//                val onChange = { t: Int? ->
-//                    var typeText = ""
-//                    if (checkType.value != R.id.rb_type_all) {
-//                        typeText = "类型:" + binding.root.findViewById<RadioButton>(checkType.value
-//                                ?: 0)?.text
-//                    }
-//                    var countryText = ""
-//                    if (checkCountry.value != R.id.rb_country_all) {
-//                        countryText = "国家:" + binding.root.findViewById<RadioButton>(checkCountry.value
-//                                ?: 0)?.text
-//                    }
-//                    var yearText = ""
-//                    if (checkYear.value != R.id.rb_year_all) {
-//                        yearText = "年份:" + binding.root.findViewById<RadioButton>(checkYear.value
-//                                ?: 0)?.text
-//                    }
-//                    value = TextUtils.join(" ", arrayOf(typeText, countryText, yearText))
-//                    viewModel.loadData(true)
-//                }
-//                addSource(checkType, onChange)
-//                addSource(checkCountry, onChange)
-//                addSource(checkYear, onChange)
-//            }
+            checkCountry.observe(this@MovieFragment, Observer {
+                updateTagText()
+            })
+            checkYear.observe(this@MovieFragment, Observer {
+                yearParam = binding.root.findViewById<RadioButton>(it
+                        ?: 0)?.getTag(R.id.action_bar) as String? ?: ""
+                updateTagText()
+            })
             toggleFilterCmd.observe(this@MovieFragment, Observer {
-                val DURATION = 200L
-                binding.llTags.clearAnimation()
-                bgAnim?.end()
-                var transAnim: Animation?
-                if (it == true) {
-                    bgAnim = ObjectAnimator.ofInt(binding.flBg, "backgroundColor", 0x00000000, 0x40000000)
-                    transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-                            Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f)
-                    binding.flBg.visibility = View.VISIBLE
-                } else {
-                    bgAnim = ObjectAnimator.ofInt(binding.flBg, "backgroundColor", 0x30000000, 0x00000000)
-                    bgAnim!!.addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            binding.flBg.visibility = View.GONE
-                        }
-                    })
-                    transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-                            Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f)
-                }
-                bgAnim!!.duration = DURATION
-                bgAnim!!.setEvaluator(ArgbEvaluator())
-                bgAnim!!.start()
-                transAnim.duration = DURATION
-                binding.llTags.startAnimation(transAnim)
+                showFilterWindow(it)
             })
+        }
+        buildYear()
+    }
+
+    private fun showFilterWindow(show: Boolean?) {
+        val DURATION = 200L
+        binding?.apply {
+            llTags.clearAnimation()
+            bgAnim?.end()
+            val transAnim: Animation?
+            if (show == true) {
+                bgAnim = ObjectAnimator.ofInt(flBg, "backgroundColor", 0x00000000, 0x40000000)
+                transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+                        Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f)
+                flBg.visibility = View.VISIBLE
+            } else {
+                bgAnim = ObjectAnimator.ofInt(flBg, "backgroundColor", 0x30000000, 0x00000000)
+                bgAnim!!.addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        flBg.visibility = View.GONE
+                    }
+                })
+                transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+                        Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f)
+            }
+            bgAnim!!.duration = DURATION
+            bgAnim!!.setEvaluator(ArgbEvaluator())
+            bgAnim!!.start()
+            transAnim.duration = DURATION
+            llTags.startAnimation(transAnim)
         }
     }
 
+    /**
+     * 动态添加年份标签
+     */
+    private fun buildYear() {
+        binding!!.apply {
+            val nowYear = Date().year + 1900
+            val years = nowYear / 10 * 10
+            //添加当前年代的年份
+            for (i in nowYear downTo years) {
+                val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
+                rb.id = View.generateViewId()
+                rb.text = i.toString()
+                rb.setTag(R.id.action_bar, i.toString())
+                rgYear.addView(rb)
+            }
+            //添加历史年代
+            for (i in years downTo 1980 step 10) {
+                val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
+                rb.id = View.generateViewId()
+                rb.text = "${i}年代"
+                rb.setTag(R.id.action_bar, "$i,${i + 9}")
+                rgYear.addView(rb)
+            }
+            //更早年代
+            val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
+            rb.id = View.generateViewId()
+            rb.text = "更早"
+            rb.setTag(R.id.action_bar, "1900,1979")
+            rgYear.addView(rb)
+        }
+    }
 }
+

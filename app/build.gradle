@@ -123,7 +123,7 @@ dependencies {
     implementation('com.trello.rxlifecycle2:rxlifecycle-android:2.2.1') {
         exclude group: "com.android.support"
     }
-    implementation 'com.dinuscxj:recycleritemdecoration:1.0.0'
+    implementation 'com.dinuscxj:recycleritemdecoration:+'
 
     //jsoup
     implementation 'org.jsoup:jsoup:1.11.3'

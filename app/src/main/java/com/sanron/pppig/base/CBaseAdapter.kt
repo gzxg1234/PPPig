@@ -12,9 +12,16 @@ import com.chad.library.adapter.base.BaseViewHolder
  */
 abstract class CBaseAdapter<T, V : BaseViewHolder> : BaseQuickAdapter<T, V> {
 
-    constructor(layoutResId: Int, data: List<T>?) : super(layoutResId, data) {}
+    constructor(layoutResId: Int, data: List<T>?) : super(layoutResId, data) {
+        setLoadMoreView(CLoadMoreView())
+    }
 
-    constructor(data: List<T>?) : super(data) {}
+    constructor(data: List<T>?) : super(data) {
+        setLoadMoreView(CLoadMoreView())
+    }
 
-    constructor(layoutResId: Int) : super(layoutResId) {}
+    constructor(layoutResId: Int) : super(layoutResId) {
+        setLoadMoreView(CLoadMoreView())
+    }
+
 }

@@ -2,7 +2,9 @@ package com.sanron.pppig.base
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
+import android.arch.lifecycle.MutableLiveData
 import com.sanron.pppig.app.PiApp
+import com.sanron.pppig.util.SingleLiveEvent
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -15,6 +17,8 @@ import io.reactivex.disposables.Disposable
 open class BaseViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mCompositeDisposable = CompositeDisposable()
+
+    val toastCmd = MutableLiveData<String>()
 
     fun addDisposable(disposable: Disposable) {
         if (!mCompositeDisposable.isDisposed) {
