@@ -16,6 +16,8 @@ abstract class LazyFragment<T : ViewDataBinding, M : BaseViewModel> : BaseFragme
 
     private var mFirstVisible = true
 
+    var isActive = false
+
     private var mInitedData = false
 
     //加载数据
@@ -29,12 +31,18 @@ abstract class LazyFragment<T : ViewDataBinding, M : BaseViewModel> : BaseFragme
             if (userVisibleHint) {
                 invokeVisible()
             } else {
-                onInvisible()
+                invokeInvisible()
             }
         }
     }
 
+    private fun invokeInvisible() {
+        isActive = false
+        onInvisible()
+    }
+
     private fun invokeVisible() {
+        isActive = true
         onVisible(mFirstVisible)
         if (mFirstVisible) {
             mFirstVisible = false

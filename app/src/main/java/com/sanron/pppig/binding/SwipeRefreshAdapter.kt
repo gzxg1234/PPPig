@@ -1,13 +1,32 @@
 package com.sanron.pppig.binding
 
+import android.arch.lifecycle.Observer
 import android.databinding.*
 import android.support.v4.widget.SwipeRefreshLayout
+import com.sanron.pppig.common.PageLoader
 
 /**
  *Author:sanron
  *Time:2019/4/17
  *Description:
  */
+
+@BindingAdapter(value = ["android:pageLoader"], requireAll = false)
+fun bindPageLoader(refreshLayout: SwipeRefreshLayout, pageLoader: PageLoader<*>) {
+    refreshLayout.setOnRefreshListener {
+        pageLoader.refreshing.value = true
+        pageLoader.refresh()
+    }
+    pageLoader.refreshing.observe(pageLoader.lifecycleOwner!!, Observer {
+        if (!refreshLayout.isAttachedToWindow && it == true) {
+            refreshLayout.postDelayed({
+                refreshLayout.isRefreshing = true
+            }, 100)
+            return@Observer
+        }
+        refreshLayout.isRefreshing = it ?: false
+    })
+}
 
 
 @InverseBindingMethods(InverseBindingMethod(type = SwipeRefreshLayout::class, attribute = "android:refreshing"))

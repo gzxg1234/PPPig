@@ -93,8 +93,9 @@ class KKMaoParser {
         return list
     }
 
-    fun parseMovieList(html: String): ListData<VideoItem> {
-        var data = ListData<VideoItem>()
+    fun parseMovieList(html: String): PageData<VideoItem> {
+        var data = PageData<VideoItem>()
+        data.data = mutableListOf()
         val doc = Jsoup.parse(html)
         doc?.let {
             //是否有下一页按钮
@@ -114,14 +115,14 @@ class KKMaoParser {
                 it.select(".picsize>.title").first().apply {
                     item.label = this.text()
                 }
-                data.data.add(item)
+                data.data?.add(item)
             }
         }
         return data
     }
 
-    fun parseTopMovie(html: String): ListData<VideoItem> {
-        var data = ListData<VideoItem>()
+    fun parseTopMovie(html: String): PageData<VideoItem> {
+        var data = PageData<VideoItem>()
         val doc = Jsoup.parse(html)
         doc?.let {
             doc.select(".main.top>.all_tab>#resize_list>li>a")?.forEach {
@@ -134,10 +135,10 @@ class KKMaoParser {
                 it.select(".picsize>.name").first().apply {
                     item.label = this.text()
                 }
-                data.data.add(item)
+                data.data?.add(item)
             }
         }
-        CLog.d(TAG, "top movie :" + data.data.size)
+        CLog.d(TAG, "top movie :" + data.data?.size)
         return data
     }
 
@@ -149,22 +150,22 @@ class KKMaoParser {
             home!!.banner = parseBaner(doc)
             home!!.categories.add(HomeCat().apply {
                 name = "热映电影"
-                type = HomeCat.Companion.MOVIE
+                type = HomeCat.MOVIE
                 items = parseHotMovie(doc)
             })
             home!!.categories.add(HomeCat().apply {
                 name = "热播电视"
-                type = HomeCat.Companion.TV
+                type = HomeCat.TV
                 items = parseTv(doc)
             })
             home!!.categories.add(HomeCat().apply {
                 name = "动漫"
-                type = HomeCat.Companion.ANIM
+                type = HomeCat.ANIM
                 items = parseAnim(doc)
             })
             home!!.categories.add(HomeCat().apply {
                 name = "综艺"
-                type = HomeCat.Companion.VARIETY
+                type = HomeCat.VARIETY
                 items = parseVariety(doc)
             })
         }

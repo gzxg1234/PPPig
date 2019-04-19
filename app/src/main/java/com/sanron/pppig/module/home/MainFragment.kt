@@ -4,6 +4,8 @@ import android.arch.lifecycle.ViewModelProviders
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.util.SparseArray
+import com.flyco.tablayout.listener.OnTabSelectListener
 import com.sanron.pppig.R
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.databinding.FragmentMainBinding
@@ -17,6 +19,7 @@ import com.sanron.pppig.module.micaitu.movie.MovieFragment
  */
 class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
 
+    private lateinit var pageAdapter: PageAdapter
 
     override fun createViewModel(): MainFragViewModel {
         return ViewModelProviders.of(this).get(MainFragViewModel::class.java)
@@ -27,8 +30,16 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
     override fun initView() {
-        binding!!.viewPager.adapter = PageAdapter(childFragmentManager)
+        binding!!.viewPager.adapter = PageAdapter(childFragmentManager).apply { pageAdapter = this }
         binding!!.tabLayout.setViewPager(binding!!.viewPager)
+        binding!!.tabLayout.setOnTabSelectListener(object : OnTabSelectListener {
+            override fun onTabSelect(position: Int) {
+            }
+
+            override fun onTabReselect(position: Int) {
+                (pageAdapter.getFragment(position) as IMainChildFragment).onReselect()
+            }
+        })
     }
 
     override fun initData() {
@@ -37,15 +48,19 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
 
     private class PageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
+        private val fragments = SparseArray<Fragment>()
+
         companion object {
             val TITLES = arrayOf("首页", "电影")
         }
 
+        fun getFragment(pos: Int): Fragment = fragments[pos]
+
         override fun getItem(i: Int): Fragment {
-            return when (i) {
+            return (when (i) {
                 0 -> HomeFragment()
                 else -> MovieFragment()
-            }
+            } as Fragment).apply { fragments.put(i, this) }
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

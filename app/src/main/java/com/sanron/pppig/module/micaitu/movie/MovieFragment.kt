@@ -16,6 +16,7 @@ import android.widget.RadioButton
 import com.sanron.pppig.R
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.databinding.FragmentMovieBinding
+import com.sanron.pppig.module.home.IMainChildFragment
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.util.inflater
@@ -27,14 +28,13 @@ import java.util.*
  *Time:2019/4/16
  *Description:
  */
-class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>() {
+class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>(), IMainChildFragment {
 
     private lateinit var adapter: MovieAdapter
     private var bgAnim: ObjectAnimator? = null
 
     override fun initData() {
-        viewModel!!.refreshing.value = true
-        viewModel!!.loadData(true)
+        setupFilter()
     }
 
     override fun getLayout() = R.layout.fragment_movie
@@ -43,36 +43,28 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>() {
         return ViewModelProviders.of(this).get(MovieViewModel::class.java)
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun initView() {
-        val binding = binding!!
-        val viewModel = viewModel!!
-        binding.apply {
-            lifecycleOwner = this@MovieFragment
-            model = viewModel
-
-            recyclerView.pauseFrescoOnScroll()
-            recyclerView.layoutManager = GridLayoutManager(context, 3)
-            recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
-
-            adapter = MovieAdapter(viewModel!!.data.value)
-            adapter.lifecycleOwner = this@MovieFragment
-            adapter.bindToRecyclerView(recyclerView)
+    override fun onReselect() {
+        viewModel?.pageLoader?.apply {
+            refreshing.value = true
+            binding!!.recyclerView.smoothScrollToPosition(0)
+            refresh()
         }
-        viewModel.apply {
-            data.observe(this@MovieFragment, Observer {
-                adapter.notifyDataSetChanged()
-            })
+    }
+
+    private fun setupFilter() {
+        viewModel?.apply {
             val updateTagText = {
-                val typeText = "类型:" + binding.root.findViewById<RadioButton>(checkType.value
+                val typeText = "类型:" + binding?.root?.findViewById<RadioButton>(checkType.value
                         ?: 0)?.text.toString()
-                val countryText = "国家:" + binding.root.findViewById<RadioButton>(checkCountry.value
+                val countryText = "国家:" + binding?.root?.findViewById<RadioButton>(checkCountry.value
                         ?: 0)?.text.toString()
-                val yearText = "年份:" + binding.root.findViewById<RadioButton>(checkYear.value
+                val yearText = "年份:" + binding?.root?.findViewById<RadioButton>(checkYear.value
                         ?: 0)?.text.toString()
                 tagsText.value = TextUtils.join(" ", arrayOf(typeText, countryText, yearText))
-                refreshing.value = true
-                loadData(true)
+                if (isActive) {
+                    pageLoader.refreshing.value = true
+                    pageLoader.refresh()
+                }
             }
             checkType.observe(this@MovieFragment, Observer {
                 updateTagText()
@@ -81,10 +73,29 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>() {
                 updateTagText()
             })
             checkYear.observe(this@MovieFragment, Observer {
-                yearParam = binding.root.findViewById<RadioButton>(it
+                yearParam = binding?.root?.findViewById<RadioButton>(it
                         ?: 0)?.getTag(R.id.action_bar) as String? ?: ""
                 updateTagText()
             })
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun initView() {
+        binding?.apply {
+            lifecycleOwner = this@MovieFragment
+            model = viewModel
+            model!!.pageLoader.lifecycleOwner = this@MovieFragment
+            recyclerView.pauseFrescoOnScroll()
+            recyclerView.layoutManager = GridLayoutManager(context, 3)
+            recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
+
+            adapter = MovieAdapter(this@MovieFragment, viewModel!!.pageLoader.data.value)
+            adapter.lifecycleOwner = this@MovieFragment
+            adapter.bindToRecyclerView(recyclerView)
+        }
+        viewModel?.apply {
+
             toggleFilterCmd.observe(this@MovieFragment, Observer {
                 showFilterWindow(it)
             })

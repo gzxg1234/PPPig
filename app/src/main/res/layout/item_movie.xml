@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
-                android:url="@{model.img}"
+                android:url="@{model.item.img}"
                 app:actualImageScaleType="centerCrop"
                 app:viewAspectRatio="0.85" />
 
@@ -44,7 +44,7 @@
                 android:paddingTop="2dp"
                 android:paddingRight="4dp"
                 android:paddingBottom="2dp"
-                android:text="@{model.label}"
+                android:text='@{model.item.label,default=""}'
                 android:textColor="@color/white"
                 android:textSize="12dp"
                 tools:text="中文高清" />
@@ -56,7 +56,7 @@
                 android:layout_gravity="bottom"
                 android:gravity="center"
                 android:maxLines="1"
-                android:text="@{model.name}"
+                android:text='@{model.item.name,default=""}'
                 android:textColor="@color/textColor1"
                 app:autoSizeMaxTextSize="14dp"
                 app:autoSizeMinTextSize="10dp"

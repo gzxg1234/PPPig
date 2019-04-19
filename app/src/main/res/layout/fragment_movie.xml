@@ -18,8 +18,7 @@
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:onRefresh="@{()->model.loadData(true)}"
-            android:refreshing="@{model.refreshing}">
+            android:pageLoader="@{model.pageLoader}">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -33,12 +32,10 @@
                     android:layout_marginTop="40dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:loadMoreEnable="@{true}"
-                    android:loadMoreState="@{model.loadMoreState}"
-                    android:onLoadMore="@{()->model.loadData(false)}"
                     android:paddingLeft="16dp"
                     android:paddingTop="8dp"
-                    android:paddingRight="16dp" />
+                    android:paddingRight="16dp"
+                    android:pageLoader="@{model.pageLoader}" />
 
                 <FrameLayout
                     android:id="@+id/fl_bg"

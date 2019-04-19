@@ -27,6 +27,7 @@ import com.sanron.pppig.data.bean.micaitu.VideoItem
 import com.sanron.pppig.databinding.FragmentHomeBinding
 import com.sanron.pppig.databinding.ItemHomeVideoBinding
 import com.sanron.pppig.databinding.ItemVideoListTitleBinding
+import com.sanron.pppig.module.home.IMainChildFragment
 import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_TITLE
 import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_VIDEO
 import com.sanron.pppig.util.*
@@ -37,7 +38,7 @@ import com.tmall.ultraviewpager.UltraViewPager
  * Time:2019/2/21
  * Description:
  */
-class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>() {
+class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainChildFragment {
 
     companion object {
         const val TYPE_BANNER = 1
@@ -62,6 +63,12 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>() {
 
     override fun getLayout(): Int {
         return R.layout.fragment_home
+    }
+
+    override fun onReselect() {
+        viewModel!!.refresh.value = true
+        viewModel!!.loadData()
+        binding!!.recyclerView.smoothScrollToPosition(0)
     }
 
     fun initBannerAdapter(): SimpleViewAdapter {

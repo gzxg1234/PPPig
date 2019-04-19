@@ -14,6 +14,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
  */
 class MainFragViewModel(application: Application) : BaseViewModel(application) {
 
+    val onTabReselectListener: ((Int) -> Unit)? = null
 
 
     fun getData() {

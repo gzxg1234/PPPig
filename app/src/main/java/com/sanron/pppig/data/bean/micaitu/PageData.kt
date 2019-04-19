@@ -5,9 +5,9 @@ package com.sanron.pppig.data.bean.micaitu
  *Time:2019/4/16
  *Description:
  */
-class ListData<T> {
+class PageData<T> {
 
-    var data: MutableList<T> = mutableListOf()
+    var data: MutableList<T>? = null
 
     var hasMore = false
 }

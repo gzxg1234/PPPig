@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder
 import com.sanron.pppig.BuildConfig
 import com.sanron.pppig.data.api.MicaituApi
 import com.sanron.pppig.data.bean.micaitu.Home
-import com.sanron.pppig.data.bean.micaitu.ListData
+import com.sanron.pppig.data.bean.micaitu.PageData
 import com.sanron.pppig.data.bean.micaitu.VideoItem
 import com.sanron.pppig.data.parser.KKMaoParser
 import io.reactivex.Observable
@@ -57,13 +57,13 @@ object Repo {
                 .map { s -> KKMaoParser.instance.parseHome(s.string()) }
     }
 
-    fun getTopMovie(): Observable<ListData<VideoItem>> {
+    fun getTopMovie(): Observable<PageData<VideoItem>> {
         return getService(MicaituApi::class.java)
                 .topMovie()
                 .map { s -> KKMaoParser.instance.parseTopMovie(s.string()) }
     }
 
-    fun getAll(type: String?, country: String?, year: String?, page: Int): Observable<ListData<VideoItem>> {
+    fun getAll(type: String?, country: String?, year: String?, page: Int): Observable<PageData<VideoItem>> {
         return getService(MicaituApi::class.java)
                 .all(type ?: "movie", page, year ?: "", country ?: "")
                 .map { s -> KKMaoParser.instance.parseMovieList(s.string()) }
