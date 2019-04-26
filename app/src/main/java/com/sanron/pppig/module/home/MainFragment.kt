@@ -25,14 +25,18 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
         return ViewModelProviders.of(this).get(MainFragViewModel::class.java)
     }
 
+    override fun onVisible(first: Boolean) {
+        super.onVisible(first)
+    }
+
     override fun getLayout(): Int {
         return R.layout.fragment_main
     }
 
     override fun initView() {
-        binding!!.viewPager.adapter = PageAdapter(childFragmentManager).apply { pageAdapter = this }
-        binding!!.tabLayout.setViewPager(binding!!.viewPager)
-        binding!!.tabLayout.setOnTabSelectListener(object : OnTabSelectListener {
+        dataBinding.viewPager.adapter = PageAdapter(childFragmentManager).apply { pageAdapter = this }
+        dataBinding.tabLayout.setViewPager(dataBinding.viewPager)
+        dataBinding.tabLayout.setOnTabSelectListener(object : OnTabSelectListener {
             override fun onTabSelect(position: Int) {
             }
 
@@ -43,7 +47,7 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
     override fun initData() {
-        viewModel!!.getData()
+        viewModel.getData()
     }
 
     private class PageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

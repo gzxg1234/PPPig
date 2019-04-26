@@ -3,6 +3,7 @@ package com.sanron.pppig.util
 import android.content.Context
 import android.databinding.Observable
 import android.databinding.ObservableField
+import android.support.annotation.Size
 import android.view.LayoutInflater
 import com.sanron.pppig.BR
 import me.jessyan.autosize.utils.AutoSizeUtils

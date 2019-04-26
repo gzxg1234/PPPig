@@ -6,7 +6,7 @@
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.movie.MovieViewModel" />
+            type="com.sanron.pppig.module.micaitu.movie.MovieVM" />
     </data>
 
     <FrameLayout
@@ -82,51 +82,6 @@
                                 android:paddingRight="16dp"
                                 android:showDividers="middle">
 
-                                <RadioButton
-                                    android:id="@+id/rb_type_all"
-                                    style="@style/TagButton"
-                                    android:checked="true"
-                                    android:text="全部" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_yg"
-                                    style="@style/TagButton"
-                                    android:text="预告片" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_xj"
-                                    style="@style/TagButton"
-                                    android:text="喜剧" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_dz"
-                                    style="@style/TagButton"
-                                    android:text="动作" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_kh"
-                                    style="@style/TagButton"
-                                    android:text="科幻" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_kb"
-                                    style="@style/TagButton"
-                                    android:text="恐怖" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_aq"
-                                    style="@style/TagButton"
-                                    android:text="爱情" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_zz"
-                                    style="@style/TagButton"
-                                    android:text="战争" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_jq"
-                                    style="@style/TagButton"
-                                    android:text="剧情" />
                             </RadioGroup>
                         </HorizontalScrollView>
 
@@ -159,71 +114,6 @@
                                 android:paddingRight="16dp"
                                 android:showDividers="middle">
 
-                                <RadioButton
-                                    android:id="@+id/rb_country_all"
-                                    style="@style/TagButton"
-                                    android:checked="true"
-                                    android:text="全部" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_dl"
-                                    style="@style/TagButton"
-                                    android:text="大陆" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_xg"
-                                    style="@style/TagButton"
-                                    android:text="香港" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_tw"
-                                    style="@style/TagButton"
-                                    android:text="台湾" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_mg"
-                                    style="@style/TagButton"
-                                    android:text="美国" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_hg"
-                                    style="@style/TagButton"
-                                    android:text="韩国" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_rb"
-                                    style="@style/TagButton"
-                                    android:text="日本" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_tg"
-                                    style="@style/TagButton"
-                                    android:text="泰国" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_xjp"
-                                    style="@style/TagButton"
-                                    android:text="新加坡" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_mlxy"
-                                    style="@style/TagButton"
-                                    android:text="马来西亚" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_yd"
-                                    style="@style/TagButton"
-                                    android:text="印度" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_fg"
-                                    style="@style/TagButton"
-                                    android:text="法国" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_jnd"
-                                    style="@style/TagButton"
-                                    android:text="加拿大" />
                             </RadioGroup>
                         </HorizontalScrollView>
 
@@ -255,12 +145,6 @@
                                 android:paddingLeft="16dp"
                                 android:paddingRight="16dp"
                                 android:showDividers="middle">
-
-                                <RadioButton
-                                    android:id="@+id/rb_year_all"
-                                    style="@style/TagButton"
-                                    android:checked="true"
-                                    android:text="全部" />
 
                             </RadioGroup>
                         </HorizontalScrollView>

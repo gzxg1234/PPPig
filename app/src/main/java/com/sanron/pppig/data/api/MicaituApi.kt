@@ -11,6 +11,11 @@ import retrofit2.http.Path
  * Description:
  */
 interface MicaituApi {
+
+
+    @GET("http://m.kkkkmao.com/{path}")
+    fun html(@Path("path") path: String): Observable<ResponseBody>
+
     @GET("http://m.kkkkmao.com/{typeParam}/index_{page}___{year}___{countryParam}_1.html")
     fun all(@Path("typeParam") type: String,
             @Path("page") page: Int,

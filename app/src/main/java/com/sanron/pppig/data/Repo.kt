@@ -5,6 +5,7 @@ import com.sanron.pppig.BuildConfig
 import com.sanron.pppig.data.api.MicaituApi
 import com.sanron.pppig.data.bean.micaitu.Home
 import com.sanron.pppig.data.bean.micaitu.PageData
+import com.sanron.pppig.data.bean.micaitu.VideoDetail
 import com.sanron.pppig.data.bean.micaitu.VideoItem
 import com.sanron.pppig.data.parser.KKMaoParser
 import io.reactivex.Observable
@@ -29,7 +30,7 @@ object Repo {
                 .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                 .client(createOkHttp())
                 .validateEagerly(BuildConfig.DEBUG)
-                .baseUrl("https://www.baidu.com")
+                .baseUrl("https://m.kkkkmao.com")
                 .build()
     }
 
@@ -61,6 +62,12 @@ object Repo {
         return getService(MicaituApi::class.java)
                 .topMovie()
                 .map { s -> KKMaoParser.instance.parseTopMovie(s.string()) }
+    }
+
+    fun getVideoDetail(path: String): Observable<VideoDetail> {
+        return getService(MicaituApi::class.java)
+                .html(path)
+                .map { s -> KKMaoParser.instance.parseVideoDetail(s.string()) }
     }
 
     fun getAll(type: String?, country: String?, year: String?, page: Int): Observable<PageData<VideoItem>> {

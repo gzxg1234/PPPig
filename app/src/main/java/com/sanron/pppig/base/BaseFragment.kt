@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.sanron.pppig.util.CLog
 import com.sanron.pppig.util.showToast
 
 /**
@@ -17,10 +18,20 @@ import com.sanron.pppig.util.showToast
  */
 abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment() {
 
-    protected var binding: T? = null
+    private var mDataBinding: T? = null
 
-    protected var viewModel: M? = null
+    private var mViewModel: M? = null
 
+    var dataBinding: T
+        private set(value) {}
+        get() {
+            return mDataBinding!!
+        }
+    var viewModel: M
+        private set(value) {}
+        get() {
+            return mViewModel!!
+        }
 
     protected abstract fun getLayout(): Int
 
@@ -30,7 +41,7 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel?.apply {
+        mViewModel?.apply {
             toastCmd.observe(this@BaseFragment, Observer {
                 showToast(it!!)
             })
@@ -38,12 +49,12 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        if (binding == null) {
-            binding = DataBindingUtil.inflate(inflater, getLayout(), container, false)
-            viewModel = createViewModel()
+        if (mDataBinding == null) {
+            mDataBinding = DataBindingUtil.inflate(inflater, getLayout(), container, false)
+            mViewModel = createViewModel()
             initView()
         }
-        return binding?.root
+        return mDataBinding?.root
     }
 
 }

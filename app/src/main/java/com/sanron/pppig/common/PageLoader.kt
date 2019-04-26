@@ -10,20 +10,18 @@ import com.sanron.pppig.util.SingleLiveEvent
 import com.sanron.pppig.util.main
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import java.lang.ref.WeakReference
 
 /**
  *Author:sanron
  *Time:2019/4/19
- *Description:
+ *Description:通用列表加载类
  */
-class PageLoader<T> : LifecycleObserver {
-
-
-    var fetch: ((page: Int) -> Observable<PageData<T>>)? = null
+class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) : LifecycleObserver {
 
     var adapter: BaseQuickAdapter<T, *>? = null
 
-    val data = MutableLiveData<MutableList<T>>().apply {
+    val listData = MutableLiveData<MutableList<T>>().apply {
         value = mutableListOf()
     }
 
@@ -35,12 +33,13 @@ class PageLoader<T> : LifecycleObserver {
         value = RecyclerViewAdapter.STATE_COMPLETE
     }
 
-    var lifecycleOwner: LifecycleOwner? = null
-        set(value) {
-            value?.lifecycle?.addObserver(this)
-            field = value
-        }
+    var lifecycleOwnerRef: WeakReference<LifecycleOwner>? = null
 
+    var lifecycleOwner: LifecycleOwner?
+        get() = lifecycleOwnerRef?.get()
+        set(value) {
+            lifecycleOwnerRef = WeakReference<LifecycleOwner>(value)
+        }
 
     var diffResult = SingleLiveEvent<DiffUtil.DiffResult>()
 
@@ -53,6 +52,7 @@ class PageLoader<T> : LifecycleObserver {
     var scrollToTop = SingleLiveEvent<Void>()
 
     fun refresh() {
+        refreshing.value = true
         loadData(true)
     }
 
@@ -67,7 +67,7 @@ class PageLoader<T> : LifecycleObserver {
 
     private fun loadData(refresh: Boolean) {
         val reqPage = if (refresh) 1 else page + 1
-        fetch?.invoke(reqPage)!!
+        fetch.invoke(reqPage)!!
                 .main()
                 .subscribe(object : BaseObserver<PageData<T>>() {
                     override fun onSubscribe(d: Disposable) {
@@ -79,12 +79,12 @@ class PageLoader<T> : LifecycleObserver {
                     override fun onNext(t: PageData<T>) {
                         super.onNext(t)
                         if (refresh) {
-                            data.value?.clear()
+                            listData.value?.clear()
                         }
                         t.data?.apply {
-                            data.value?.addAll(this)
+                            listData.value?.addAll(this)
                         }
-                        data.value = data.value
+                        listData.value = listData.value
 
                         diffCallback?.let {
                             diffResult.value = DiffUtil.calculateDiff(diffCallback!!)

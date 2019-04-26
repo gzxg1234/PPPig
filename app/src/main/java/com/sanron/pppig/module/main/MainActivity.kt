@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentPagerAdapter
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.databinding.ActivityMainBinding
-import com.sanron.pppig.module.home.MainFragViewModel
 import com.sanron.pppig.module.home.MainFragment
 import com.sanron.pppig.module.live.LiveFragment
 
@@ -34,10 +33,10 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     }
 
     private fun initView() {
-        mDataBinding!!.apply{
+        dataBinding!!.apply{
             viewPager.adapter = HomePageAdapter(supportFragmentManager)
             bottomNavigationBar.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
-            bottomNavigationBar.setupWithViewPager(mDataBinding!!.viewPager)
+            bottomNavigationBar.setupWithViewPager(dataBinding!!.viewPager)
         }
     }
 

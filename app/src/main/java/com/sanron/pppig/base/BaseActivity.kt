@@ -12,24 +12,31 @@ import android.support.v7.app.AppCompatActivity
  */
 abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatActivity() {
 
-    protected var mActivity: BaseActivity<T, M>? = null
+    protected lateinit var activity: BaseActivity<T, M>
 
     abstract val layout: Int
 
-    protected var mDataBinding: T? = null
+    private var mDataBinding: T? = null
 
-    protected var mViewModel: M? = null
+    private var mViewModel: M? = null
 
     abstract fun createViewModel(): M
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mActivity = this
+        activity = this
         mDataBinding = DataBindingUtil.setContentView(this, layout)
         mViewModel = createViewModel()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
+    var dataBinding: T
+        private set(value) {}
+        get() {
+            return mDataBinding!!
+        }
+    var viewModel: M
+        private set(value) {}
+        get() {
+            return mViewModel!!
+        }
 }

@@ -8,7 +8,6 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.widget.GridLayoutManager
-import android.text.TextUtils
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
@@ -21,14 +20,13 @@ import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.util.inflater
 import com.sanron.pppig.util.pauseFrescoOnScroll
-import java.util.*
 
 /**
  *Author:sanron
  *Time:2019/4/16
  *Description:
  */
-class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>(), IMainChildFragment {
+class MovieFragment : LazyFragment<FragmentMovieBinding, MovieVM>(), IMainChildFragment {
 
     private lateinit var adapter: MovieAdapter
     private var bgAnim: ObjectAnimator? = null
@@ -39,50 +37,39 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>(), IMai
 
     override fun getLayout() = R.layout.fragment_movie
 
-    override fun createViewModel(): MovieViewModel? {
-        return ViewModelProviders.of(this).get(MovieViewModel::class.java)
+    override fun createViewModel(): MovieVM? {
+        return ViewModelProviders.of(this).get(MovieVM::class.java)
     }
 
     override fun onReselect() {
-        viewModel?.pageLoader?.apply {
-            refreshing.value = true
-            binding!!.recyclerView.smoothScrollToPosition(0)
+        viewModel.pageLoader.apply {
+            dataBinding.recyclerView.smoothScrollToPosition(0)
             refresh()
         }
     }
 
     private fun setupFilter() {
-        viewModel?.apply {
-            val updateTagText = {
-                val typeText = "类型:" + binding?.root?.findViewById<RadioButton>(checkType.value
-                        ?: 0)?.text.toString()
-                val countryText = "国家:" + binding?.root?.findViewById<RadioButton>(checkCountry.value
-                        ?: 0)?.text.toString()
-                val yearText = "年份:" + binding?.root?.findViewById<RadioButton>(checkYear.value
-                        ?: 0)?.text.toString()
-                tagsText.value = TextUtils.join(" ", arrayOf(typeText, countryText, yearText))
+        viewModel.apply {
+            val refreshData = {
                 if (isActive) {
-                    pageLoader.refreshing.value = true
                     pageLoader.refresh()
                 }
             }
             checkType.observe(this@MovieFragment, Observer {
-                updateTagText()
+                refreshData()
             })
             checkCountry.observe(this@MovieFragment, Observer {
-                updateTagText()
+                refreshData()
             })
             checkYear.observe(this@MovieFragment, Observer {
-                yearParam = binding?.root?.findViewById<RadioButton>(it
-                        ?: 0)?.getTag(R.id.action_bar) as String? ?: ""
-                updateTagText()
+                refreshData()
             })
         }
     }
 
     @SuppressLint("SetTextI18n")
     override fun initView() {
-        binding?.apply {
+        dataBinding.apply {
             lifecycleOwner = this@MovieFragment
             model = viewModel
             model!!.pageLoader.lifecycleOwner = this@MovieFragment
@@ -90,22 +77,22 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>(), IMai
             recyclerView.layoutManager = GridLayoutManager(context, 3)
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
-            adapter = MovieAdapter(this@MovieFragment, viewModel!!.pageLoader.data.value)
+            adapter = MovieAdapter(this@MovieFragment, viewModel.pageLoader.listData.value)
             adapter.lifecycleOwner = this@MovieFragment
             adapter.bindToRecyclerView(recyclerView)
         }
-        viewModel?.apply {
+        viewModel.apply {
 
             toggleFilterCmd.observe(this@MovieFragment, Observer {
                 showFilterWindow(it)
             })
         }
-        buildYear()
+        buildFilter()
     }
 
     private fun showFilterWindow(show: Boolean?) {
         val DURATION = 200L
-        binding?.apply {
+        dataBinding.apply {
             llTags.clearAnimation()
             bgAnim?.end()
             val transAnim: Animation?
@@ -133,36 +120,26 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieViewModel>(), IMai
         }
     }
 
-    /**
-     * 动态添加年份标签
-     */
-    private fun buildYear() {
-        binding!!.apply {
-            val nowYear = Date().year + 1900
-            val years = nowYear / 10 * 10
-            //添加当前年代的年份
-            for (i in nowYear downTo years) {
-                val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
-                rb.id = View.generateViewId()
-                rb.text = i.toString()
-                rb.setTag(R.id.action_bar, i.toString())
-                rgYear.addView(rb)
-            }
-            //添加历史年代
-            for (i in years downTo 1980 step 10) {
-                val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
-                rb.id = View.generateViewId()
-                rb.text = "${i}年代"
-                rb.setTag(R.id.action_bar, "$i,${i + 9}")
-                rgYear.addView(rb)
-            }
-            //更早年代
-            val rb = context!!.inflater.inflate(R.layout.tag_button, rgYear, false) as RadioButton
-            rb.id = View.generateViewId()
-            rb.text = "更早"
-            rb.setTag(R.id.action_bar, "1900,1979")
-            rgYear.addView(rb)
+    private fun buildFilter() {
+        for ((id, type) in viewModel.TYPES.withIndex()) {
+            val rb = context!!.inflater.inflate(R.layout.tag_button, dataBinding.rgType, false) as RadioButton
+            rb.id = id
+            rb.text = type.first
+            dataBinding.rgType.addView(rb)
+        }
+        for ((id, type) in viewModel.COUNTRYS.withIndex()) {
+            val rb = context!!.inflater.inflate(R.layout.tag_button, dataBinding.rgCountry, false) as RadioButton
+            rb.id = id
+            rb.text = type.first
+            dataBinding.rgCountry.addView(rb)
+        }
+        for ((id, type) in viewModel.YEARS.withIndex()) {
+            val rb = context!!.inflater.inflate(R.layout.tag_button, dataBinding.rgYear, false) as RadioButton
+            rb.id = id
+            rb.text = type.first
+            dataBinding.rgYear.addView(rb)
         }
     }
+
 }
 

@@ -60,11 +60,11 @@ abstract class LazyFragment<T : ViewDataBinding, M : BaseViewModel> : BaseFragme
         mInitedData = false
     }
 
-    protected fun onVisible(first: Boolean) {
+    protected open fun onVisible(first: Boolean) {
         CLog.d(TAG, this.javaClass.simpleName + " onVisible")
     }
 
-    protected fun onInvisible() {
+    protected open fun onInvisible() {
         CLog.d(TAG, this.javaClass.simpleName + " onInvisible")
     }
 

@@ -1,10 +1,13 @@
 package com.sanron.pppig.module.micaitu.home
 
+import android.app.Activity
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.databinding.DataBindingUtil
+import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.app.SharedElementCallback
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -18,6 +21,7 @@ import com.alibaba.android.vlayout.layout.GridLayoutHelper
 import com.alibaba.android.vlayout.layout.SingleLayoutHelper
 import com.facebook.drawee.view.SimpleDraweeView
 import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
 import com.sanron.pppig.app.PiApp
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.data.bean.micaitu.Banner
@@ -25,11 +29,12 @@ import com.sanron.pppig.data.bean.micaitu.Home
 import com.sanron.pppig.data.bean.micaitu.HomeCat
 import com.sanron.pppig.data.bean.micaitu.VideoItem
 import com.sanron.pppig.databinding.FragmentHomeBinding
-import com.sanron.pppig.databinding.ItemHomeVideoBinding
+import com.sanron.pppig.databinding.ItemVideoBinding
 import com.sanron.pppig.databinding.ItemVideoListTitleBinding
 import com.sanron.pppig.module.home.IMainChildFragment
 import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_TITLE
 import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_VIDEO
+import com.sanron.pppig.module.micaitu.movie.ItemVideoVM
 import com.sanron.pppig.util.*
 import com.tmall.ultraviewpager.UltraViewPager
 
@@ -38,7 +43,7 @@ import com.tmall.ultraviewpager.UltraViewPager
  * Time:2019/2/21
  * Description:
  */
-class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainChildFragment {
+class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFragment {
 
     companion object {
         const val TYPE_BANNER = 1
@@ -53,12 +58,12 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainCh
     lateinit var adapter: DelegateAdapter
 
     override fun initData() {
-        viewModel!!.refresh.value = true
-        viewModel!!.loadData()
+        viewModel.refresh.value = true
+        viewModel.loadData()
     }
 
-    override fun createViewModel(): HomeViewModel? {
-        return ViewModelProviders.of(this).get(HomeViewModel::class.java)
+    override fun createViewModel(): HomeVM? {
+        return ViewModelProviders.of(this).get(HomeVM::class.java)
     }
 
     override fun getLayout(): Int {
@@ -66,13 +71,13 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainCh
     }
 
     override fun onReselect() {
-        viewModel!!.refresh.value = true
-        viewModel!!.loadData()
-        binding!!.recyclerView.smoothScrollToPosition(0)
+        viewModel.refresh.value = true
+        viewModel.loadData()
+        dataBinding.recyclerView.smoothScrollToPosition(0)
     }
 
     fun initBannerAdapter(): SimpleViewAdapter {
-        val banner = context!!.inflater.inflate(R.layout.item_banner, binding!!.recyclerView, false) as UltraViewPager
+        val banner = context!!.inflater.inflate(R.layout.item_banner, dataBinding.recyclerView, false) as UltraViewPager
         banner.setPageTransformer(true) { p0, p1 ->
             if (p1 < 0) {
                 p0.scaleX = 1 + p1 * 0.1f
@@ -99,7 +104,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainCh
     }
 
     override fun initView() {
-        binding!!.apply {
+        dataBinding.apply {
             lifecycleOwner = this@HomeFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
@@ -114,8 +119,25 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainCh
             adapter = DelegateAdapter(layoutManager, true)
             recyclerView.adapter = adapter
         }
-        viewModel!!.homeData.observe(this@HomeFragment, Observer<Home> { homeData ->
-            binding?.apply {
+        viewModel.toVideoDetail.observe(this, Observer {
+            val intent = Intents.movieDetail(context!!, it?.link)
+            startActivity(intent)
+        })
+        activity?.setExitSharedElementCallback(object : SharedElementCallback() {
+            override fun onSharedElementEnd(sharedElementNames: MutableList<String>?, sharedElements: MutableList<View>?, sharedElementSnapshots: MutableList<View>?) {
+                super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots)
+                if (sharedElements != null) {
+                    for (v in sharedElements) {
+                        //fresco用shareElement回来后会被设置为invisible导致不见
+                        if (v is SimpleDraweeView) {
+                            v.visibility = View.VISIBLE
+                        }
+                    }
+                }
+            }
+        })
+        viewModel.homeData.observe(this@HomeFragment, Observer<Home> { homeData ->
+            dataBinding.apply {
                 val adapters = mutableListOf<DelegateAdapter.Adapter<*>>()
                 val viewPager = bannerAdapter.view as UltraViewPager
                 if (homeData?.banner?.size ?: 0 <= 1) {
@@ -136,11 +158,12 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeViewModel>(), IMainCh
                 }
                 adapters.add(bannerAdapter)
                 homeData?.categories?.forEachIndexed { index, homeCat ->
-                    val binding = DataBindingUtil.inflate<ItemVideoListTitleBinding>(context!!.inflater, R.layout.item_video_list_title, binding!!.recyclerView, false)
-                    binding.model = CatTitleModel(PiApp.sInstance)
+                    val binding = DataBindingUtil.inflate<ItemVideoListTitleBinding>(context!!.inflater, R.layout.item_video_list_title, dataBinding.recyclerView, false)
                     binding.lifecycleOwner = this@HomeFragment
                     adapters.add(TitleAdapter(binding, homeCat, context!!.dp2px(12f)))
-                    adapters.add(VideoAdapter(context!!, homeCat.items))
+
+                    val videoAdapter = VideoAdapter(this@HomeFragment, homeCat.items)
+                    adapters.add(videoAdapter)
                 }
                 adapter.setAdapters(adapters)
             }
@@ -156,19 +179,22 @@ class TitleAdapter(binding: ItemVideoListTitleBinding, val homeCat: HomeCat, mar
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val binding = DataBindingUtil.getBinding<ItemVideoListTitleBinding>(holder.itemView)
+        val binding = DataBindingUtil.getBinding<ItemVideoListTitleBinding>(holder.itemView)!!
         val icon = when (homeCat.type) {
             HomeCat.MOVIE -> R.drawable.ic_title_movie
             HomeCat.TV -> R.drawable.ic_title_tv
             HomeCat.ANIM -> R.drawable.ic_title_anim
             else -> R.drawable.ic_title_verity
         }
-        binding?.model?.setVariable(homeCat.name, icon)
-        binding?.executePendingBindings()
+        binding.tvTitle.text = homeCat.name
+        binding.ivIcon.setImageResource(icon)
+        binding.executePendingBindings()
     }
 }
 
-class VideoAdapter(val context: Context, val items: List<VideoItem>?) : DelegateAdapter.Adapter<RecyclerView.ViewHolder>() {
+class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem>?) : DelegateAdapter.Adapter<RecyclerView.ViewHolder>() {
+
+    val context = fragment.context!!
 
     override fun getItemCount() = items?.size ?: 0
 
@@ -183,21 +209,24 @@ class VideoAdapter(val context: Context, val items: List<VideoItem>?) : Delegate
     }
 
     override fun onBindViewHolder(p0: RecyclerView.ViewHolder, p1: Int) {
-        val binding = DataBindingUtil.getBinding<ItemHomeVideoBinding>(p0.itemView)
-        binding?.model?.apply {
-            img.value = items!![p1].img
-            name.value = items[p1].name
-            score.value = items[p1].score
-            label.value = items[p1].label
-        }
-        binding?.executePendingBindings()
+        val binding = DataBindingUtil.getBinding<ItemVideoBinding>(p0.itemView)!!
+        binding.model!!.item.value = items!![p1]
+        binding.executePendingBindings()
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemHomeVideoBinding>(p0.context.inflater, R.layout.item_home_video, p0, false)
+        val binding = DataBindingUtil.inflate<ItemVideoBinding>(p0.context.inflater, R.layout.item_video, p0, false)
+        val viewHolder = SimpleViewHolder(binding.root)
         binding.lifecycleOwner = p0.context as LifecycleOwner
-        binding.model = ItemVideoViewModel(PiApp.sInstance)
-        return SimpleViewHolder(binding.root)
+        binding.model = ItemVideoVM(PiApp.sInstance)
+        binding.root.setOnClickListener {
+            val item = binding.model!!.item.value!!
+            val intent = Intents.movieDetail(context, item.link, item.img, item.name)
+            val pair1 = android.support.v4.util.Pair(binding.sdv as View, ViewCompat.getTransitionName(binding.sdv)!!)
+            val activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(context as Activity, pair1)
+            fragment.startActivity(intent, activityOptionsCompat.toBundle())
+        }
+        return viewHolder
     }
 
 

@@ -7,6 +7,8 @@ import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.data.Repo
 import com.sanron.pppig.data.bean.micaitu.Home
+import com.sanron.pppig.data.bean.micaitu.VideoItem
+import com.sanron.pppig.util.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
@@ -14,11 +16,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
  * Time:2019/2/21
  * Description:
  */
-class HomeViewModel(application: Application) : BaseViewModel(application) {
+class HomeVM(application: Application) : BaseViewModel(application) {
 
 
     val homeData = MutableLiveData<Home>()
     val refresh = MutableLiveData<Boolean>()
+    val toVideoDetail = SingleLiveEvent<VideoItem>()
 
     init {
         refresh.value = false

@@ -7,7 +7,7 @@ import android.view.MotionEvent
 
 /**
  * author:mingking
- * data:2016/6/30
+ * listData:2016/6/30
  */
 class NoScrollViewPager : ViewPager {
 

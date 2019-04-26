@@ -6,7 +6,7 @@
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.home.HomeViewModel" />
+            type="com.sanron.pppig.module.micaitu.home.HomeVM" />
     </data>
 
     <com.sanron.pppig.widget.PiRefreshLayout

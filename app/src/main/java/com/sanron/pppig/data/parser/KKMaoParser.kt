@@ -4,6 +4,7 @@ import com.sanron.pppig.data.bean.micaitu.*
 import com.sanron.pppig.util.CLog
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.util.regex.Pattern
 
 /**
  * Author:sanron
@@ -12,13 +13,22 @@ import org.jsoup.nodes.Document
  */
 class KKMaoParser {
 
-
     companion object {
         val instance by lazy {
             KKMaoParser()
         }
         const val MAX_LIST_SIZE = 6
-        val TAG = KKMaoParser::class.java.simpleName
+        val TAG: String = KKMaoParser::class.java.simpleName
+        val PATTERN_TITLE: Pattern = Pattern.compile("\\[([\\s\\S]*)]")
+
+        fun completePath(path: String?): String? {
+            path?.let {
+                if (path.startsWith("/")) {
+                    return "http://m.kkkkmao.com$path"
+                }
+            }
+            return path
+        }
     }
 
     private fun parseBaner(doc: Document): List<Banner> {
@@ -34,6 +44,12 @@ class KKMaoParser {
                 it.select(".sTxt>em").first()?.let {
                     banner.title = it.text()
                 }
+                //去除两端括号
+                val matcher = PATTERN_TITLE.matcher(banner.title)
+                if (matcher.find() && matcher.groupCount() > 1) {
+                    banner.title = matcher.group(1)
+                }
+
                 banners.add(banner)
             }
         }
@@ -170,5 +186,26 @@ class KKMaoParser {
             })
         }
         return home
+    }
+
+
+    fun parseVideoDetail(html: String): VideoDetail? {
+        val doc = Jsoup.parse(html)
+        doc?.apply {
+            val detail = VideoDetail()
+            detail.infoList = mutableListOf()
+            select(".vod-n-l>p")?.forEach {
+                detail.infoList!!.add(it.text())
+            }
+            select(".vod-n-l>h1")?.forEach {
+                detail.title = it.text()
+            }
+
+            select("#resize_vod.main>.vod-l>.vod-n-img>img")?.first()?.apply {
+                detail.image = attr("src")
+            }
+            return detail
+        }
+        return null
     }
 }

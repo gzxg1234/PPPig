@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="model"
-            type="com.sanron.pppig.module.micaitu.home.CatTitleModel" />
+            name="homeCat"
+            type="com.sanron.pppig.data.bean.micaitu.HomeCat" />
     </data>
 
     <LinearLayout
@@ -21,7 +21,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:adjustViewBounds="true"
-            android:imgRes="@{model.icon??0}"
             tools:src="@drawable/ic_title_movie" />
 
         <TextView
@@ -30,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_weight="1"
-            android:text="@{model.title}"
             android:textColor="@color/textColor1"
             android:textSize="14dp"
             tools:text="电影热映" />

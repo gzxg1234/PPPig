@@ -7,7 +7,7 @@
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.movie.ItemMovieViewModel" />
+            type="com.sanron.pppig.module.micaitu.movie.ItemVideoVM" />
 
     </data>
 
@@ -29,8 +29,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
+                android:transitionName="video_img"
                 android:url="@{model.item.img}"
                 app:actualImageScaleType="centerCrop"
+                app:failureImage="@drawable/img_load_fail"
+                app:failureImageScaleType="centerInside"
                 app:viewAspectRatio="0.85" />
 
             <TextView
@@ -44,24 +47,41 @@
                 android:paddingTop="2dp"
                 android:paddingRight="4dp"
                 android:paddingBottom="2dp"
-                android:text='@{model.item.label,default=""}'
+                android:text="@{model.item.label}"
                 android:textColor="@color/white"
                 android:textSize="12dp"
                 tools:text="中文高清" />
+
+            <TextView
+                android:id="@+id/tv_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|top"
+                android:background="@drawable/bg_score"
+                android:gone="@{model.scoreGone}"
+                android:paddingLeft="4dp"
+                android:paddingTop="2dp"
+                android:paddingRight="4dp"
+                android:paddingBottom="2dp"
+                android:text="@{model.item.score}"
+                android:textColor="@color/white"
+                android:textSize="12dp"
+                tools:text="8.2" />
 
             <TextView
                 android:id="@+id/tv_name"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_gravity="bottom"
+                android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:text='@{model.item.name,default=""}'
+                android:text="@{model.item.name}"
                 android:textColor="@color/textColor1"
                 app:autoSizeMaxTextSize="14dp"
                 app:autoSizeMinTextSize="10dp"
                 app:autoSizeTextType="uniform"
-                tools:text="Make Something" />
+                tools:text="使徒行者" />
         </android.support.v7.widget.CardView>
     </FrameLayout>
 </layout>
