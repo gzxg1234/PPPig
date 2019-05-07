@@ -15,7 +15,7 @@ android {
         multiDexEnabled true
 
         ndk{
-            abiFilters "armeabi-v7a"
+            abiFilters "armeabi-v7a","x86"
         }
     }
 
@@ -173,10 +173,10 @@ dependencies {
         exclude group:"com.android.support"
     }
 
+    //折叠textView
+    implementation 'com.ms-square:expandableTextView:0.1.4'
+
     implementation('com.sanron.lib:statusbarhelper:1.0.4') {
         exclude group: "com.android.support"
     }
-}
-repositories {
-    mavenCentral()
 }

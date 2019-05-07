@@ -18,7 +18,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val mCompositeDisposable = CompositeDisposable()
 
-    val toastCmd = MutableLiveData<String>()
+    val toastMsg = SingleLiveEvent<String>()
 
     fun addDisposable(disposable: Disposable) {
         if (!mCompositeDisposable.isDisposed) {

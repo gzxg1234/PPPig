@@ -14,7 +14,7 @@ import com.sanron.pppig.databinding.ItemVideoBinding
  *Time:2019/4/16
  *Description:
  */
-class MovieAdapter(var lifecycleOwner: LifecycleOwner,data: List<VideoItem>?) : CBaseAdapter<VideoItem, BaseViewHolder>(R.layout.item_video, data) {
+class MovieAdapter(var lifecycleOwner: LifecycleOwner, data: List<VideoItem>?) : CBaseAdapter<VideoItem, BaseViewHolder>(R.layout.item_video, data) {
 
     override fun convert(helper: BaseViewHolder, item: VideoItem) {
         val dataBinding = DataBindingUtil.bind<ItemVideoBinding>(helper.itemView)!!
@@ -22,9 +22,7 @@ class MovieAdapter(var lifecycleOwner: LifecycleOwner,data: List<VideoItem>?) : 
             dataBinding.model = ItemVideoVM(mContext.applicationContext as Application)
             dataBinding.lifecycleOwner = lifecycleOwner
         }
-        dataBinding.model?.apply {
-            this.item.value = item
-        }
+        dataBinding.model?.item?.value = item
         dataBinding.executePendingBindings()
     }
 }

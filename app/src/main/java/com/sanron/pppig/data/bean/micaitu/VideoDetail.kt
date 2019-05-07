@@ -5,13 +5,16 @@ package com.sanron.pppig.data.bean.micaitu
  * Time:2019/4/24
  * Description:
  */
-class VideoDetail{
+class VideoDetail {
 
-    var title:String? = null
+    var title: String? = null
 
-    var image:String?= null
+    var image: String? = null
 
-    var infoList:MutableList<String>? = null
+    var infoList: MutableList<String>? = null
 
 
+    var source: MutableList<PlaySource>? = null
+
+    var intro: String? = null
 }

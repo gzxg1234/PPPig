@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.sanron.pppig.util.CLog
 import com.sanron.pppig.util.showToast
 
 /**
@@ -41,11 +40,9 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mViewModel?.apply {
-            toastCmd.observe(this@BaseFragment, Observer {
-                showToast(it!!)
-            })
-        }
+        mViewModel?.toastMsg?.observe(this@BaseFragment, Observer {
+            showToast(it)
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -1,4 +1,4 @@
-package com.sanron.pppig.util
+package com.sanron.pppig.widget
 
 import android.support.v4.view.PagerAdapter
 import android.view.View
@@ -9,16 +9,16 @@ import android.view.ViewGroup
  * Time:2019/2/21
  * Description:
  */
-abstract class ViewPagerAdapter<T>(private val mData: List<T>?) : PagerAdapter() {
+abstract class ViewPagerAdapter<T>(private val data: List<T>?) : PagerAdapter() {
 
     override fun getCount(): Int {
-        return mData?.size ?: 0
+        return data?.size ?: 0
     }
 
     abstract fun getView(container: ViewGroup, position: Int, item: T): View
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val view = getView(container, position, mData!![position])
+        val view = getView(container, position, data!![position])
         container.addView(view)
         return view
     }

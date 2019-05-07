@@ -10,11 +10,11 @@ import com.sanron.pppig.app.PiApp
  */
 var toast: Toast? = null
 
-fun showToast(msg: CharSequence, duration: Int = Toast.LENGTH_SHORT) {
+fun showToast(msg: CharSequence?, duration: Int = Toast.LENGTH_SHORT) {
     toast?.apply {
         cancel()
     }
-    toast = Toast.makeText(PiApp.sInstance, msg, duration)
+    toast = Toast.makeText(PiApp.sInstance, msg ?: "", duration)
     toast!!.show()
 }
 

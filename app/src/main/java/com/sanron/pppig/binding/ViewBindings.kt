@@ -4,6 +4,7 @@ import android.databinding.*
 import android.view.View
 import android.widget.ImageView
 import com.facebook.drawee.view.SimpleDraweeView
+import com.ms.square.android.expandabletextview.ExpandableTextView
 import com.sanron.pppig.widget.PiRefreshLayout
 import com.scwang.smartrefresh.layout.constant.RefreshState
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
@@ -39,3 +40,7 @@ fun setGone(view: View, gone: Boolean) {
     view.visibility = if (gone) View.GONE else View.VISIBLE
 }
 
+@BindingAdapter(value=["android:text"])
+fun setText(view:ExpandableTextView,text:String?){
+    view.text = text
+}

@@ -10,11 +10,9 @@ import com.sanron.pppig.module.micaitu.moviedetail.MovieDetailAct
  * Description:
  */
 object Intents {
-    fun movieDetail(context: Context, url: String?, imgUrl: String? = null, videoName: String? = null): Intent {
+    fun movieDetail(context: Context, url: String?): Intent {
         val intent = Intent(context, MovieDetailAct::class.java)
         intent.putExtra(MovieDetailAct.ARG_URL, url)
-        intent.putExtra(MovieDetailAct.ARG_IMG_URL, imgUrl)
-        intent.putExtra(MovieDetailAct.ARG_NAME, videoName)
         return intent
     }
 }

@@ -21,16 +21,11 @@ class KKMaoParser {
         val TAG: String = KKMaoParser::class.java.simpleName
         val PATTERN_TITLE: Pattern = Pattern.compile("\\[([\\s\\S]*)]")
 
-        fun completePath(path: String?): String? {
-            path?.let {
-                if (path.startsWith("/")) {
-                    return "http://m.kkkkmao.com$path"
-                }
-            }
-            return path
-        }
     }
 
+    /**
+     * 解析banner轮播
+     */
     private fun parseBaner(doc: Document): List<Banner> {
         val banners = mutableListOf<Banner>()
         val items = doc.select("#focus>.focusList>.con>a")
@@ -57,6 +52,9 @@ class KKMaoParser {
         return banners
     }
 
+    /**
+     * 解析列表
+     */
     private fun parseCommonList(doc: Document, title: String): MutableList<VideoItem> {
         var list = mutableListOf<VideoItem>()
         doc.select(".modo_title.top>h2>a[title='$title']").first()?.apply {
@@ -109,6 +107,9 @@ class KKMaoParser {
         return list
     }
 
+    /**
+     * 解析电影页
+     */
     fun parseMovieList(html: String): PageData<VideoItem> {
         var data = PageData<VideoItem>()
         data.data = mutableListOf()
@@ -137,6 +138,9 @@ class KKMaoParser {
         return data
     }
 
+    /**
+     * 解析top电影
+     */
     fun parseTopMovie(html: String): PageData<VideoItem> {
         var data = PageData<VideoItem>()
         val doc = Jsoup.parse(html)
@@ -158,6 +162,9 @@ class KKMaoParser {
         return data
     }
 
+    /**
+     * 解析首页数据
+     */
     fun parseHome(html: String): Home? {
         var home: Home? = null
         val doc = Jsoup.parse(html)
@@ -189,10 +196,14 @@ class KKMaoParser {
     }
 
 
+    /**
+     * 解析电影详情
+     */
     fun parseVideoDetail(html: String): VideoDetail? {
         val doc = Jsoup.parse(html)
         doc?.apply {
             val detail = VideoDetail()
+            //介绍信息
             detail.infoList = mutableListOf()
             select(".vod-n-l>p")?.forEach {
                 detail.infoList!!.add(it.text())
@@ -203,6 +214,32 @@ class KKMaoParser {
 
             select("#resize_vod.main>.vod-l>.vod-n-img>img")?.first()?.apply {
                 detail.image = attr("src")
+            }
+
+            //简介
+            selectFirst(".vod-play-info.main>.vod-info-tab>.vod_content")?.apply {
+                detail.intro = ownText()
+            }
+
+            //解析播放列表
+            detail.source = mutableListOf()
+            select(".vod-play-info.main>#con_vod_1>.play-box")?.forEach {
+                val playSource = PlaySource()
+                playSource.name = "播放源"
+                playSource.items = mutableListOf()
+                //找播放源名称
+                select(".vod-play-info.main>#con_vod_1>.play-title>#${it.id()}>a").first()?.let { titleE ->
+                    playSource.name = titleE.ownText()
+                }
+                it.select(".plau-ul-list>li>a").forEach { itemE ->
+                    val item = PlaySource.Item()
+                    item.name = itemE.attr("title")
+                    item.link = itemE.attr("href")
+                    playSource.items?.add(item)
+                }
+                detail.source?.add(playSource)
+
+
             }
             return detail
         }

@@ -46,6 +46,12 @@ fun RecyclerView.pauseFrescoOnScroll() {
     })
 }
 
+inline fun ViewGroup.childForEach(action: (index: Int, v: View) -> Unit) {
+    for (i in 0 until this.childCount) {
+        action(i, this.getChildAt(i))
+    }
+}
+
 /**
  * 设置间距
  */
@@ -57,7 +63,7 @@ fun RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) {
             GridDividerItemDecoration.GRID_DIVIDER_VERTICAL
         addItemDecoration(GridDividerItemDecoration(context, ori).apply {
             setHorizontalDivider(SimpleSizeDrawable(width = hGap))
-            setVerticalDivider(SimpleSizeDrawable( height = vGap))
+            setVerticalDivider(SimpleSizeDrawable(height = vGap))
         })
     } else if (layoutManager is LinearLayoutManager) {
         val ori = if ((layoutManager as LinearLayoutManager).orientation == GridLayoutManager.HORIZONTAL)

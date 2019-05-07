@@ -36,6 +36,7 @@ import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_TITLE
 import com.sanron.pppig.module.micaitu.home.HomeFragment.Companion.TYPE_VIDEO
 import com.sanron.pppig.module.micaitu.movie.ItemVideoVM
 import com.sanron.pppig.util.*
+import com.sanron.pppig.widget.ViewPagerAdapter
 import com.tmall.ultraviewpager.UltraViewPager
 
 /**
@@ -58,7 +59,6 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
     lateinit var adapter: DelegateAdapter
 
     override fun initData() {
-        viewModel.refresh.value = true
         viewModel.loadData()
     }
 
@@ -71,7 +71,6 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
     }
 
     override fun onReselect() {
-        viewModel.refresh.value = true
         viewModel.loadData()
         dataBinding.recyclerView.smoothScrollToPosition(0)
     }
@@ -221,10 +220,11 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         binding.model = ItemVideoVM(PiApp.sInstance)
         binding.root.setOnClickListener {
             val item = binding.model!!.item.value!!
-            val intent = Intents.movieDetail(context, item.link, item.img, item.name)
-            val pair1 = android.support.v4.util.Pair(binding.sdv as View, ViewCompat.getTransitionName(binding.sdv)!!)
-            val activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(context as Activity, pair1)
-            fragment.startActivity(intent, activityOptionsCompat.toBundle())
+            val intent = Intents.movieDetail(context, item.link)
+//            val pair1 = android.support.v4.util.Pair(binding.sdv as View, ViewCompat.getTransitionName(binding.sdv)!!)
+//            val activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(context as Activity, pair1)
+//            fragment.startActivity(intent, activityOptionsCompat.toBundle())
+            fragment.startActivity(intent)
         }
         return viewHolder
     }

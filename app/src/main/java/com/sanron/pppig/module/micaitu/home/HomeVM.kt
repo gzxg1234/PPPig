@@ -33,6 +33,7 @@ class HomeVM(application: Application) : BaseViewModel(application) {
 
 
     fun loadData() {
+        refresh.value = true
         Repo.getMicaituHome()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : BaseObserver<Home>() {
