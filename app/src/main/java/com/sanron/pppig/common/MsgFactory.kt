@@ -1,5 +1,6 @@
 package com.sanron.pppig.common
 
+import com.sanron.pppig.data.exception.ParseException
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.ConnectException
@@ -22,6 +23,9 @@ object MsgFactory {
             }
             is IOException -> {
                 "请求失败"
+            }
+            is ParseException -> {
+                "数据解析失败，请尝试检查更新"
             }
             else -> {
                 "未知错误"

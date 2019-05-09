@@ -1,6 +1,7 @@
-package com.sanron.pppig.module.micaitu.moviedetail
+package com.sanron.pppig.module.micaitu.videodetail
 
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -21,6 +22,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseViewHolder
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.common.LoadingView
@@ -35,43 +37,46 @@ import com.sanron.pppig.widget.ViewPagerAdapter
  * Time:2019/4/24
  * Description:
  */
-class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>() {
+class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>() {
 
     companion object {
         const val ARG_URL = "url"
     }
 
     //图片提取的颜色
-    var imgDominantColor = 0xff999999.toInt()
+    private var imgDominantColor = 0xff999999.toInt()
+    //标题是电影名称
+    private var isVideoNameTitle = false
 
     val loadingView by lazy {
         LoadingView(this)
     }
 
-    override val layout: Int
-        get() = R.layout.activity_video_detail
+    override fun getLayout(): Int {
+        return R.layout.activity_video_detail
+    }
 
-    override fun createViewModel(): MovieDetailVM {
-        return ViewModelProviders.of(this).get(MovieDetailVM::class.java)
+    override fun createViewModel(): VideoDetailVM {
+        return ViewModelProviders.of(this).get(VideoDetailVM::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        StatusBarHelper.with(this@MovieDetailAct)
+        StatusBarHelper.with(this@VideoDetailAct)
                 .setStatusBarColor(0)
                 .setLayoutBelowStatusBar(true)
                 .setPaddingTop(dataBinding.flTopWrap)
                 .setPaddingTop(dataBinding.coordinator)
-        dataBinding.lifecycleOwner = this@MovieDetailAct
+        dataBinding.lifecycleOwner = this@VideoDetailAct
         dataBinding.model = viewModel
         dataBinding.ivBack.setOnClickListener {
-            ActivityCompat.finishAfterTransition(this@MovieDetailAct)
+            ActivityCompat.finishAfterTransition(this@VideoDetailAct)
         }
         dataBinding.appbarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { p0, p1 ->
             onAppBarScroll(p1)
         })
         viewModel.url = intent?.getStringExtra(ARG_URL)
-        viewModel.loading.observe(this@MovieDetailAct, Observer {
+        viewModel.loading.observe(this@VideoDetailAct, Observer {
             it?.let { b ->
                 if (b) {
                     loadingView.show()
@@ -80,7 +85,7 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                 }
             }
         })
-        viewModel.infoList.observe(this@MovieDetailAct, Observer {
+        viewModel.infoList.observe(this@VideoDetailAct, Observer {
             dataBinding.llInfos.childForEach { _, v ->
                 if (v != dataBinding.tvVideoName) {
                     dataBinding.llInfos.removeView(v)
@@ -99,13 +104,13 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
             }
         })
 
-        viewModel.image.observe(this@MovieDetailAct, Observer {
+        viewModel.image.observe(this@VideoDetailAct, Observer {
             it?.let { imgUrl ->
                 getImageDominant(imgUrl)
             }
         })
 
-        viewModel.playSourceList.observe(this@MovieDetailAct, Observer {
+        viewModel.playSourceList.observe(this@VideoDetailAct, Observer {
             it?.let { sourceList ->
                 val titles = sourceList.map {
                     it.name
@@ -147,7 +152,7 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
         val alphaShowAnim = AlphaAnimation(0f, 1f)
         val alphaHideAnim = AlphaAnimation(1f, 0f)
         val duration = 300L
-        if (fraction == 1f) {
+        if (fraction == 1f && !isVideoNameTitle) {
             var transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f)
             var anim = AnimationSet(true).apply {
@@ -155,6 +160,7 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                 addAnimation(transAnim)
                 fillAfter = true
                 this.duration = duration
+                bindLifecycle(this@VideoDetailAct)
             }
             dataBinding.tvTitle.startAnimation(anim)
             transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
@@ -164,9 +170,11 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                 addAnimation(transAnim)
                 fillAfter = true
                 this.duration = duration
+                bindLifecycle(this@VideoDetailAct)
             }
             dataBinding.tvTitleVideoName.startAnimation(anim)
-        } else if (fraction == 0f) {
+            isVideoNameTitle = true
+        } else if (fraction == 0f && isVideoNameTitle) {
             var transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f)
             var anim = AnimationSet(true).apply {
@@ -174,6 +182,7 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                 addAnimation(transAnim)
                 fillAfter = true
                 this.duration = duration
+                bindLifecycle(this@VideoDetailAct)
             }
             dataBinding.tvTitle.startAnimation(anim)
             transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
@@ -183,8 +192,10 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                 addAnimation(transAnim)
                 fillAfter = true
                 this.duration = duration
+                bindLifecycle(this@VideoDetailAct)
             }
             dataBinding.tvTitleVideoName.startAnimation(anim)
+            isVideoNameTitle = false
         }
     }
 
@@ -202,14 +213,17 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
                             ?: palette?.lightVibrantSwatch?.rgb
                             ?: resources.getColor(R.color.colorPrimaryDark)
                     imgDominantColor = ColorUtil.covertToDark(color)
-                    val anim = ValueAnimator.ofInt(0xFF999999.toInt(), imgDominantColor)
-                    anim.setEvaluator(ArgbEvaluatorCompat.getInstance())
-                    anim.duration = 300
-                    anim.addUpdateListener { valueAnimator ->
-                        dataBinding.coordinator.setBackgroundColor(valueAnimator.animatedValue as Int)
-                    }
-                    anim.start()
-                }
+                    ValueAnimator.ofInt(0xFF999999.toInt(), imgDominantColor)
+                            .apply {
+                                setEvaluator(ArgbEvaluatorCompat.getInstance())
+                                duration = 300
+                                addUpdateListener { valueAnimator ->
+                                    dataBinding.coordinator.setBackgroundColor(valueAnimator.animatedValue as Int)
+                                }
+                                start()
+                                bindLifecycle(this@VideoDetailAct)
+                            }
+                }.bindLifecycle(this)
             }
         }
     }
@@ -235,6 +249,9 @@ class MovieDetailAct : BaseActivity<ActivityVideoDetailBinding, MovieDetailVM>()
             val adapter = ItemAdapter()
             adapter.setNewData(item.items)
             adapter.bindToRecyclerView(recyclerView)
+            adapter.setOnItemClickListener { adapter1, view, position ->
+                (context as Activity).startActivity(Intents.playVideo(context, adapter.getItem(position)?.link))
+            }
             return recyclerView
         }
     }

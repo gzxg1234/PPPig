@@ -105,7 +105,7 @@ class MovieVM(application: Application) : BaseViewModel(application) {
         val typeParam = TYPES[checkType.value!!].second
         val countryParam = COUNTRYS[checkCountry.value!!].second
         val yearParam = YEARS[checkYear.value!!].second
-        return Repo.getAll(typeParam, countryParam, yearParam, page)
+        return Repo.getAll(typeParam, countryParam, yearParam, page).compose(addDisposable())
     }
 
 }

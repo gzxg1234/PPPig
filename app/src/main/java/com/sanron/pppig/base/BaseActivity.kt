@@ -18,8 +18,6 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
 
     protected lateinit var activity: BaseActivity<T, M>
 
-    abstract val layout: Int
-
     private var mDataBinding: T? = null
 
     private var mViewModel: M? = null
@@ -29,6 +27,8 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
         false
     }
 
+    protected abstract fun getLayout(): Int
+
     abstract fun createViewModel(): M
 
     //加载数据
@@ -37,7 +37,7 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activity = this
-        mDataBinding = DataBindingUtil.setContentView(this, layout)
+        mDataBinding = DataBindingUtil.setContentView(this, getLayout())
         mViewModel = createViewModel()
         mViewModel?.toastMsg?.observe(this, Observer {
             showToast(it)

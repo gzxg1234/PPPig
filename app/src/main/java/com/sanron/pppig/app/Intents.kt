@@ -2,7 +2,8 @@ package com.sanron.pppig.app
 
 import android.content.Context
 import android.content.Intent
-import com.sanron.pppig.module.micaitu.moviedetail.MovieDetailAct
+import com.sanron.pppig.module.micaitu.play.PlayerAct
+import com.sanron.pppig.module.micaitu.videodetail.VideoDetailAct
 
 /**
  * Author:sanron
@@ -10,9 +11,16 @@ import com.sanron.pppig.module.micaitu.moviedetail.MovieDetailAct
  * Description:
  */
 object Intents {
-    fun movieDetail(context: Context, url: String?): Intent {
-        val intent = Intent(context, MovieDetailAct::class.java)
-        intent.putExtra(MovieDetailAct.ARG_URL, url)
+
+    fun videoDetail(context: Context, url: String?): Intent {
+        val intent = Intent(context, VideoDetailAct::class.java)
+        intent.putExtra(VideoDetailAct.ARG_URL, url)
+        return intent
+    }
+
+    fun playVideo(context: Context, url: String?): Intent {
+        val intent = Intent(context, PlayerAct::class.java)
+        intent.putExtra(PlayerAct.ARG_URL, url)
         return intent
     }
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.util.SparseArray
 import com.flyco.tablayout.listener.OnTabSelectListener
+import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.databinding.FragmentMainBinding
@@ -27,6 +28,9 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
 
     override fun onVisible(first: Boolean) {
         super.onVisible(first)
+        StatusBarHelper.with(activity)
+                .setLightIcon()
+                .setPaddingTop(dataBinding.topBar)
     }
 
     override fun getLayout(): Int {

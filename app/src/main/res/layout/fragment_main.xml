@@ -12,10 +12,12 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/top_bar"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
             android:gravity="center_vertical"
+            android:minHeight="50dp"
             android:orientation="horizontal"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">

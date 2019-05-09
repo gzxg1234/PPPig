@@ -9,6 +9,7 @@ import com.sanron.pppig.data.Repo
 import com.sanron.pppig.data.bean.micaitu.Home
 import com.sanron.pppig.data.bean.micaitu.VideoItem
 import com.sanron.pppig.util.SingleLiveEvent
+import com.sanron.pppig.util.main
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 /**
@@ -35,7 +36,8 @@ class HomeVM(application: Application) : BaseViewModel(application) {
     fun loadData() {
         refresh.value = true
         Repo.getMicaituHome()
-                .observeOn(AndroidSchedulers.mainThread())
+                .main()
+                .compose(addDisposable())
                 .subscribe(object : BaseObserver<Home>() {
                     override fun onNext(home: Home) {
                         super.onNext(home)

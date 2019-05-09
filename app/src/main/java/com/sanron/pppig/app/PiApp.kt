@@ -3,10 +3,13 @@ package com.sanron.pppig.app
 import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
+import com.blankj.utilcode.util.ProcessUtils
 import com.facebook.cache.disk.DiskCacheConfig
-
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ImagePipelineConfig
+import com.sanron.pppig.BuildConfig
+import com.tencent.bugly.crashreport.CrashReport
+import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 
 
 /**
@@ -30,9 +33,19 @@ class PiApp : Application() {
         super.onCreate()
         sInstance = this
         initFresco()
+        initBugly()
     }
 
-    fun initFresco() {
+    private fun initBugly() {
+        val context = applicationContext
+        val packageName = context.packageName
+        val processName = ProcessUtils.getCurrentProcessName()
+        val strategy = UserStrategy(context)
+        strategy.isUploadProcess = processName == null || processName == packageName
+        CrashReport.initCrashReport(this, BuildConfig.BUGLY_ID, BuildConfig.DEBUG, strategy)
+    }
+
+    private fun initFresco() {
         val MB = 1024 * 1024L
         val config = ImagePipelineConfig.newBuilder(this)
                 .setDownsampleEnabled(true)

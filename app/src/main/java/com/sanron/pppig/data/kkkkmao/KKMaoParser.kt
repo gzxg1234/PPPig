@@ -1,4 +1,4 @@
-package com.sanron.pppig.data.parser
+package com.sanron.pppig.data.kkkkmao
 
 import com.sanron.pppig.data.bean.micaitu.*
 import com.sanron.pppig.util.CLog
@@ -224,6 +224,11 @@ class KKMaoParser {
             //解析播放列表
             detail.source = mutableListOf()
             select(".vod-play-info.main>#con_vod_1>.play-box")?.forEach {
+                if(it.id() == "xigua"
+                        ||it.id()=="pan"){
+                    //西瓜和网盘过滤
+                    return@forEach
+                }
                 val playSource = PlaySource()
                 playSource.name = "播放源"
                 playSource.items = mutableListOf()
@@ -242,6 +247,16 @@ class KKMaoParser {
 
             }
             return detail
+        }
+        return null
+    }
+
+    fun parsePlayPageUrl(html: String): String? {
+        val doc = Jsoup.parse(html)
+        doc?.apply {
+            select(".playerbox>iframe").first()?.apply {
+                return this.attr("src")
+            }
         }
         return null
     }

@@ -1,4 +1,4 @@
-package com.sanron.pppig.data.api
+package com.sanron.pppig.data.kkkkmao
 
 import io.reactivex.Observable
 import okhttp3.ResponseBody
@@ -10,7 +10,7 @@ import retrofit2.http.Path
  * Time:2019/2/20
  * Description:
  */
-interface MicaituApi {
+interface KmaoApi {
 
 
     @GET("http://m.kkkkmao.com/{path}")

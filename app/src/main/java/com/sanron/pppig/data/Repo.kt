@@ -1,78 +1,35 @@
 package com.sanron.pppig.data
 
-import com.google.gson.GsonBuilder
-import com.sanron.pppig.BuildConfig
-import com.sanron.pppig.data.api.MicaituApi
 import com.sanron.pppig.data.bean.micaitu.Home
 import com.sanron.pppig.data.bean.micaitu.PageData
 import com.sanron.pppig.data.bean.micaitu.VideoDetail
 import com.sanron.pppig.data.bean.micaitu.VideoItem
-import com.sanron.pppig.data.parser.KKMaoParser
+import com.sanron.pppig.data.kkkkmao.KMaoFetch
 import io.reactivex.Observable
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
 
 /**
  * Author:sanron
  * Time:2019/2/20
  * Description:
  */
-object Repo {
+object Repo : DataFetch {
 
-    private val mRetrofit: Retrofit by lazy {
-        val gsonBuilder = GsonBuilder()
-        gsonBuilder.setDateFormat("yyyy-MM-dd HH:mm:ss")
-        return@lazy Retrofit.Builder()
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
-                .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
-                .client(createOkHttp())
-                .validateEagerly(BuildConfig.DEBUG)
-                .baseUrl("https://m.kkkkmao.com")
-                .build()
-    }
+    var dataFetch: DataFetch = KMaoFetch()
 
-    private val mApis = HashMap<Class<*>, Any>()
-
-
-    private fun <T> getService(clazz: Class<T>): T {
-        var t = mApis[clazz] as T?
-        if (t == null) {
-            t = mRetrofit.create(clazz)
-            mApis[clazz] = t!! as Any
+    fun setSource(type: Int) {
+        if (type == 0) {
+            dataFetch = KMaoFetch()
         }
-        return t
     }
 
-    private fun createOkHttp(): OkHttpClient {
-        val builder = Injector.provideOkHttpClient()
-                .newBuilder()
-        return builder.build()
-    }
+    override fun getMicaituHome(): Observable<Home> = dataFetch.getMicaituHome()
 
-    fun getMicaituHome(): Observable<Home> {
-        return getService(MicaituApi::class.java)
-                .home()
-                .map { s -> KKMaoParser.instance.parseHome(s.string()) }
-    }
+    override fun getTopMovie(): Observable<PageData<VideoItem>> = dataFetch.getTopMovie()
 
-    fun getTopMovie(): Observable<PageData<VideoItem>> {
-        return getService(MicaituApi::class.java)
-                .topMovie()
-                .map { s -> KKMaoParser.instance.parseTopMovie(s.string()) }
-    }
+    override fun getVideoDetail(path: String): Observable<VideoDetail> = dataFetch.getVideoDetail(path)
 
-    fun getVideoDetail(path: String): Observable<VideoDetail> {
-        return getService(MicaituApi::class.java)
-                .html(path)
-                .map { s -> KKMaoParser.instance.parseVideoDetail(s.string()) }
-    }
+    override fun getVideoSource(url: String, webPageHelper: WebPageHelper) = dataFetch.getVideoSource(url, webPageHelper)
 
-    fun getAll(type: String?, country: String?, year: String?, page: Int): Observable<PageData<VideoItem>> {
-        return getService(MicaituApi::class.java)
-                .all(type ?: "movie", page, year ?: "", country ?: "")
-                .map { s -> KKMaoParser.instance.parseMovieList(s.string()) }
-    }
+    override fun getAll(type: String?, country: String?, year: String?, page: Int) = dataFetch.getAll(type, country, year, page)
+
 }

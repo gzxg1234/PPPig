@@ -7,7 +7,7 @@
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.moviedetail.MovieDetailVM" />
+            type="com.sanron.pppig.module.micaitu.videodetail.VideoDetailVM" />
     </data>
 
     <FrameLayout
@@ -107,6 +107,8 @@
                             android:text="@{model.intro}"
                             app:animAlphaStart="1"
                             app:animDuration="300"
+                            app:collapseDrawable="@drawable/ic_arrow_drop_up_white_24dp"
+                            app:expandDrawable="@drawable/ic_arrow_drop_down_white_24dp"
                             app:maxCollapsedLines="3">
 
                             <TextView
@@ -121,6 +123,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="right|bottom"
+                                android:background="@null"
                                 android:textColor="@color/white" />
                         </com.ms.square.android.expandabletextview.ExpandableTextView>
                     </LinearLayout>

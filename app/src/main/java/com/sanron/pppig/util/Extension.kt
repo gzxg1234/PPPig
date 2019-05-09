@@ -1,10 +1,16 @@
 package com.sanron.pppig.util
 
+import android.animation.Animator
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.Context
 import android.databinding.Observable
 import android.databinding.ObservableField
-import android.support.annotation.Size
+import android.os.AsyncTask
 import android.view.LayoutInflater
+import android.view.animation.Animation
 import com.sanron.pppig.BR
 import me.jessyan.autosize.utils.AutoSizeUtils
 
@@ -14,6 +20,36 @@ import me.jessyan.autosize.utils.AutoSizeUtils
  *Description:
  */
 fun Context.dp2px(dp: Float) = AutoSizeUtils.dp2px(this, dp)
+
+/**
+ * 绑定lifecycle，自动取消
+ */
+fun Animation.bindLifecycle(lifecycleOwner: LifecycleOwner) {
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun destroy() {
+            this@bindLifecycle.cancel()
+        }
+    })
+}
+
+fun Animator.bindLifecycle(lifecycleOwner: LifecycleOwner) {
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun destroy() {
+            this@bindLifecycle.cancel()
+        }
+    })
+}
+
+fun <A,B,C> AsyncTask<A,B,C>.bindLifecycle(lifecycleOwner: LifecycleOwner) {
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun destroy() {
+            this@bindLifecycle.cancel(false)
+        }
+    })
+}
 
 val Context.inflater: LayoutInflater
     get() = LayoutInflater.from(this)

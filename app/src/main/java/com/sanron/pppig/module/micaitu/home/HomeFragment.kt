@@ -1,13 +1,10 @@
 package com.sanron.pppig.module.micaitu.home
 
-import android.app.Activity
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.databinding.DataBindingUtil
-import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.app.SharedElementCallback
-import android.support.v4.view.ViewCompat
 import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -119,7 +116,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
             recyclerView.adapter = adapter
         }
         viewModel.toVideoDetail.observe(this, Observer {
-            val intent = Intents.movieDetail(context!!, it?.link)
+            val intent = Intents.videoDetail(context!!, it?.link)
             startActivity(intent)
         })
         activity?.setExitSharedElementCallback(object : SharedElementCallback() {
@@ -152,6 +149,9 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
                         val tv = view.findViewById<TextView>(R.id.tv_title)
                         sdv.setImageURI(item.image)
                         tv.text = item.title
+                        view.setOnClickListener { _ ->
+                            startActivity(Intents.videoDetail(context!!,item.link))
+                        }
                         return view
                     }
                 }
@@ -220,7 +220,7 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         binding.model = ItemVideoVM(PiApp.sInstance)
         binding.root.setOnClickListener {
             val item = binding.model!!.item.value!!
-            val intent = Intents.movieDetail(context, item.link)
+            val intent = Intents.videoDetail(context, item.link)
 //            val pair1 = android.support.v4.util.Pair(binding.sdv as View, ViewCompat.getTransitionName(binding.sdv)!!)
 //            val activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(context as Activity, pair1)
 //            fragment.startActivity(intent, activityOptionsCompat.toBundle())

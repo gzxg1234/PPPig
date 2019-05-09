@@ -1,4 +1,4 @@
-package com.sanron.pppig.module.micaitu.moviedetail
+package com.sanron.pppig.module.micaitu.videodetail
 
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
@@ -17,7 +17,7 @@ import io.reactivex.disposables.Disposable
  *Time:2019/4/24
  *Description:
  */
-class MovieDetailVM(application: Application) : BaseViewModel(application) {
+class VideoDetailVM(application: Application) : BaseViewModel(application) {
 
     val fav = MutableLiveData<Boolean>()
 
@@ -39,6 +39,7 @@ class MovieDetailVM(application: Application) : BaseViewModel(application) {
     fun loadData() {
         Repo.getVideoDetail(url ?: "")
                 .main()
+                .compose(addDisposable())
                 .subscribe(object : BaseObserver<VideoDetail>() {
                     override fun onSubscribe(d: Disposable) {
                         super.onSubscribe(d)

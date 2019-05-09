@@ -6,6 +6,7 @@ import android.support.design.bottomnavigation.LabelVisibilityMode
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import com.sanron.lib.StatusBarHelper
 
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
@@ -20,8 +21,7 @@ import com.sanron.pppig.module.live.LiveFragment
  */
 class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
 
-    override val layout: Int
-        get() = R.layout.activity_main
+    override fun getLayout(): Int = R.layout.activity_main
 
     override fun createViewModel(): MainViewModel {
         return ViewModelProviders.of(this).get(MainViewModel::class.java)
@@ -33,10 +33,13 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
     }
 
     private fun initView() {
-        dataBinding!!.apply{
+        StatusBarHelper.with(this)
+                .setStatusBarColor(0)
+                .setLayoutBelowStatusBar(true)
+        dataBinding.apply {
             viewPager.adapter = HomePageAdapter(supportFragmentManager)
             bottomNavigationBar.labelVisibilityMode = LabelVisibilityMode.LABEL_VISIBILITY_LABELED
-            bottomNavigationBar.setupWithViewPager(dataBinding!!.viewPager)
+            bottomNavigationBar.setupWithViewPager(dataBinding.viewPager)
         }
     }
 

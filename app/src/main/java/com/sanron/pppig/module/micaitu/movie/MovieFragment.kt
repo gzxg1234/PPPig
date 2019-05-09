@@ -13,6 +13,7 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.RadioButton
 import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.databinding.FragmentMovieBinding
 import com.sanron.pppig.module.home.IMainChildFragment
@@ -27,6 +28,10 @@ import com.sanron.pppig.util.pauseFrescoOnScroll
  *Description:
  */
 class MovieFragment : LazyFragment<FragmentMovieBinding, MovieVM>(), IMainChildFragment {
+
+    companion object {
+        const val SHOW_FILTER_DURATION = 200L
+    }
 
     private lateinit var adapter: MovieAdapter
     private var bgAnim: ObjectAnimator? = null
@@ -78,6 +83,9 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieVM>(), IMainChildF
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
             adapter = MovieAdapter(this@MovieFragment, viewModel.pageLoader.listData.value)
+            adapter.setOnItemClickListener { adapter1, view, position ->
+                startActivity(Intents.videoDetail(context!!,adapter.getItem(position)?.link))
+            }
             adapter.lifecycleOwner = this@MovieFragment
             adapter.bindToRecyclerView(recyclerView)
         }
@@ -90,8 +98,8 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieVM>(), IMainChildF
         buildFilter()
     }
 
+
     private fun showFilterWindow(show: Boolean?) {
-        val DURATION = 200L
         dataBinding.apply {
             llTags.clearAnimation()
             bgAnim?.end()
@@ -112,10 +120,10 @@ class MovieFragment : LazyFragment<FragmentMovieBinding, MovieVM>(), IMainChildF
                 transAnim = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
                         Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f)
             }
-            bgAnim!!.duration = DURATION
+            bgAnim!!.duration = SHOW_FILTER_DURATION
             bgAnim!!.setEvaluator(ArgbEvaluator())
             bgAnim!!.start()
-            transAnim.duration = DURATION
+            transAnim.duration = SHOW_FILTER_DURATION
             llTags.startAnimation(transAnim)
         }
     }

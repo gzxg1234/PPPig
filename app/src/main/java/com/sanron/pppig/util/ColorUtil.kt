@@ -1,5 +1,7 @@
 package com.sanron.pppig.util
 
+import android.graphics.Color
+
 /**
  *Author:sanron
  *Time:2019/4/26
@@ -30,20 +32,12 @@ object ColorUtil {
     }
 
     fun covertToDark(color: Int): Int {
-        var a: Int = color shr 24 and 0xFF
-        var r = color ushr 16 and 0xFF
-        var g = color ushr 8 and 0xFF
-        var b = color and 0xFF
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color,hsv)
 
-        val grey = toGrey(color)
-        if (grey > GREY_THRESHOLD) {
-            var v: Int = (grey - GREY_THRESHOLD / (0.299 + 0.587 + 0.114)).toInt()
-            //防止减到负数
-            v = min(v, r, g, b)
-            r -= v
-            g -= v
-            b -= v
+        if(hsv[2]>0.6f){
+            hsv[2] = 0.6f
         }
-        return argb(a, r, g, b)
+        return Color.HSVToColor(hsv)
     }
 }
