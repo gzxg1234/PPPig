@@ -187,7 +187,13 @@ dependencies {
     implementation 'com.tencent.bugly:nativecrashreport:3.6.0.1'
 
     //ijkplay
-    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+    implementation('com.shuyu:gsyVideoPlayer-java:6.0.3') {
+        exclude group: "com.android.support"
+    }
+    implementation( 'com.shuyu:gsyVideoPlayer-armv7a:6.0.3' ){
+        exclude group: "com.android.support"
+    }
+//    implementation project(':pigplayer')
 //    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
 //    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
 }

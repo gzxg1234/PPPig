@@ -115,7 +115,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
                 val titles = sourceList.map {
                     it.name
                 }
-                dataBinding.viewPager.adapter = SourceAdapter(sourceList)
+                dataBinding.viewPager.adapter = SourceAdapter(viewModel.title.value,sourceList)
                 dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
             }
         })
@@ -234,7 +234,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
     }
 
 
-    class SourceAdapter(data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
+    class SourceAdapter(val title:String?,data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
 
         override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
             val context = container.context
@@ -249,8 +249,10 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
             val adapter = ItemAdapter()
             adapter.setNewData(item.items)
             adapter.bindToRecyclerView(recyclerView)
-            adapter.setOnItemClickListener { adapter1, view, position ->
-                (context as Activity).startActivity(Intents.playVideo(context, adapter.getItem(position)?.link))
+            adapter.setOnItemClickListener { _, _, _ ->
+                adapter.getItem(position)?.let {it
+                    (context as Activity).startActivity(Intents.playVideo(context, it.link,title,item.items))
+                }
             }
             return recyclerView
         }
@@ -261,9 +263,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
         override fun convert(helper: BaseViewHolder?, item: PlaySource.Item?) {
             val text = helper!!.itemView as TextView
             text.text = item?.name
-
         }
-
     }
 
 }

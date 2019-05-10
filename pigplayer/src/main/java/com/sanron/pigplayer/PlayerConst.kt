@@ -1,4 +1,4 @@
-package com.sanron.pppig.widget.player
+package com.sanron.pigplayer
 
 /**
  * Author:sanron

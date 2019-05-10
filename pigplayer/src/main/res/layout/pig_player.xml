@@ -4,12 +4,15 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     android:orientation="vertical">
 
-    <TextureView
-        android:id="@+id/texture_view"
+    <FrameLayout
+        android:id="@+id/render_view_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
 
     <LinearLayout
@@ -110,7 +113,8 @@
         android:paddingLeft="16dp"
         android:paddingTop="10dp"
         android:paddingRight="16dp"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/iv_toggle_play"
@@ -152,4 +156,71 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_volume_adjust"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_player_adjust_status"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="4dp"
+        android:paddingTop="6dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="6dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_volume_up_white_24dp" />
+
+        <ProgressBar
+            android:id="@+id/pb_volume"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:minHeight="2dp"
+            android:progressDrawable="@drawable/player_adjust_progress"
+            tools:progress="40" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_bright_adjust"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_player_adjust_status"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="4dp"
+        android:paddingTop="6dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="6dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_brightness_high_white_24dp" />
+
+        <ProgressBar
+            android:id="@+id/pb_brightness"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:minHeight="2dp"
+            android:progressDrawable="@drawable/player_adjust_progress"
+            tools:progress="40" />
+
+    </LinearLayout>
 </FrameLayout>

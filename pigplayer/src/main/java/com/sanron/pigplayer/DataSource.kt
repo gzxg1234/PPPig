@@ -1,5 +1,4 @@
-package com.sanron.pppig.widget.player
-
+package com.sanron.pigplayer
 /**
  * Author:sanron
  * Time:2019/5/9
