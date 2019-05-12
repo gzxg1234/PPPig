@@ -1,10 +1,10 @@
 package com.sanron.pppig.data
 
-import com.sanron.pppig.data.bean.micaitu.Home
-import com.sanron.pppig.data.bean.micaitu.PageData
-import com.sanron.pppig.data.bean.micaitu.VideoDetail
-import com.sanron.pppig.data.bean.micaitu.VideoItem
-import com.sanron.pppig.data.kkkkmao.KMaoFetch
+import com.sanron.datafetch.SourceManagerImpl
+import com.sanron.datafetch_interface.DataFetch
+import com.sanron.datafetch_interface.SourceManager
+import com.sanron.datafetch_interface.bean.*
+import com.sanron.pppig.app.PiApp
 import io.reactivex.Observable
 
 /**
@@ -14,22 +14,25 @@ import io.reactivex.Observable
  */
 object Repo : DataFetch {
 
-    var dataFetch: DataFetch = KMaoFetch()
-
-    fun setSource(type: Int) {
-        if (type == 0) {
-            dataFetch = KMaoFetch()
-        }
+    var sourceManager: SourceManager = SourceManagerImpl().apply {
+        init(context = PiApp.sInstance)
     }
 
-    override fun getMicaituHome(): Observable<Home> = dataFetch.getMicaituHome()
+    var dataFetch: DataFetch = sourceManager.getSourceList().get(1).fetch
+
+
+    override fun getHomeData(): Observable<Home> = dataFetch.getHomeData()
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> = dataFetch.getTopMovie()
 
     override fun getVideoDetail(path: String): Observable<VideoDetail> = dataFetch.getVideoDetail(path)
 
-    override fun getVideoSource(url: String, webPageHelper: WebPageHelper) = dataFetch.getVideoSource(url, webPageHelper)
+    override fun getVideoSource(url: String) = dataFetch.getVideoSource(url)
 
-    override fun getAll(type: String?, country: String?, year: String?, page: Int) = dataFetch.getAll(type, country, year, page)
+    override fun getVideoListTypes(): List<VideoListType> = dataFetch.getVideoListTypes()
+
+    override fun getVideoList(type: Int, param: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> = dataFetch.getVideoList(type, param, page)
+
+    override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> = dataFetch.getVideoListFilter(type)
 
 }

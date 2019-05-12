@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_filter_name"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:text="类型"
+        android:textColor="@color/textColor3"
+        android:textSize="12dp"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:scrollbars="none">
+
+        <RadioGroup
+            android:id="@+id/rg_filter_items"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:divider="@drawable/tag_divider"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:showDividers="middle">
+
+        </RadioGroup>
+    </HorizontalScrollView>
+
+</LinearLayout>

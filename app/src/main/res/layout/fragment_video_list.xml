@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.sanron.pppig.module.mainhome.videolist.VideoListVM"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.sanron.pppig.widget.PiRefreshLayout
+            android:id="@+id/refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:pageLoader="@{model.pageLoader}">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="40dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingLeft="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="16dp"
+                    android:pageLoader="@{model.pageLoader}"/>
+
+                <FrameLayout
+                    android:id="@+id/fl_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:onClick="@{()->model.closeFilterWindow()}"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/ll_tags"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="40dp"
+                        android:background="@color/white"
+                        android:onClick="@{()->model.toggleFilterCmd}"
+                        android:orientation="vertical"/>
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:onClick="@{()->model.toggleFilterWindow()}"
+                    android:orientation="horizontal"
+                    android:paddingLeft="16dp">
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/tv_filter_desc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/textColor1"
+                        android:textSize="14dp"
+                        app:autoSizeMaxTextSize="14dp"
+                        app:autoSizeMinTextSize="10dp"
+                        app:autoSizeTextType="uniform"/>
+
+                    <ImageView
+                        android:id="@+id/ib_arrow"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_arrow_drop_down_black_24dp"/>
+                </LinearLayout>
+
+            </FrameLayout>
+        </com.sanron.pppig.widget.PiRefreshLayout>
+
+    </FrameLayout>
+</layout>

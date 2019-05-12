@@ -1,8 +1,13 @@
 package com.sanron.pppig.widget.player
 
+import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.text.format.Formatter
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -18,36 +23,55 @@ import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
  */
 class PigPlayer : StandardGSYVideoPlayer {
 
-    val timeTextView: TextView by lazy {
+    private val timeTextView: TextView by lazy {
         findViewById<TextView>(R.id.tv_time)
     }
 
-    val volumnLayout: View by lazy {
+    private val volumeLayout: View by lazy {
         findViewById<View>(R.id.ll_volume_adjust)
     }
-    val pbVolumn: ProgressBar by lazy {
+    private val pbVolume: ProgressBar by lazy {
         findViewById<ProgressBar>(R.id.pb_volume)
     }
-    val brightnessLayout: View by lazy {
+    private val brightnessLayout: View by lazy {
         findViewById<View>(R.id.ll_bright_adjust)
     }
-    val pbBrightness: ProgressBar by lazy {
+    private val pbBrightness: ProgressBar by lazy {
         findViewById<ProgressBar>(R.id.pb_brightness)
     }
 
-    val seekPosLayout: View by lazy {
+    private val seekPosLayout: View by lazy {
         findViewById<View>(R.id.ll_seek_position)
     }
-    val tvCurPos: TextView by lazy {
+    private val tvCurPos: TextView by lazy {
         findViewById<TextView>(R.id.tv_current)
     }
-    val tvDuration: TextView by lazy {
+    private val tvDuration: TextView by lazy {
         findViewById<TextView>(R.id.tv_duration)
     }
-    val pbSeekPos: ProgressBar by lazy {
+    private val pbSeekPos: ProgressBar by lazy {
         findViewById<ProgressBar>(R.id.pb_seek_position)
     }
+    private val loadingView: View by lazy {
+        findViewById<View>(R.id.loading)
+    }
+    private val tvSpeed: TextView by lazy {
+        findViewById<TextView>(R.id.tv_speed)
+    }
 
+    private val activity = context as Activity
+
+
+    fun getTopBar(): ViewGroup = mTopContainer
+
+    private val taskHandler = Handler()
+
+    private val syncSpeed = object : Runnable {
+        override fun run() {
+            tvSpeed.text = context.getString(R.string.player_loading_text, Formatter.formatFileSize(context, netSpeed))
+            taskHandler.postDelayed(this, 500)
+        }
+    }
 
     constructor(context: Context?, fullFlag: Boolean?) : super(context, fullFlag)
     constructor(context: Context?) : super(context)
@@ -64,12 +88,12 @@ class PigPlayer : StandardGSYVideoPlayer {
     }
 
     override fun showVolumeDialog(deltaY: Float, volumePercent: Int) {
-        volumnLayout.visibility = View.VISIBLE
-        pbVolumn.progress = volumePercent
+        volumeLayout.visibility = View.VISIBLE
+        pbVolume.progress = volumePercent
     }
 
     override fun dismissVolumeDialog() {
-        volumnLayout.visibility = View.GONE
+        volumeLayout.visibility = View.GONE
     }
 
     override fun showBrightnessDialog(percent: Float) {
@@ -83,7 +107,11 @@ class PigPlayer : StandardGSYVideoPlayer {
 
     override fun showProgressDialog(deltaX: Float, seekTime: String?, seekTimePosition: Int, totalTime: String?, totalTimeDuration: Int) {
         seekPosLayout.visibility = View.VISIBLE
-        pbSeekPos.progress = seekTimePosition * 100 / totalTimeDuration
+        if (totalTimeDuration > 0) {
+            pbSeekPos.progress = seekTimePosition * 100 / totalTimeDuration
+        } else {
+            pbSeekPos.progress = 0
+        }
         tvCurPos.text = seekTime
         tvDuration.text = "/" + totalTime
     }
@@ -92,6 +120,24 @@ class PigPlayer : StandardGSYVideoPlayer {
         seekPosLayout.visibility = View.GONE
     }
 
+    override fun setViewShowState(view: View?, visibility: Int) {
+        super.setViewShowState(view, visibility)
+        if (view == loadingView) {
+            if (visibility == View.VISIBLE) {
+                taskHandler.post(syncSpeed)
+            } else {
+                taskHandler.removeCallbacks(syncSpeed)
+            }
+        }else if(view == mTopContainer){
+            if(!mIfCurrentIsFullscreen){
+                if (visibility == View.VISIBLE) {
+                    activity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                } else {
+                    activity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                }
+            }
+        }
+    }
     /**
      * 获取当前播放进度
      */

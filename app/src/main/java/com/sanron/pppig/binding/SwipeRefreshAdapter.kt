@@ -28,7 +28,6 @@ fun bindPageLoader(refreshLayout: SwipeRefreshLayout, pageLoader: PageLoader<*>)
     })
 }
 
-
 @InverseBindingMethods(InverseBindingMethod(type = SwipeRefreshLayout::class, attribute = "android:refreshing"))
 object SwipeRefreshAdapter {
     @JvmStatic

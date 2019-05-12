@@ -3,11 +3,13 @@ package com.sanron.pppig.app
 import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
+import android.webkit.WebView
 import com.blankj.utilcode.util.ProcessUtils
 import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.sanron.pppig.BuildConfig
+import com.squareup.leakcanary.LeakCanary
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 
@@ -34,6 +36,12 @@ class PiApp : Application() {
         sInstance = this
         initFresco()
         initBugly()
+        initLeakCanary()
+        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
+    }
+
+    private fun initLeakCanary(){
+        LeakCanary.install(this)
     }
 
     private fun initBugly() {

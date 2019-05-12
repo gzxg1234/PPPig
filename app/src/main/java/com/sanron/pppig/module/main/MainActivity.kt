@@ -7,12 +7,11 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import com.sanron.lib.StatusBarHelper
-
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.databinding.ActivityMainBinding
-import com.sanron.pppig.module.home.MainFragment
 import com.sanron.pppig.module.live.LiveFragment
+import com.sanron.pppig.module.mainhome.MainFragment
 
 /**
  * Author:sanron

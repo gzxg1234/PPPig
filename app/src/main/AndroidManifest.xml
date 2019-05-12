@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sanron.pppig">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.sanron.pppig">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -33,10 +34,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".module.micaitu.videodetail.VideoDetailAct" />
+        <activity android:name="com.sanron.pppig.module.videodetail.VideoDetailAct" />
         <activity
-            android:name=".module.micaitu.play.PlayerAct"
+            android:name="com.sanron.pppig.module.play.PlayerAct"
             android:configChanges="orientation|screenSize" />
+        <activity android:name=".module.search.SearchAct"/>
     </application>
 
 </manifest>

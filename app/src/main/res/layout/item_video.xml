@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.movie.ItemVideoVM" />
+            type="com.sanron.pppig.module.mainhome.videolist.ItemVideoVM"/>
 
     </data>
 
@@ -34,7 +34,7 @@
                 app:actualImageScaleType="centerCrop"
                 app:failureImage="@drawable/img_load_fail"
                 app:failureImageScaleType="centerInside"
-                app:viewAspectRatio="0.85" />
+                app:viewAspectRatio="0.85"/>
 
             <TextView
                 android:id="@+id/tv_label"
@@ -50,7 +50,7 @@
                 android:text="@{model.item.label}"
                 android:textColor="@color/white"
                 android:textSize="12dp"
-                tools:text="中文高清" />
+                tools:text="中文高清"/>
 
             <TextView
                 android:id="@+id/tv_score"
@@ -66,7 +66,7 @@
                 android:text="@{model.item.score}"
                 android:textColor="@color/white"
                 android:textSize="12dp"
-                tools:text="8.2" />
+                tools:text="8.2"/>
 
             <TextView
                 android:id="@+id/tv_name"
@@ -81,7 +81,7 @@
                 app:autoSizeMaxTextSize="14dp"
                 app:autoSizeMinTextSize="10dp"
                 app:autoSizeTextType="uniform"
-                tools:text="使徒行者" />
+                tools:text="使徒行者"/>
         </android.support.v7.widget.CardView>
     </FrameLayout>
 </layout>

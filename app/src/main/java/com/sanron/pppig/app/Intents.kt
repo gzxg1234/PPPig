@@ -2,9 +2,9 @@ package com.sanron.pppig.app
 
 import android.content.Context
 import android.content.Intent
-import com.sanron.pppig.data.bean.micaitu.PlaySource
-import com.sanron.pppig.module.micaitu.play.PlayerAct
-import com.sanron.pppig.module.micaitu.videodetail.VideoDetailAct
+import com.sanron.datafetch_interface.bean.PlaySource
+import com.sanron.pppig.module.play.PlayerAct
+import com.sanron.pppig.module.videodetail.VideoDetailAct
 
 /**
  * Author:sanron
@@ -19,11 +19,12 @@ object Intents {
         return intent
     }
 
-    fun playVideo(context: Context, url: String?, title: String? = "", items: List<PlaySource.Item>? = null): Intent {
+    fun playVideo(context: Context, title: String? = "", items: List<PlaySource>, sourcePos:Int, itemPos:Int): Intent {
         val intent = Intent(context, PlayerAct::class.java)
-        intent.putExtra(PlayerAct.ARG_URL, url)
+        intent.putExtra(PlayerAct.ARG_SOURCE_POS, sourcePos)
+        intent.putExtra(PlayerAct.ARG_ITEM_POS, itemPos)
         intent.putExtra(PlayerAct.ARG_TITLE, title)
-        intent.putExtra(PlayerAct.ARG_SOURCE_ITEMS, arrayListOf(items))
+        intent.putExtra(PlayerAct.ARG_SOURCE, ArrayList(items))
         return intent
     }
 }

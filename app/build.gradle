@@ -190,9 +190,19 @@ dependencies {
     implementation('com.shuyu:gsyVideoPlayer-java:6.0.3') {
         exclude group: "com.android.support"
     }
-    implementation( 'com.shuyu:gsyVideoPlayer-armv7a:6.0.3' ){
+    implementation('com.shuyu:gsyVideoPlayer-armv7a:6.0.3') {
         exclude group: "com.android.support"
     }
+
+    //加载框
+    implementation 'com.pnikosis:materialish-progress:1.7'
+    //leakcanary内存泄漏检测
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
+
+    //资源接口
+    implementation project(':datafetch')
+    implementation project(':datafetch_interface')
 //    implementation project(':pigplayer')
 //    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
 //    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'

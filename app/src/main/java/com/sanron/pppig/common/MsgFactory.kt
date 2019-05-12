@@ -1,6 +1,6 @@
 package com.sanron.pppig.common
 
-import com.sanron.pppig.data.exception.ParseException
+import com.sanron.datafetch.exception.ParseException
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.ConnectException

@@ -3,11 +3,12 @@ package com.sanron.pppig.common
 import android.arch.lifecycle.*
 import android.support.v7.util.DiffUtil
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.sanron.datafetch_interface.bean.PageData
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.binding.RecyclerViewAdapter
-import com.sanron.pppig.data.bean.micaitu.PageData
 import com.sanron.pppig.util.SingleLiveEvent
 import com.sanron.pppig.util.main
+import com.sanron.pppig.util.showToast
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import java.lang.ref.WeakReference
@@ -103,6 +104,7 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
                             loadMoreState.value = RecyclerViewAdapter.STATE_FAIL
                         }
                         refreshing.value = false
+                        showToast(MsgFactory.get(e))
                     }
                 })
     }

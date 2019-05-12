@@ -4,9 +4,6 @@
 
     <data>
 
-        <variable
-            name="homeCat"
-            type="com.sanron.pppig.data.bean.micaitu.HomeCat" />
     </data>
 
     <LinearLayout

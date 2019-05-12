@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <data>
 
         <variable
             name="model"
-            type="com.sanron.pppig.module.micaitu.play.PlayerVM" />
+            type="com.sanron.pppig.module.play.PlayerVM"/>
     </data>
 
     <LinearLayout
@@ -14,45 +15,36 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/top_bar"
+        <com.sanron.pppig.widget.AspectLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="?attr/actionBarSize">
+            app:cc_aspect="1.8">
 
-            <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="?attr/actionBarSize"
-                android:layout_height="?attr/actionBarSize"
-                android:padding="12dp"
-                android:src="@drawable/ic_arrow_back_white_24dp" />
+            <com.sanron.pppig.widget.player.PigPlayer
+                android:id="@+id/player_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </com.sanron.pppig.widget.AspectLayout>
 
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="20dp"
-                android:textColor="@color/white"
-                android:textSize="16dp"
-                tools:text="呜呜呜" />
-        </LinearLayout>
-
-        <com.sanron.pppig.widget.player.PigPlayer
-            android:id="@+id/player_view"
+        <com.flyco.tablayout.SlidingTabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/black" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:padding="16dp">
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            app:tl_indicator_color="@color/colorPrimary"
+            app:tl_textSelectColor="@color/colorPrimary"
+            app:tl_textUnselectColor="@color/textColor3" />
 
-        </android.support.v7.widget.RecyclerView>
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+
+        </android.support.v4.view.ViewPager>
     </LinearLayout>
 </layout>
