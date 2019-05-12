@@ -15,7 +15,7 @@ android {
         multiDexEnabled true
 
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a"
         }
     }
 
@@ -190,7 +190,7 @@ dependencies {
     implementation('com.shuyu:gsyVideoPlayer-java:6.0.3') {
         exclude group: "com.android.support"
     }
-    implementation('com.shuyu:gsyVideoPlayer-armv7a:6.0.3') {
+    implementation('com.shuyu:gsyVideoPlayer-ex_so:6.0.3') {
         exclude group: "com.android.support"
     }
 

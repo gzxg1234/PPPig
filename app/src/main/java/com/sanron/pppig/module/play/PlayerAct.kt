@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseViewHolder
-import com.sanron.datafetch.WebHelper
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
@@ -70,7 +69,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         dataBinding.model = viewModel
         viewModel.videoSourceList.observe(this, Observer {
             if (!it.isNullOrEmpty()) {
-                dataBinding.playerView.setUp(it[0], true, title)
+                dataBinding.playerView.setUp(it[0], false, title)
                 dataBinding.playerView.startPlayLogic()
             }
         })
@@ -96,6 +95,8 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1))
                 //解决m3u8文件拖动问题 比如:一个3个多少小时的音频文件，开始播放几秒中，然后拖动到2小时左右的时间，要loading 10分钟
                 it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "fastseek"))
+                //打开重试
+                it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1))
             }
             setIsTouchWiget(true)
             isRotateViewAuto = false
@@ -185,6 +186,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     private fun loadItem(item: PlaySource.Item) {
         dataBinding.playerView.release()
+        dataBinding.playerView.onVideoReset()
         viewModel.playItem = item
         viewModel.loadData()
     }
@@ -243,7 +245,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         }
     }
 
-    class ItemAdapter(context: Context) : CBaseAdapter<PlaySource.Item, BaseViewHolder>(context,R.layout.item_play_item) {
+    class ItemAdapter(context: Context) : CBaseAdapter<PlaySource.Item, BaseViewHolder>(context, R.layout.item_play_item) {
 
         var selectedPos = -1
             set(value) {

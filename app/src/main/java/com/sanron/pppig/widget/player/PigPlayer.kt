@@ -157,9 +157,28 @@ class PigPlayer : StandardGSYVideoPlayer {
         } else position
     }
 
+    override fun changeUiToNormal() {
+        super.changeUiToNormal()
+        setProgressAndTime(0,0,0,0)
+
+    }
+
+    override fun setSecondaryProgress(secProgress: Int) {
+        if (mProgressBar != null) {
+            if (secProgress >= 0 && !gsyVideoManager.isCacheFile) {
+                mProgressBar.secondaryProgress = secProgress
+            }
+        }
+        if (mBottomProgressBar != null) {
+            if (secProgress >= 0 && !gsyVideoManager.isCacheFile) {
+                mBottomProgressBar.secondaryProgress = secProgress
+            }
+        }
+    }
+
     override fun setProgressAndTime(progress: Int, secProgress1: Int, currentTime: Int, totalTime: Int) {
+        super.setProgressAndTime(progress, secProgress1, currentTime, totalTime)
         var secProgress = secProgress1
-        super.setProgressAndTime(progress, secProgress, currentTime, totalTime)
 
         if (mGSYVideoProgressListener != null && mCurrentState == GSYVideoView.CURRENT_STATE_PLAYING) {
             mGSYVideoProgressListener.onProgress(progress, secProgress, currentTime, totalTime)
@@ -180,7 +199,7 @@ class PigPlayer : StandardGSYVideoPlayer {
 
         timeTextView.text = CommonUtil.stringForTime(currentTime) + "/" + CommonUtil.stringForTime(totalTime)
         if (mBottomProgressBar != null) {
-            if (progress != 0) mBottomProgressBar.progress = progress
+            if (progress >=0) mBottomProgressBar.progress = progress
             setSecondaryProgress(secProgress)
         }
     }
