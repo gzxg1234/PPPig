@@ -1,4 +1,4 @@
-package com.sanron.datafetch.moyan
+package com.sanron.datafetch.source.moyan
 
 import android.content.Context
 import com.sanron.datafetch.WebHelper

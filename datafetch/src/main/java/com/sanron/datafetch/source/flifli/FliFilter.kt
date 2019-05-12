@@ -1,4 +1,4 @@
-package com.sanron.datafetch.kkkkmao
+package com.sanron.datafetch.source.flifli
 
 import com.sanron.datafetch_interface.bean.FilterItem
 import java.util.*
@@ -8,7 +8,7 @@ import java.util.*
  * @author chenrong
  * @date 2019/5/12
  */
-object KMaoFilter{
+object FliFilter{
 
 
     internal fun moveListFilter(): Map<String, List<FilterItem>> {

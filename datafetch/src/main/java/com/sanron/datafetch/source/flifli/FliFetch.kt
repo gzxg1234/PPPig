@@ -1,8 +1,10 @@
-package com.sanron.datafetch.kkkkmao
+package com.sanron.datafetch.source.flifli
 
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
 import com.sanron.datafetch.exception.ParseException
+import com.sanron.datafetch.source.kkkkmao.KKMaoParser
+import com.sanron.datafetch.source.kkkkmao.KmaoApi
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
 import io.reactivex.Observable
@@ -18,7 +20,7 @@ import java.util.*
  * Time:2019/5/8
  * Description:
  */
-class KMaoFetch : DataFetch {
+class FliFetch : DataFetch {
     companion object {
         const val TYPE_MOVIE = 1
         const val TYPE_TV = 2
@@ -40,7 +42,7 @@ class KMaoFetch : DataFetch {
         return@lazy Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .client(SourceManagerImpl.okHttpClient)
-                .baseUrl("https://m.kkkkmao.com")
+                .baseUrl("http://flif.li")
                 .build()
     }
 
@@ -108,13 +110,13 @@ class KMaoFetch : DataFetch {
 
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> {
         if (type == TYPE_MOVIE) {
-            return KMaoFilter.moveListFilter()
+            return FliFilter.moveListFilter()
         } else if (type == TYPE_TV) {
-            return KMaoFilter.tvListFilter()
+            return FliFilter.tvListFilter()
         } else if (type == TYPE_VARIETY) {
-            return KMaoFilter.varietyListFilter()
+            return FliFilter.varietyListFilter()
         } else if (type == TYPE_ANIM) {
-            return KMaoFilter.animListFilter()
+            return FliFilter.animListFilter()
         }
         return mapOf()
     }

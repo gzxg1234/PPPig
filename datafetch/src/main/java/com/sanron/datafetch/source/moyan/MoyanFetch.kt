@@ -1,16 +1,16 @@
-package com.sanron.datafetch.moyan
+package com.sanron.datafetch.source.moyan
 
 import com.sanron.datafetch.BuildConfig
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
 import com.sanron.datafetch.exception.ParseException
-import com.sanron.datafetch.kkkkmao.KmaoApi
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import java.net.URLEncoder
 import java.util.*
 
 /**
@@ -62,7 +62,7 @@ class MoyanFetch : DataFetch {
     }
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(MoyanApi::class.java)
                 .topMovie()
                 .map { s -> MoyanParser.instance.parseTopMovie(s.string()) }
     }
@@ -120,31 +120,104 @@ class MoyanFetch : DataFetch {
         return mapOf()
     }
 
-    private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
-                .tvList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+    private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/index.php/vod/show")
+        params["国家"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/id/1").append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
+        return getService(MoyanApi::class.java)
+                .html(path.toString())
                 .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
     }
 
-    private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
-                .movieList(params["类型"]?.value ?: "movie", params["国家"]?.value
-                        ?: "", params["年代"]?.value ?: "", page)
+    private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/index.php/vod/show")
+        params["国家"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/id/2").append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
+        return getService(MoyanApi::class.java)
+                .html(path.toString())
                 .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
     }
+
 
     private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
-                .varietyList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/index.php/vod/show")
+        params["国家"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/id/3").append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
+        return getService(MoyanApi::class.java)
+                .html(path.toString())
                 .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
-                .animList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/index.php/vod/show")
+        params["国家"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/id/4").append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
+        return getService(MoyanApi::class.java)
+                .html(path.toString())
                 .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
     }
 

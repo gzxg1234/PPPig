@@ -1,7 +1,8 @@
-package com.sanron.datafetch.kkkkmao
+package com.sanron.datafetch.source.flifli
 
 import com.sanron.datafetch.FetchLog
 import com.sanron.datafetch.exception.ParseException
+import com.sanron.datafetch.source.kkkkmao.KKMaoParser
 import com.sanron.datafetch_interface.bean.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -12,11 +13,11 @@ import java.util.regex.Pattern
  * Time:2019/4/12
  * Description:
  */
-class KKMaoParser {
+class FliParser {
 
     companion object {
         val instance by lazy {
-            KKMaoParser()
+            FliParser()
         }
         const val BANNER_MAX_SIZE = 9
         const val HOME_CAT_VIDEO_MAX_SIZE = 9

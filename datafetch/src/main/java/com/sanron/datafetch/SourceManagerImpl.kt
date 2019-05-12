@@ -2,8 +2,8 @@ package com.sanron.datafetch
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.sanron.datafetch.kkkkmao.KMaoFetch
-import com.sanron.datafetch.moyan.MoyanFetch
+import com.sanron.datafetch.source.flifli.FliFetch
+import com.sanron.datafetch.source.moyan.MoyanFetch
 import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.SourceManager
 import okhttp3.OkHttpClient
@@ -28,7 +28,7 @@ class SourceManagerImpl : SourceManager {
         internal lateinit var okHttpClient: OkHttpClient
 
         var SOURCE_LIST = listOf(
-                Source("看看猫", KMaoFetch()),
+                Source("看看猫", FliFetch()),
                 Source("陌颜影视", MoyanFetch())
         )
     }

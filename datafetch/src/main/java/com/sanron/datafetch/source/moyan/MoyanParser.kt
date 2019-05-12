@@ -1,4 +1,4 @@
-package com.sanron.datafetch.moyan
+package com.sanron.datafetch.source.moyan
 
 import android.text.TextUtils
 import com.sanron.datafetch.FetchLog
@@ -107,23 +107,19 @@ class MoyanParser {
         data.data = mutableListOf()
         val doc = Jsoup.parse(html)
         doc?.let {
-            //是否有下一页按钮
-            doc.select(".next.pagegbk")?.first()?.let {
-                data.hasMore = true
+            //是否有下一页
+            doc.selectFirst(".container>.row>.stui-page>li>span.num")?.let {
+                val numText = it.ownText()
+                val arr = numText.split("/")
+                data.hasMore = arr.size == 2 && arr[0] != arr[1]
             }
-            doc.select(".main.top>.list_vod>#vod_list>li>a")?.forEach {
+            doc.select(".container>.row>.stui-pannel>.stui-pannel-box>.stui-pannel_bd>.stui-vodlist>li>.stui-vodlist__box>a")?.forEach {
                 val item = VideoItem()
-                item.link = it.attr("href")
                 item.name = it.attr("title")
-                it.select(".picsize>img").first().apply {
-                    item.img = this.attr("src")
-                }
-                it.select(".picsize>.score").first().apply {
-                    item.score = this.text()
-                }
-                it.select(".picsize>.title").first().apply {
-                    item.label = this.text()
-                }
+                item.link = it.attr("href")
+                item.img = it.attr("data-original")
+                item.label = it.selectFirst("span.pic-text.text-right")?.ownText() ?: ""
+                item.score = ""
                 data.data?.add(item)
             }
         }

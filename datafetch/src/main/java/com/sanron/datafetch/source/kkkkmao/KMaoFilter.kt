@@ -1,4 +1,4 @@
-package com.sanron.datafetch.moyan
+package com.sanron.datafetch.source.kkkkmao
 
 import com.sanron.datafetch_interface.bean.FilterItem
 import java.util.*
@@ -8,7 +8,8 @@ import java.util.*
  * @author chenrong
  * @date 2019/5/12
  */
-object MoyanFilter {
+object KMaoFilter{
+
 
     internal fun moveListFilter(): Map<String, List<FilterItem>> {
         val types = listOf(
