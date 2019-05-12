@@ -15,7 +15,8 @@ import io.reactivex.Observable
 object Repo : DataFetch {
 
     var sourceManager: SourceManager = SourceManagerImpl().apply {
-        init(context = PiApp.sInstance)
+        initContext(context = PiApp.sInstance)
+        setHttpClient(Injector.provideOkHttpClient())
     }
 
     var dataFetch: DataFetch = sourceManager.getSourceList().get(1).fetch
