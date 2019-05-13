@@ -12,17 +12,21 @@ import retrofit2.http.Path
  */
 interface KmaoApi {
 
+    companion object {
+        const val BASE_URL = "http://m.kkkkmao.com"
+    }
 
-    @GET("http://m.kkkkmao.com/{path}")
+
+    @GET("$BASE_URL/{path}")
     fun html(@Path(encoded = true, value = "path") path: String): Observable<ResponseBody>
 
-    @GET("http://m.kkkkmao.com/{type}/index_{page}___{year}___{country}_1.html")
+    @GET("$BASE_URL/{type}/index_{page}___{year}___{country}_1.html")
     fun movieList(@Path("type") type: String,
                   @Path("country") country: String,
                   @Path("year") year: String,
                   @Path("page") page: Int): Observable<ResponseBody>
 
-    @GET("http://m.kkkkmao.com/tv/index_{page}_{type}_{end}_{year}___{country}_1.html")
+    @GET("$BASE_URL/tv/index_{page}_{type}_{end}_{year}___{country}_1.html")
     fun tvList(@Path("type") type: String,
                @Path("end") end: String,
                @Path("country") country: String,
@@ -30,7 +34,7 @@ interface KmaoApi {
                @Path("page") page: Int): Observable<ResponseBody>
 
 
-    @GET("http://m.kkkkmao.com/Animation/index_{page}_{type}_{end}_{year}___{country}_1.html")
+    @GET("$BASE_URL/Animation/index_{page}_{type}_{end}_{year}___{country}_1.html")
     fun animList(@Path("type") type: String,
                  @Path("end") end: String,
                  @Path("country") country: String,
@@ -38,22 +42,26 @@ interface KmaoApi {
                  @Path("page") page: Int): Observable<ResponseBody>
 
 
-    @GET("http://m.kkkkmao.com/Arts/index_{page}_{type}_{end}_{year}___{country}_1.html")
+    @GET("$BASE_URL/Arts/index_{page}_{type}_{end}_{year}___{country}_1.html")
     fun varietyList(@Path("type") type: String,
                     @Path("end") end: String,
                     @Path("country") country: String,
                     @Path("year") year: String,
                     @Path("page") page: Int): Observable<ResponseBody>
 
+    @GET("$BASE_URL/vod-search-wd-{word}-p-{page}.html")
+    fun search(@Path("word") word: String,
+               @Path("page") page: Int): Observable<ResponseBody>
+
     /**
      * 主页
      */
-    @GET("http://m.kkkkmao.com")
+    @GET(BASE_URL)
     fun home(): Observable<ResponseBody>
 
     /**
      * 热映电影
      */
-    @GET("http://m.kkkkmao.com/top_mov.html")
+    @GET("$BASE_URL/top_mov.html")
     fun topMovie(): Observable<ResponseBody>
 }

@@ -36,7 +36,7 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
         mViewModel?.toastMsg?.observe(this, Observer {
             showToast(it)
         })
-        runInMainIdle {
+        runInMainIdle(this) {
             initData()
         }
     }

@@ -19,6 +19,7 @@ import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.common.LoadingView
 import com.sanron.pppig.databinding.ActivityPlayerBinding
+import com.sanron.pppig.module.videodetail.VideoDetailAct
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.widget.ViewPagerAdapter
@@ -40,10 +41,11 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
     lateinit var orientationUtils: OrientationUtils
 
     companion object {
-        const val ARG_SOURCE = "source"
+        const val ARG_PLAY_SOURCE = "play_source_list"
         const val ARG_TITLE = "title"
         const val ARG_SOURCE_POS = "page_pos"
         const val ARG_ITEM_POS = "item_pos"
+        const val ARG_SOURCE_ID = "source_id"
     }
 
     val loadingView: LoadingView by lazy {
@@ -65,6 +67,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 .setStatusBarColor(0x60000000)
                 .setLayoutBelowStatusBar(true)
                 .setPaddingTop(dataBinding.playerView.getTopBar())
+        viewModel.setSource(intent?.getStringExtra(ARG_SOURCE_ID) ?: "")
         dataBinding.lifecycleOwner = this
         dataBinding.model = viewModel
         viewModel.videoSourceList.observe(this, Observer {
@@ -131,7 +134,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             }
         }
 
-        val sourceList: List<PlaySource> = intent?.getSerializableExtra(ARG_SOURCE) as List<PlaySource>
+        val sourceList: List<PlaySource> = intent?.getSerializableExtra(ARG_PLAY_SOURCE) as List<PlaySource>
         val pagePos = intent?.getIntExtra(ARG_SOURCE_POS, 0)!!
         val itemPos = intent?.getIntExtra(ARG_ITEM_POS, 0)!!
         dataBinding.viewPager.adapter = SourceAdapter(sourceList).apply {

@@ -10,10 +10,24 @@ import okhttp3.OkHttpClient
  */
 interface SourceManager {
 
+    /**
+     * 版本
+     */
+    fun getVersion(): Int
+
+    /**
+     * 设置Context
+     */
     fun initContext(context: Context)
 
+    /**
+     * 获取视频源
+     */
     fun getSourceList(): List<Source>
 
-    fun setHttpClient(okHttpClient:OkHttpClient)
+    /**
+     * 设置HttpClient
+     */
+    fun setHttpClient(okHttpClient: OkHttpClient)
 
 }

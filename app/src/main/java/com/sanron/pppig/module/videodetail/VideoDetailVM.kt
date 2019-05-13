@@ -2,12 +2,13 @@ package com.sanron.pppig.module.videodetail
 
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
+import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.datafetch_interface.bean.VideoDetail
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.MsgFactory
-import com.sanron.pppig.data.Repo
+import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.util.SingleLiveEvent
 import com.sanron.pppig.util.main
 import io.reactivex.disposables.Disposable
@@ -36,8 +37,14 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
         loading.value = false
     }
 
+    lateinit var source: Source
+
+    fun setSource(sourceId: String) {
+        source = FetchManager.getSourceById(sourceId)!!
+    }
+
     fun loadData() {
-        Repo.getVideoDetail(url ?: "")
+        source.fetch.getVideoDetail(url ?: "")
                 .main()
                 .compose(addDisposable())
                 .subscribe(object : BaseObserver<VideoDetail>() {

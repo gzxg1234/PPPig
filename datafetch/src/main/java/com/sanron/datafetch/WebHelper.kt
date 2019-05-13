@@ -35,17 +35,19 @@ class WebHelper(val context: Context) {
 
         fun evaluate(context: Context, url: String, header: Map<String, String>? = null, js: String, callback: Callback): Cancellable {
             val webPageHelper = WebHelper(context)
-            webPageHelper.evaluate(url, header, js, object : Callback {
-                override fun success(result: String) {
-                    webPageHelper.destroy()
-                    callback.success(result)
-                }
+            runOnUiThread {
+                webPageHelper.evaluate(url, header, js, object : Callback {
+                    override fun success(result: String) {
+                        webPageHelper.destroy()
+                        callback.success(result)
+                    }
 
-                override fun error(msg: String) {
-                    webPageHelper.destroy()
-                    callback.error(msg)
-                }
-            })
+                    override fun error(msg: String) {
+                        webPageHelper.destroy()
+                        callback.error(msg)
+                    }
+                })
+            }
             return object : Cancellable {
                 override fun cancel() {
                     webPageHelper.destroy()

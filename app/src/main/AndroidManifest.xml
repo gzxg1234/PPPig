@@ -28,11 +28,14 @@
             android:name="design_height_in_dp"
             android:value="731" />
 
-        <activity android:name=".module.main.MainActivity">
+        <activity android:name=".module.splash.SplashAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".module.main.MainActivity"
+            >
         </activity>
         <activity android:name="com.sanron.pppig.module.videodetail.VideoDetailAct" />
         <activity

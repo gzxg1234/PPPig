@@ -1,8 +1,8 @@
 package com.sanron.datafetch.source.kkkkmao
 
 import com.sanron.datafetch.FetchLog
-import com.sanron.datafetch.exception.ParseException
 import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.exception.ParseException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.regex.Pattern
@@ -12,18 +12,12 @@ import java.util.regex.Pattern
  * Time:2019/4/12
  * Description:
  */
-class KKMaoParser {
+object KKMaoParser {
 
-    companion object {
-        val instance by lazy {
-            KKMaoParser()
-        }
-        const val BANNER_MAX_SIZE = 9
-        const val HOME_CAT_VIDEO_MAX_SIZE = 9
-        val TAG: String = KKMaoParser::class.java.simpleName
-        val PATTERN_TITLE: Pattern = Pattern.compile("\\[([\\s\\S]*)]")
-
-    }
+    const val BANNER_MAX_SIZE = 9
+    const val HOME_CAT_VIDEO_MAX_SIZE = 9
+    val TAG: String = KKMaoParser::class.java.simpleName
+    val PATTERN_TITLE: Pattern = Pattern.compile("\\[([\\s\\S]*)]")
 
     /**
      * 解析banner轮播
@@ -43,7 +37,7 @@ class KKMaoParser {
                 }
                 //去除两端括号
                 val matcher = PATTERN_TITLE.matcher(banner.title)
-                if (matcher.find() && matcher.groupCount() > 1) {
+                if (matcher.find()) {
                     banner.title = matcher.group(1)
                 }
 
@@ -139,6 +133,24 @@ class KKMaoParser {
                 }
                 data.data?.add(item)
             }
+        }
+        return data
+    }
+
+    fun parseSearchResult(html: String): PageData<VideoItem> {
+        var data = PageData<VideoItem>()
+        Jsoup.parse(html)?.let { doc ->
+            data.data = mutableListOf()
+            doc.select(".main>.all_tab.top>ul.new_tab_img>li>a")?.forEach {
+                val item = VideoItem()
+                item.name = it.attr("title")
+                item.link = it.attr("href")
+                item.img = it.selectFirst(".picsize>.loading")?.attr("src") ?: ""
+                data.data?.add(item)
+            }
+            data.hasMore = doc.selectFirst(".ui-vpages>a.next")?.let {
+                true
+            } ?: false
         }
         return data
     }

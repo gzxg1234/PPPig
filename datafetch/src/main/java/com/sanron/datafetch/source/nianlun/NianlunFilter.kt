@@ -1,4 +1,4 @@
-package com.sanron.datafetch.source.flifli
+package com.sanron.datafetch.source.nianlun
 
 import com.sanron.datafetch_interface.bean.FilterItem
 import java.util.*
@@ -8,7 +8,7 @@ import java.util.*
  * @author chenrong
  * @date 2019/5/12
  */
-object FliFilter{
+object NianlunFilter{
 
 
     internal fun moveListFilter(): Map<String, List<FilterItem>> {

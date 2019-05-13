@@ -13,7 +13,7 @@ import com.sanron.pppig.R
  * Description:
  * 基类RecyclerViewAdapter
  */
-abstract class CBaseAdapter<T, V : BaseViewHolder>(context: Context, layoutResId: Int, data: List<T>? = null)
+abstract class CBaseAdapter<T, V : BaseViewHolder>(val context: Context, layoutResId: Int, data: List<T>? = null)
     : BaseQuickAdapter<T, V>(layoutResId, data) {
 
 

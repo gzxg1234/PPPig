@@ -1,10 +1,7 @@
 package com.sanron.pppig.data
 
-import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch_interface.DataFetch
-import com.sanron.datafetch_interface.SourceManager
 import com.sanron.datafetch_interface.bean.*
-import com.sanron.pppig.app.PiApp
 import io.reactivex.Observable
 
 /**
@@ -14,19 +11,15 @@ import io.reactivex.Observable
  */
 object Repo : DataFetch {
 
-    var sourceManager: SourceManager = SourceManagerImpl().apply {
-        initContext(context = PiApp.sInstance)
-        setHttpClient(Injector.provideOkHttpClient())
-    }
-
-    var dataFetch: DataFetch = sourceManager.getSourceList().get(1).fetch
-
+    lateinit var dataFetch: DataFetch
 
     override fun getHomeData(): Observable<Home> = dataFetch.getHomeData()
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> = dataFetch.getTopMovie()
 
     override fun getVideoDetail(path: String): Observable<VideoDetail> = dataFetch.getVideoDetail(path)
+
+    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> = dataFetch.getVideoPlayPageUrl(videoPageUrl)
 
     override fun getVideoSource(url: String) = dataFetch.getVideoSource(url)
 
@@ -36,4 +29,6 @@ object Repo : DataFetch {
 
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> = dataFetch.getVideoListFilter(type)
 
+    override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> = dataFetch.getSearchResult(word, page)
 }
+

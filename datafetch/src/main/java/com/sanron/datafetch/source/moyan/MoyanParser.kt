@@ -2,8 +2,8 @@ package com.sanron.datafetch.source.moyan
 
 import android.text.TextUtils
 import com.sanron.datafetch.FetchLog
-import com.sanron.datafetch.exception.ParseException
 import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.exception.ParseException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
@@ -12,16 +12,11 @@ import org.jsoup.nodes.Document
  * Time:2019/4/12
  * Description:
  */
-class MoyanParser {
+object MoyanParser {
 
-    companion object {
-        val instance by lazy {
-            MoyanParser()
-        }
-        const val BANNER_MAX_SIZE = 9
-        const val HOME_CAT_VIDEO_MAX_SIZE = 9
-        val TAG: String = MoyanParser::class.java.simpleName
-    }
+    const val BANNER_MAX_SIZE = 9
+    const val HOME_CAT_VIDEO_MAX_SIZE = 9
+    val TAG: String = MoyanParser::class.java.simpleName
 
     /**
      * 解析banner轮播
@@ -250,5 +245,27 @@ class MoyanParser {
             }
         }
         return null
+    }
+
+    fun parseSearchResult(html: String?): PageData<VideoItem>? {
+        var data = PageData<VideoItem>()
+        data.data = mutableListOf()
+        Jsoup.parse(html)?.let { doc ->
+            doc.select(".container>.row ul.stui-vodlist__media>li>.thumb>.stui-vodlist__thumb")?.forEach {
+                val item = VideoItem()
+                item.name = it.attr("title")
+                item.img = it.attr("data-original")
+                item.link = it.attr("href")
+                item.label = it.selectFirst("span.pic-text")?.ownText()
+                data.data?.add(item)
+            }
+            //是否有下一页
+            doc.selectFirst(".stui-page>li>span.num")?.let {
+                val numText = it.ownText()
+                val arr = numText.split("/")
+                data.hasMore = arr.size == 2 && arr[0] != arr[1]
+            }
+        }
+        return data
     }
 }

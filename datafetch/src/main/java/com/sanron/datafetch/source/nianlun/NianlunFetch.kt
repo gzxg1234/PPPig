@@ -1,12 +1,10 @@
-package com.sanron.datafetch.source.flifli
+package com.sanron.datafetch.source.nianlun
 
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
-import com.sanron.datafetch.exception.ParseException
-import com.sanron.datafetch.source.kkkkmao.KKMaoParser
-import com.sanron.datafetch.source.kkkkmao.KmaoApi
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.exception.ParseException
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import org.jsoup.Jsoup
@@ -20,7 +18,7 @@ import java.util.*
  * Time:2019/5/8
  * Description:
  */
-class FliFetch : DataFetch {
+class NianlunFetch : DataFetch {
     companion object {
         const val TYPE_MOVIE = 1
         const val TYPE_TV = 2
@@ -42,7 +40,7 @@ class FliFetch : DataFetch {
         return@lazy Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
                 .client(SourceManagerImpl.okHttpClient)
-                .baseUrl("http://flif.li")
+                .baseUrl(NianlunApi.BASE_URL)
                 .build()
     }
 
@@ -58,31 +56,31 @@ class FliFetch : DataFetch {
     }
 
     override fun getHomeData(): Observable<Home> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .home()
                 .map { s ->
-                    val data = KKMaoParser.instance.parseHome(s.string())
+                    val data = NianlunParser.parseHome(s.string())
                     return@map data
                 }
     }
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .topMovie()
-                .map { s -> KKMaoParser.instance.parseTopMovie(s.string()) }
+                .map { s -> NianlunParser.parseTopMovie(s.string()) }
     }
 
     override fun getVideoDetail(path: String): Observable<VideoDetail> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .html(path)
-                .map { responseBody -> KKMaoParser.instance.parseVideoDetail(responseBody.string()) }
+                .map { responseBody -> NianlunParser.parseVideoDetail(responseBody.string()) }
     }
 
     override fun getVideoSource(url: String): Observable<List<String>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .html(url)
                 .flatMap { responseBody ->
-                    val sourceUrl = KKMaoParser.instance.parsePlayPageUrl(responseBody.string())
+                    val sourceUrl = NianlunParser.parsePlayPageUrl(responseBody.string())
                             ?: throw ParseException("解析url失败")
                     val referer = "http://m.kkkkmao.com/$url"
                     val header = mutableMapOf<String, String>()
@@ -110,43 +108,43 @@ class FliFetch : DataFetch {
 
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> {
         if (type == TYPE_MOVIE) {
-            return FliFilter.moveListFilter()
+            return NianlunFilter.moveListFilter()
         } else if (type == TYPE_TV) {
-            return FliFilter.tvListFilter()
+            return NianlunFilter.tvListFilter()
         } else if (type == TYPE_VARIETY) {
-            return FliFilter.varietyListFilter()
+            return NianlunFilter.varietyListFilter()
         } else if (type == TYPE_ANIM) {
-            return FliFilter.animListFilter()
+            return NianlunFilter.animListFilter()
         }
         return mapOf()
     }
 
     private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .tvList(params["类型"]?.value ?: "", params["状态"]?.value
                         ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
-                .map { s -> KKMaoParser.instance.parseVideoList(s.string()) }
+                .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
     private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .movieList(params["类型"]?.value ?: "movie", params["国家"]?.value
                         ?: "", params["年代"]?.value ?: "", page)
-                .map { s -> KKMaoParser.instance.parseVideoList(s.string()) }
+                .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
     private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .varietyList(params["类型"]?.value ?: "", params["状态"]?.value
                         ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
-                .map { s -> KKMaoParser.instance.parseVideoList(s.string()) }
+                .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(KmaoApi::class.java)
+        return getService(NianlunApi::class.java)
                 .animList(params["类型"]?.value ?: "", params["状态"]?.value
                         ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
-                .map { s -> KKMaoParser.instance.parseVideoList(s.string()) }
+                .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
     override fun getVideoList(type: Int, param: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
@@ -161,4 +159,13 @@ class FliFetch : DataFetch {
         }
         return Observable.empty()
     }
+
+    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 }

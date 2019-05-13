@@ -40,6 +40,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
 
     companion object {
         const val ARG_URL = "url"
+        const val ARG_SOURCE_ID = "source_id"
     }
 
     //标题是电影名称
@@ -59,6 +60,8 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.url = intent?.getStringExtra(ARG_URL)
+        viewModel.setSource(intent?.getStringExtra(ARG_SOURCE_ID) ?: "")
         StatusBarHelper.with(this@VideoDetailAct)
                 .setStatusBarColor(0)
                 .setDarkIcon(0.5f)
@@ -73,7 +76,6 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
         dataBinding.appbarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { p0, p1 ->
             onAppBarScroll(p1)
         })
-        viewModel.url = intent?.getStringExtra(ARG_URL)
         viewModel.loading.observe(this@VideoDetailAct, Observer {
             it?.let { b ->
                 if (b) {
@@ -110,7 +112,8 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
                 val titles = sourceList.map { source ->
                     source.name
                 }
-                dataBinding.viewPager.adapter = SourceAdapter(viewModel.title.value, sourceList)
+                dataBinding.viewPager.adapter = SourceAdapter(viewModel.title.value,
+                        intent?.getStringExtra(ARG_SOURCE_ID) ?: "", sourceList)
                 dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
             }
         })
@@ -201,7 +204,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
     }
 
 
-    class SourceAdapter(val title: String?, val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
+    class SourceAdapter(val title: String?, val sourceId: String, val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
 
         override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
             val context = container.context
@@ -218,7 +221,7 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
             adapter.bindToRecyclerView(recyclerView)
             adapter.setOnItemClickListener { _, _, position2 ->
                 if (!data.isNullOrEmpty()) {
-                    (context as Activity).startActivity(Intents.playVideo(context, title, data, position, position2))
+                    (context as Activity).startActivity(Intents.playVideo(context, title, data, position, position2, sourceId))
                 }
             }
             return recyclerView

@@ -25,9 +25,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+//    compileOnly fileTree(dir: 'libs', include: ['fetch_interface.jar'])
+    compileOnly project(':datafetch_interface')
 
-    compileOnly project(":datafetch_interface")
     compileOnly 'io.reactivex.rxjava2:rxjava:2.2.3'
     compileOnly 'com.squareup.retrofit2:retrofit:2.4.0'
     compileOnly 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'

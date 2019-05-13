@@ -9,7 +9,9 @@ import com.flyco.tablayout.listener.OnTabSelectListener
 import com.sanron.datafetch_interface.bean.VideoListType
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
+import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.data.Repo
 import com.sanron.pppig.databinding.FragmentMainBinding
 import com.sanron.pppig.module.mainhome.home.HomeFragment
@@ -50,13 +52,32 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
                 (pageAdapter.getFragment(position) as IMainChildFragment).onReselect()
             }
         })
+        dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
+        dataBinding.llSearch.setOnClickListener {
+            startActivity(Intents.search(context!!))
+        }
+        dataBinding.llChangeSource.setOnClickListener {
+            SelectSourceDialog(context!!) {
+                onRepoChange()
+            }.show()
+        }
+    }
+
+    private fun onRepoChange() {
+        dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
+        (dataBinding.viewPager.adapter as? PageAdapter)?.removeAll()
+        dataBinding.viewPager.adapter = PageAdapter(Repo.getVideoListTypes(), childFragmentManager).apply { pageAdapter = this }
+        dataBinding.tabLayout.setViewPager(dataBinding.viewPager)
+        dataBinding.tabLayout.currentTab = 0
+        dataBinding.tabLayout.notifyDataSetChanged()
     }
 
     override fun initData() {
         viewModel.getData()
     }
 
-    private class PageAdapter(val videoTypeList: List<VideoListType>, fm: FragmentManager) : FragmentPagerAdapter(fm) {
+
+    private class PageAdapter(val videoTypeList: List<VideoListType>, var fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         private val fragments = SparseArray<Fragment>()
         val TITLES = mutableListOf<String>()
@@ -66,6 +87,15 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
             videoTypeList.forEach {
                 TITLES.add(it.name)
             }
+        }
+
+        fun removeAll() {
+            val transaction = fm.beginTransaction()
+            for (i in 0 until fragments.size()) {
+                transaction
+                        .remove(fragments.valueAt(i))
+            }
+            transaction.commitNowAllowingStateLoss()
         }
 
         fun getFragment(pos: Int): Fragment = fragments[pos]

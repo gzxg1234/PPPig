@@ -6,14 +6,13 @@ package com.sanron.datafetch_interface.bean
  * Description:
  */
 class VideoItem {
+    var name: String? = ""
 
-    var name: String? = null
+    var label: String? = ""
 
-    var label: String? = null
+    var score: String? = ""
 
-    var score: String? = null
+    var link: String? = ""
 
-    var link: String? = null
-
-    var img:String?=null
+    var img: String? = ""
 }

@@ -1,4 +1,4 @@
-package com.sanron.datafetch.exception
+package com.sanron.datafetch_interface.exception
 
 /**
  * Author:sanron

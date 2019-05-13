@@ -21,12 +21,12 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment()
 
     private var mViewModel: M? = null
 
-    var dataBinding: T
+    protected var dataBinding: T
         private set(value) {}
         get() {
             return mDataBinding!!
         }
-    var viewModel: M
+    protected var viewModel: M
         private set(value) {}
         get() {
             return mViewModel!!

@@ -40,7 +40,6 @@ fun bindPageLoader(recyclerView: RecyclerView, pageLoader: PageLoader<*>) {
                 RecyclerViewAdapter.STATE_END -> loadMoreEnd()
                 else -> {
                     loadMoreComplete()
-                    disableLoadMoreIfNotFullPage()
                 }
             }
         })
@@ -81,7 +80,6 @@ fun bindBaseAdapter(recyclerView: RecyclerView, state: Int?, loadMoreEnable: Boo
                 RecyclerViewAdapter.STATE_END -> loadMoreEnd()
                 else -> {
                     loadMoreComplete()
-                    disableLoadMoreIfNotFullPage()
                 }
             }
         }

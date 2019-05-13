@@ -2,11 +2,12 @@ package com.sanron.pppig.module.play
 
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
+import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.MsgFactory
-import com.sanron.pppig.data.Repo
+import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.util.main
 
 /**
@@ -24,8 +25,14 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     var videoSourceList = MutableLiveData<List<String>>()
 
 
+    lateinit var source: Source
+
+    fun setSource(sourceId: String) {
+        source = FetchManager.getSourceById(sourceId)!!
+    }
+
     fun loadData() {
-        Repo.getVideoSource(playItem?.link ?: "")
+        source.fetch.getVideoSource(playItem?.link ?: "")
                 .main()
                 .compose(addDisposable())
                 .doOnSubscribe {

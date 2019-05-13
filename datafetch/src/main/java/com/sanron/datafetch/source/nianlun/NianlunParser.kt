@@ -1,9 +1,10 @@
-package com.sanron.datafetch.source.flifli
+package com.sanron.datafetch.source.nianlun
 
 import com.sanron.datafetch.FetchLog
-import com.sanron.datafetch.exception.ParseException
 import com.sanron.datafetch.source.kkkkmao.KKMaoParser
+import com.sanron.datafetch.source.moyan.MoyanParser
 import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.exception.ParseException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.regex.Pattern
@@ -13,46 +14,29 @@ import java.util.regex.Pattern
  * Time:2019/4/12
  * Description:
  */
-class FliParser {
+object NianlunParser {
 
-    companion object {
-        val instance by lazy {
-            FliParser()
-        }
-        const val BANNER_MAX_SIZE = 9
-        const val HOME_CAT_VIDEO_MAX_SIZE = 9
-        val TAG: String = KKMaoParser::class.java.simpleName
-        val PATTERN_TITLE: Pattern = Pattern.compile("\\[([\\s\\S]*)]")
+    const val BANNER_MAX_SIZE = 9
+    const val HOME_CAT_VIDEO_MAX_SIZE = 9
+    val TAG: String = KKMaoParser::class.java.simpleName
+    val BANNER_IMG_PATTERN: Pattern = Pattern.compile("background: url\\(([\\s\\S]*)\\)")
 
-    }
 
     /**
      * 解析banner轮播
      */
     private fun parseBanner(doc: Document): List<Banner> {
         val banners = mutableListOf<Banner>()
-        val items = doc.select("#focus>.focusList>.con>a")
-        items?.let {
-            items.forEach {
-                val banner = Banner()
-                banner.link = it.attr("href")
-                it.select("img").first()?.let {
-                    banner.image = it.attr("data-src")
-                }
-                it.select(".sTxt>em").first()?.let {
-                    banner.title = it.text()
-                }
-                //去除两端括号
-                val matcher = PATTERN_TITLE.matcher(banner.title)
-                if (matcher.find() && matcher.groupCount() > 1) {
-                    banner.title = matcher.group(1)
-                }
-
-                banners.add(banner)
-                if (banners.size >= BANNER_MAX_SIZE) {
-                    return@let
+        doc.select("#banner>.carousel-inner>div.item>a.stui-banner__pic")?.forEach {
+            val banner = Banner()
+            banner.link = it.attr("href")
+            it.attr("style")?.let {
+                val matcher = BANNER_IMG_PATTERN.matcher(it)
+                if (matcher.find() ) {
+                    banner.image = completeUrl(matcher.group(1))
                 }
             }
+            banners.add(banner)
         }
         FetchLog.d(TAG, "banner size = ${banners.size}")
         return banners
@@ -113,6 +97,16 @@ class FliParser {
         return list
     }
 
+    private fun completeUrl(path: String?): String? {
+        return path?.let {
+            if (it.startsWith("/")) {
+                return@let NianlunApi.BASE_URL + it
+            } else {
+                return@let it
+            }
+        }
+    }
+
     /**
      * 解析电影页
      */
@@ -168,6 +162,55 @@ class FliParser {
         return data
     }
 
+
+    /**
+     * 解析列表
+     */
+    private fun parseCategories(doc: Document): MutableList<HomeCat> {
+        val categories = mutableListOf<HomeCat>()
+        doc.select(".container>.row>.stui-pannel.stui-pannel-bg")?.forEach { it1 ->
+            val title = it1.selectFirst(".stui-pannel-box>.stui-pannel_hd>.stui-pannel__head>h3.title>a")?.ownText()
+                    ?: ""
+            if (!title.contains("热播推荐")) {
+                val cat = HomeCat()
+                if (title.contains("电影")) {
+                    cat.name = "电影"
+                    cat.type = HomeCat.MOVIE
+                } else if (title.contains("连续剧")) {
+                    cat.name = "电视剧"
+                    cat.type = HomeCat.TV
+                } else if (title.contains("综艺")) {
+                    cat.name = "综艺"
+                    cat.type = HomeCat.VARIETY
+                } else if (title.contains("动漫")) {
+                    cat.name = "动漫"
+                    cat.type = HomeCat.ANIM
+                } else {
+                    return@forEach
+                }
+                val list = mutableListOf<VideoItem>()
+                run {
+                    it1.select(".stui-pannel-box>div.stui-pannel_bd>div>ul.stui-vodlist>li>.stui-vodlist__box>.stui-vodlist__thumb")?.forEach { it2 ->
+                        val item = VideoItem()
+                        item.name = it2.attr("title")
+                        item.img = completeUrl(it2.attr("data-original"))
+                        item.link = it2.attr("href")
+                        item.label = it2.selectFirst("span.pic-text.text-right")?.ownText() ?: ""
+                        item.score = ""
+                        list.add(item)
+                        if (list.size == MoyanParser.HOME_CAT_VIDEO_MAX_SIZE) {
+                            return@run
+                        }
+                    }
+                }
+                cat.items = list
+                categories.add(cat)
+            }
+        }
+        return categories
+    }
+
+
     /**
      * 解析首页数据
      */
@@ -178,26 +221,7 @@ class FliParser {
             doc?.let {
                 home = Home()
                 home!!.banner = parseBanner(doc)
-                home!!.categories.add(HomeCat().apply {
-                    name = "电影"
-                    type = HomeCat.MOVIE
-                    items = parseHotMovie(doc)
-                })
-                home!!.categories.add(HomeCat().apply {
-                    name = "电视剧"
-                    type = HomeCat.TV
-                    items = parseTv(doc)
-                })
-                home!!.categories.add(HomeCat().apply {
-                    name = "动漫"
-                    type = HomeCat.ANIM
-                    items = parseAnim(doc)
-                })
-                home!!.categories.add(HomeCat().apply {
-                    name = "综艺"
-                    type = HomeCat.VARIETY
-                    items = parseVariety(doc)
-                })
+                home!!.categories = parseCategories(doc)
             }
             return home
         } catch (e: Throwable) {

@@ -3,9 +3,9 @@ package com.sanron.datafetch.source.moyan
 import com.sanron.datafetch.BuildConfig
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
-import com.sanron.datafetch.exception.ParseException
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.exception.ParseException
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import retrofit2.Retrofit
@@ -57,25 +57,25 @@ class MoyanFetch : DataFetch {
         return getService(MoyanApi::class.java)
                 .home()
                 .map { s ->
-                    MoyanParser.instance.parseHome(s.string())
+                    MoyanParser.parseHome(s.string())
                 }
     }
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> {
         return getService(MoyanApi::class.java)
                 .topMovie()
-                .map { s -> MoyanParser.instance.parseTopMovie(s.string()) }
+                .map { s -> MoyanParser.parseTopMovie(s.string()) }
     }
 
     override fun getVideoDetail(path: String): Observable<VideoDetail> {
         return getService(MoyanApi::class.java)
                 .html(path)
-                .map { responseBody -> MoyanParser.instance.parseVideoDetail(responseBody.string()) }
+                .map { responseBody -> MoyanParser.parseVideoDetail(responseBody.string()) }
     }
 
-    override fun getVideoSource(url: String): Observable<List<String>> {
-        return Observable.create(ObservableOnSubscribe<String> { emitter ->
-            val cancellable = MoyanVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, MoyanApi.BASE_URL + url, null, object : WebHelper.Callback {
+    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
+        return Observable.create { emitter ->
+            val cancellable = MoyanVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, MoyanApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {
                     emitter.onNext(result)
                     emitter.onComplete()
@@ -88,23 +88,28 @@ class MoyanFetch : DataFetch {
             emitter.setCancellable {
                 cancellable.cancel()
             }
-        }).flatMap { videoPageUrl ->
-            return@flatMap Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
-                val cancellable = MoyanVideoUrlHelper.getVideoSource(SourceManagerImpl.context, videoPageUrl, null, object : WebHelper.Callback {
-                    override fun success(result: String) {
-                        emitter.onNext(listOf(result))
-                        emitter.onComplete()
-                    }
-
-                    override fun error(msg: String) {
-                        emitter.tryOnError(ParseException("解析失败"))
-                    }
-                })
-                emitter.setCancellable {
-                    cancellable.cancel()
-                }
-            })
         }
+    }
+
+    override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
+        return getVideoPlayPageUrl(videoPageUrl)
+                .flatMap { videoPlayPageUrl ->
+                    return@flatMap Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
+                        val cancellable = MoyanVideoUrlHelper.getVideoSource(SourceManagerImpl.context, videoPlayPageUrl, null, object : WebHelper.Callback {
+                            override fun success(result: String) {
+                                emitter.onNext(listOf(result))
+                                emitter.onComplete()
+                            }
+
+                            override fun error(msg: String) {
+                                emitter.tryOnError(ParseException("解析失败"))
+                            }
+                        })
+                        emitter.setCancellable {
+                            cancellable.cancel()
+                        }
+                    })
+                }
     }
 
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> {
@@ -142,7 +147,7 @@ class MoyanFetch : DataFetch {
         path.append(".html")
         return getService(MoyanApi::class.java)
                 .html(path.toString())
-                .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
+                .map { s -> MoyanParser.parseVideoList(s.string()) }
     }
 
     private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
@@ -167,7 +172,7 @@ class MoyanFetch : DataFetch {
         path.append(".html")
         return getService(MoyanApi::class.java)
                 .html(path.toString())
-                .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
+                .map { s -> MoyanParser.parseVideoList(s.string()) }
     }
 
 
@@ -193,7 +198,7 @@ class MoyanFetch : DataFetch {
         path.append(".html")
         return getService(MoyanApi::class.java)
                 .html(path.toString())
-                .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
+                .map { s -> MoyanParser.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
@@ -218,7 +223,7 @@ class MoyanFetch : DataFetch {
         path.append(".html")
         return getService(MoyanApi::class.java)
                 .html(path.toString())
-                .map { s -> MoyanParser.instance.parseVideoList(s.string()) }
+                .map { s -> MoyanParser.parseVideoList(s.string()) }
     }
 
     override fun getVideoListTypes(): List<VideoListType> {
@@ -236,5 +241,11 @@ class MoyanFetch : DataFetch {
             return getAnimList(param, page)
         }
         return Observable.empty()
+    }
+
+    override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> {
+        return getService(MoyanApi::class.java)
+                .search(word, page)
+                .map { responseBody -> MoyanParser.parseSearchResult(responseBody.string()) }
     }
 }

@@ -3,9 +3,12 @@ package com.sanron.pppig.util
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.dinuscxj.itemdecoration.LinearDividerItemDecoration
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.sanron.pppig.widget.GridDividerItemDecoration
@@ -76,4 +79,26 @@ fun RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) {
     } else {
         Log.w("RecyclerView", "不支持其他布局")
     }
+}
+
+
+fun EditText.bindClear(view: View) {
+    view.setOnClickListener {
+        this.setText("")
+    }
+    this.addTextChangedListener(object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            if (s?.length ?: 0 == 0) {
+                view.visibility = View.GONE
+            } else {
+                view.visibility = View.VISIBLE
+            }
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        }
+    })
 }

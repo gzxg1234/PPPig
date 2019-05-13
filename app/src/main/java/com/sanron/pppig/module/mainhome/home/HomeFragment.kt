@@ -25,6 +25,7 @@ import com.sanron.datafetch_interface.bean.Banner
 import com.sanron.datafetch_interface.bean.Home
 import com.sanron.datafetch_interface.bean.HomeCat
 import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.FragmentHomeBinding
 import com.sanron.pppig.databinding.ItemVideoBinding
 import com.sanron.pppig.databinding.ItemVideoListTitleBinding
@@ -116,7 +117,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
             recyclerView.adapter = adapter
         }
         viewModel.toVideoDetail.observe(this, Observer {
-            val intent = Intents.videoDetail(context!!, it?.link)
+            val intent = Intents.videoDetail(context!!, it?.link,FetchManager.currentSourceId()?:"")
             startActivity(intent)
         })
         activity?.setExitSharedElementCallback(object : SharedElementCallback() {
@@ -150,7 +151,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
                         sdv.setImageURI(item.image)
                         tv.text = item.title
                         view.setOnClickListener { _ ->
-                            startActivity(Intents.videoDetail(context!!,item.link))
+                            startActivity(Intents.videoDetail(context!!,item.link,FetchManager.currentSourceId()?:""))
                         }
                         return view
                     }
@@ -220,7 +221,7 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         binding.model = ItemVideoVM(PiApp.sInstance)
         binding.root.setOnClickListener {
             val item = binding.model!!.item.value!!
-            val intent = Intents.videoDetail(context, item.link)
+            val intent = Intents.videoDetail(context, item.link,FetchManager.currentSourceId()?:"")
             fragment.startActivity(intent)
         }
         return viewHolder

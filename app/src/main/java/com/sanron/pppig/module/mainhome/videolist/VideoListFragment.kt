@@ -19,6 +19,7 @@ import android.widget.TextView
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
+import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.FragmentVideoListBinding
 import com.sanron.pppig.module.mainhome.IMainChildFragment
 import com.sanron.pppig.util.*
@@ -48,8 +49,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
 
     override fun initData() {
         buildFilter()
-        runInMainIdle { refreshData() }
-
+        runInMainIdle(this) { refreshData() }
     }
 
     override fun getLayout() = R.layout.fragment_video_list
@@ -83,7 +83,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
 
             adapter = VideoAdapter(context!!, this@VideoListFragment, viewModel.pageLoader.listData.value)
             adapter.setOnItemClickListener { adapter1, view, position ->
-                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link))
+                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, FetchManager.currentSourceId()?:""))
             }
             adapter.lifecycleOwner = this@VideoListFragment
             adapter.bindToRecyclerView(recyclerView)

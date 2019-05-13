@@ -1,4 +1,4 @@
-package com.sanron.datafetch.source.flifli
+package com.sanron.datafetch.source.nianlun
 
 import io.reactivex.Observable
 import okhttp3.ResponseBody
@@ -10,10 +10,13 @@ import retrofit2.http.Path
  * Time:2019/2/20
  * Description:
  */
-interface FliApi {
+interface NianlunApi {
 
+    companion object{
+        const val BASE_URL = "http://www.nlmp4.com"
+    }
 
-    @GET("http://flif.li/{path}")
+    @GET("$BASE_URL/{path}")
     fun html(@Path(encoded = true, value = "path") path: String): Observable<ResponseBody>
 
     @GET("http://m.kkkkmao.com/{type}/index_{page}___{year}___{country}_1.html")
@@ -48,7 +51,7 @@ interface FliApi {
     /**
      * 主页
      */
-    @GET("http://m.kkkkmao.com")
+    @GET("$BASE_URL")
     fun home(): Observable<ResponseBody>
 
     /**

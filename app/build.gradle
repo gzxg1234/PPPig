@@ -200,6 +200,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
 
+//    implementation 'com.afollestad.material-dialogs:core:2.8.1'
     //资源接口
     implementation project(':datafetch')
     implementation project(':datafetch_interface')

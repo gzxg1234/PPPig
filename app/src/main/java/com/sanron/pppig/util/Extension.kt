@@ -1,7 +1,6 @@
 package com.sanron.pppig.util
 
 import android.animation.Animator
-import android.app.Activity
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
@@ -10,9 +9,11 @@ import android.content.Context
 import android.databinding.Observable
 import android.databinding.ObservableField
 import android.os.AsyncTask
+import android.os.Handler
 import android.os.Looper
+import android.os.MessageQueue
 import android.support.annotation.ColorRes
-import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.animation.Animation
 import com.sanron.pppig.BR
@@ -25,18 +26,29 @@ import me.jessyan.autosize.utils.AutoSizeUtils
  */
 fun Context.dp2px(dp: Float) = AutoSizeUtils.dp2px(this, dp)
 
-fun Activity.getColorCompat(@ColorRes id: Int): Int {
-    return ActivityCompat.getColor(this, id)
+fun Context.getColorCompat(@ColorRes id: Int): Int {
+    return ContextCompat.getColor(this, id)
+}
+
+val MainHandler by lazy {
+    Handler(Looper.getMainLooper())
 }
 
 /**
  * 当主线程空闲时执行
  */
-fun runInMainIdle(run: () -> Unit) {
-    Looper.myQueue().addIdleHandler {
+fun runInMainIdle(lifecycleOwner: LifecycleOwner,run: () -> Unit) {
+    val idleHandler = MessageQueue.IdleHandler {
         run()
         false
     }
+    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        fun destroy() {
+            Looper.myQueue().removeIdleHandler(idleHandler)
+        }
+    })
+    Looper.myQueue().addIdleHandler(idleHandler)
 }
 
 /**
