@@ -8,6 +8,7 @@ import com.sanron.datafetch_interface.bean.*
 import com.sanron.datafetch_interface.exception.ParseException
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.android.schedulers.AndroidSchedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import java.net.URLEncoder
@@ -74,7 +75,7 @@ class MoyanFetch : DataFetch {
     }
 
     override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
-        return Observable.create { emitter ->
+        return Observable.create(ObservableOnSubscribe<String> { emitter ->
             val cancellable = MoyanVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, MoyanApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {
                     emitter.onNext(result)
@@ -88,7 +89,7 @@ class MoyanFetch : DataFetch {
             emitter.setCancellable {
                 cancellable.cancel()
             }
-        }
+        }).subscribeOn(AndroidSchedulers.mainThread())
     }
 
     override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
@@ -128,7 +129,7 @@ class MoyanFetch : DataFetch {
     private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
 //        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
         val path = StringBuilder("/index.php/vod/show")
-        params["国家"]?.value?.let {
+        params["地区"]?.value?.let {
             if (it.isNotEmpty()) {
                 path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
             }
@@ -153,7 +154,7 @@ class MoyanFetch : DataFetch {
     private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
 //        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
         val path = StringBuilder("/index.php/vod/show")
-        params["国家"]?.value?.let {
+        params["地区"]?.value?.let {
             if (it.isNotEmpty()) {
                 path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
             }
@@ -179,7 +180,7 @@ class MoyanFetch : DataFetch {
     private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
 //        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
         val path = StringBuilder("/index.php/vod/show")
-        params["国家"]?.value?.let {
+        params["地区"]?.value?.let {
             if (it.isNotEmpty()) {
                 path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
             }
@@ -204,7 +205,7 @@ class MoyanFetch : DataFetch {
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
 //        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
         val path = StringBuilder("/index.php/vod/show")
-        params["国家"]?.value?.let {
+        params["地区"]?.value?.let {
             if (it.isNotEmpty()) {
                 path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
             }

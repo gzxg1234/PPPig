@@ -44,7 +44,7 @@ class VideoListVM(application: Application) : BaseViewModel(application) {
     }
 
     private fun getRequest(page: Int): Observable<PageData<VideoItem>> {
-        return Repo.getVideoList(type,params,page).compose(addDisposable())
+        return Repo.getVideoList(type,params,page).compose(autoDispose())
     }
 
 }

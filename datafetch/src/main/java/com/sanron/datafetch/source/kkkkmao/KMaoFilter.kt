@@ -58,7 +58,7 @@ object KMaoFilter{
         }
         return linkedMapOf(
                 "类型" to types,
-                "国家" to countrys,
+                "地区" to countrys,
                 "年代" to years
         )
     }
@@ -137,7 +137,7 @@ object KMaoFilter{
         return linkedMapOf(
                 "类型" to types,
                 "状态" to status,
-                "国家" to countrys,
+                "地区" to countrys,
                 "年代" to years
         )
     }
@@ -216,7 +216,7 @@ object KMaoFilter{
         return linkedMapOf(
                 "类型" to types,
                 "状态" to status,
-                "国家" to countrys,
+                "地区" to countrys,
                 "年代" to years
         )
     }
@@ -292,7 +292,7 @@ object KMaoFilter{
         return linkedMapOf(
                 "类型" to types,
                 "状态" to status,
-                "国家" to countrys,
+                "地区" to countrys,
                 "年代" to years
         )
     }

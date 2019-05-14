@@ -2,8 +2,6 @@ package com.sanron.pppig.base
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.MutableLiveData
-import com.sanron.pppig.app.PiApp
 import com.sanron.pppig.util.SingleLiveEvent
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable
@@ -18,9 +16,11 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val mCompositeDisposable = CompositeDisposable()
 
+    private val mCompositeMap = mutableMapOf<String, Disposable>()
+
     val toastMsg = SingleLiveEvent<String>()
 
-    fun addDisposable(disposable: Disposable) {
+    private fun autoDispose(disposable: Disposable) {
         if (!mCompositeDisposable.isDisposed) {
             mCompositeDisposable.add(disposable)
         } else {
@@ -28,11 +28,20 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun <T> addDisposable(): ObservableTransformer<T, T> {
-        return ObservableTransformer { upstream -> upstream.doOnSubscribe { disposable -> addDisposable(disposable) } }
+    fun <T> autoDispose(tag: String? = null): ObservableTransformer<T, T> {
+        return ObservableTransformer { upstream ->
+            upstream.doOnSubscribe { disposable ->
+                tag?.let {
+                    mCompositeMap.remove(tag)?.dispose()
+                    mCompositeMap.put(tag,disposable)
+                }
+                autoDispose(disposable)
+            }
+        }
     }
 
     override fun onCleared() {
+        mCompositeMap.clear()
         mCompositeDisposable.clear()
         super.onCleared()
     }

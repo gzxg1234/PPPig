@@ -19,7 +19,6 @@ import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.common.LoadingView
 import com.sanron.pppig.databinding.ActivityPlayerBinding
-import com.sanron.pppig.module.videodetail.VideoDetailAct
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.widget.ViewPagerAdapter
@@ -38,7 +37,12 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer
  */
 class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
+    private var itemPos: Int = 0
+    private var pagePos: Int = 0
+    private lateinit var sourceList: List<PlaySource>
     lateinit var orientationUtils: OrientationUtils
+
+    var title: String? = null
 
     companion object {
         const val ARG_PLAY_SOURCE = "play_source_list"
@@ -62,7 +66,10 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val title = intent?.getStringExtra(ARG_TITLE)
+        title = intent?.getStringExtra(ARG_TITLE)
+        sourceList = intent?.getSerializableExtra(ARG_PLAY_SOURCE) as List<PlaySource>
+        pagePos = intent?.getIntExtra(ARG_SOURCE_POS, 0)!!
+        itemPos = intent?.getIntExtra(ARG_ITEM_POS, 0)!!
         StatusBarHelper.with(this)
                 .setStatusBarColor(0x60000000)
                 .setLayoutBelowStatusBar(true)
@@ -72,7 +79,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         dataBinding.model = viewModel
         viewModel.videoSourceList.observe(this, Observer {
             if (!it.isNullOrEmpty()) {
-                dataBinding.playerView.setUp(it[0], false, title)
+                dataBinding.playerView.setUp(it[0], false, null)
                 dataBinding.playerView.startPlayLogic()
             }
         })
@@ -134,9 +141,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             }
         }
 
-        val sourceList: List<PlaySource> = intent?.getSerializableExtra(ARG_PLAY_SOURCE) as List<PlaySource>
-        val pagePos = intent?.getIntExtra(ARG_SOURCE_POS, 0)!!
-        val itemPos = intent?.getIntExtra(ARG_ITEM_POS, 0)!!
         dataBinding.viewPager.adapter = SourceAdapter(sourceList).apply {
             setSelectPos(pagePos, itemPos)
         }
@@ -145,8 +149,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         }
         dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
         dataBinding.tabLayout.currentTab = pagePos
-        viewModel.playItem = sourceList[pagePos].items?.get(itemPos)
-
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
@@ -174,7 +176,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     override fun initData() {
         super.initData()
-        viewModel.loadData()
+        sourceList[pagePos].items?.get(itemPos)?.let { loadItem(it) }
     }
 
     override fun onResume() {
@@ -190,6 +192,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
     private fun loadItem(item: PlaySource.Item) {
         dataBinding.playerView.release()
         dataBinding.playerView.onVideoReset()
+        dataBinding.playerView.titleTextView.text = "$title-${item.name}"
         viewModel.playItem = item
         viewModel.loadData()
     }

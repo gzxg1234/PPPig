@@ -36,7 +36,7 @@ class HomeVM(application: Application) : BaseViewModel(application) {
         refresh.value = true
         Repo.getHomeData()
                 .main()
-                .compose(addDisposable())
+                .compose(autoDispose())
                 .subscribe(object : BaseObserver<Home>() {
                     override fun onNext(home: Home) {
                         super.onNext(home)

@@ -18,8 +18,7 @@
         <com.sanron.pppig.widget.PiRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:pageLoader="@{model.pageLoader}">
+            android:layout_height="match_parent">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -35,8 +34,7 @@
                     android:clipToPadding="false"
                     android:paddingLeft="16dp"
                     android:paddingTop="8dp"
-                    android:paddingRight="16dp"
-                    android:pageLoader="@{model.pageLoader}"/>
+                    android:paddingRight="16dp"/>
 
                 <FrameLayout
                     android:id="@+id/fl_bg"

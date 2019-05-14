@@ -60,19 +60,22 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
     private class PageAdapter(val sourceList: List<Source>, fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
         private val fragments = SparseArray<SearchFragment>()
+        private var word: String = ""
         private var titles: List<String> = sourceList.map {
             it.name
         }
 
         fun setWord(word: String) {
+            this.word = word
             for (i in 0 until fragments.size()) {
                 fragments.valueAt(i).setWord(word)
             }
         }
 
         override fun getItem(i: Int): Fragment {
-            return (SearchFragment.new(sourceList[i].id)).apply {
-                fragments.put(i, this)
+            return SearchFragment.new(sourceList[i].id, word).let { fragment ->
+                fragments.put(i, fragment)
+                return@let fragment
             }
         }
 

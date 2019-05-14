@@ -35,6 +35,6 @@ class SearchVM(application: Application) : BaseViewModel(application) {
     }
 
     private fun getRequest(page: Int): Observable<PageData<VideoItem>> {
-        return source!!.fetch.getSearchResult(word, page).compose(addDisposable())
+        return source!!.fetch.getSearchResult(word, page).compose(autoDispose())
     }
 }

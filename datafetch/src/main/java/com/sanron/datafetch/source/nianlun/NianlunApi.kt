@@ -1,5 +1,6 @@
 package com.sanron.datafetch.source.nianlun
 
+import com.sanron.datafetch.source.moyan.MoyanApi
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.http.GET
@@ -19,35 +20,9 @@ interface NianlunApi {
     @GET("$BASE_URL/{path}")
     fun html(@Path(encoded = true, value = "path") path: String): Observable<ResponseBody>
 
-    @GET("http://m.kkkkmao.com/{type}/index_{page}___{year}___{country}_1.html")
-    fun movieList(@Path("type") type: String,
-                  @Path("country") country: String,
-                  @Path("year") year: String,
-                  @Path("page") page: Int): Observable<ResponseBody>
-
-    @GET("http://m.kkkkmao.com/tv/index_{page}_{type}_{end}_{year}___{country}_1.html")
-    fun tvList(@Path("type") type: String,
-               @Path("end") end: String,
-               @Path("country") country: String,
-               @Path("year") year: String,
+    @GET("${BASE_URL}/vodsearch/{word}----------{page}---.html")
+    fun search(@Path("word") word: String,
                @Path("page") page: Int): Observable<ResponseBody>
-
-
-    @GET("http://m.kkkkmao.com/Animation/index_{page}_{type}_{end}_{year}___{country}_1.html")
-    fun animList(@Path("type") type: String,
-                 @Path("end") end: String,
-                 @Path("country") country: String,
-                 @Path("year") year: String,
-                 @Path("page") page: Int): Observable<ResponseBody>
-
-
-    @GET("http://m.kkkkmao.com/Arts/index_{page}_{type}_{end}_{year}___{country}_1.html")
-    fun varietyList(@Path("type") type: String,
-                    @Path("end") end: String,
-                    @Path("country") country: String,
-                    @Path("year") year: String,
-                    @Path("page") page: Int): Observable<ResponseBody>
-
     /**
      * 主页
      */

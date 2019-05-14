@@ -1,5 +1,6 @@
 package com.sanron.datafetch.source.nianlun
 
+import android.text.TextUtils
 import com.sanron.datafetch.FetchLog
 import com.sanron.datafetch.source.kkkkmao.KKMaoParser
 import com.sanron.datafetch.source.moyan.MoyanParser
@@ -23,6 +24,32 @@ object NianlunParser {
 
 
     /**
+     * 搜索结果列表解析
+     */
+    fun parseSearchResult(html: String?): PageData<VideoItem>? {
+        var data = PageData<VideoItem>()
+        data.data = mutableListOf()
+        Jsoup.parse(html)?.let { doc ->
+            doc.select(".container>.row ul.stui-vodlist__media>li>.thumb>.stui-vodlist__thumb")?.forEach {
+                val item = VideoItem()
+                item.name = it.attr("title")
+                item.img = completeUrl(it.attr("data-original"))
+                item.link = it.attr("href")
+                item.label = it.selectFirst("span.pic-text")?.ownText()
+                data.data?.add(item)
+            }
+            //是否有下一页
+            doc.selectFirst(".stui-page>li>span.num")?.let {
+                val numText = it.ownText()
+                val arr = numText.split("/")
+                data.hasMore = arr.size == 2 && arr[0] != arr[1]
+            }
+        }
+        return data
+    }
+
+
+    /**
      * 解析banner轮播
      */
     private fun parseBanner(doc: Document): List<Banner> {
@@ -32,7 +59,7 @@ object NianlunParser {
             banner.link = it.attr("href")
             it.attr("style")?.let {
                 val matcher = BANNER_IMG_PATTERN.matcher(it)
-                if (matcher.find() ) {
+                if (matcher.find()) {
                     banner.image = completeUrl(matcher.group(1))
                 }
             }
@@ -40,61 +67,6 @@ object NianlunParser {
         }
         FetchLog.d(TAG, "banner size = ${banners.size}")
         return banners
-    }
-
-    /**
-     * 解析列表
-     */
-    private fun parseCommonList(doc: Document, title: String): MutableList<VideoItem> {
-        var list = mutableListOf<VideoItem>()
-        doc.select(".modo_title.top>h2>a[title='$title']").first()?.apply {
-            this.parent()?.parent()?.nextElementSibling()?.apply {
-                val els = this.select(".all_tab>#resize_list>li>a")
-                els?.forEach {
-                    val item = VideoItem()
-                    item.name = it.attr("title")
-                    item.link = it.attr("href")
-                    it.select(".picsize>img").first()?.apply {
-                        item.img = this.attr("src")
-                    }
-                    it.select(".title").first()?.apply {
-                        item.label = this.text()
-                    }
-                    it.select(".score").first()?.apply {
-                        item.score = this.text()
-                    }
-                    list.add(item)
-                    if (list.size == HOME_CAT_VIDEO_MAX_SIZE) {
-                        return@apply
-                    }
-                }
-            }
-        }
-        return list
-    }
-
-    private fun parseAnim(doc: Document): MutableList<VideoItem> {
-        val list = parseCommonList(doc, "动漫")
-        FetchLog.d(TAG, "anim :" + list.size)
-        return list
-    }
-
-    private fun parseVariety(doc: Document): MutableList<VideoItem> {
-        val list = parseCommonList(doc, "综艺")
-        FetchLog.d(TAG, "variety :" + list.size)
-        return list
-    }
-
-    private fun parseTv(doc: Document): MutableList<VideoItem> {
-        val list = parseCommonList(doc, "电视剧")
-        FetchLog.d(TAG, "hot tv :" + list.size)
-        return list
-    }
-
-    private fun parseHotMovie(doc: Document): MutableList<VideoItem> {
-        val list = parseCommonList(doc, "电影")
-        FetchLog.d(TAG, "hot movie :" + list.size)
-        return list
     }
 
     private fun completeUrl(path: String?): String? {
@@ -115,23 +87,19 @@ object NianlunParser {
         data.data = mutableListOf()
         val doc = Jsoup.parse(html)
         doc?.let {
-            //是否有下一页按钮
-            doc.select(".next.pagegbk")?.first()?.let {
-                data.hasMore = true
+            //是否有下一页
+            doc.selectFirst(".container>.row>.stui-page>li>span.num")?.let {
+                val numText = it.ownText()
+                val arr = numText.split("/")
+                data.hasMore = arr.size == 2 && arr[0] != arr[1]
             }
-            doc.select(".main.top>.list_vod>#vod_list>li>a")?.forEach {
+            doc.select(".container>.row>.stui-pannel>.stui-pannel-box>.stui-pannel_bd>.stui-vodlist>li>.stui-vodlist__box>a")?.forEach {
                 val item = VideoItem()
-                item.link = it.attr("href")
                 item.name = it.attr("title")
-                it.select(".picsize>img").first().apply {
-                    item.img = this.attr("src")
-                }
-                it.select(".picsize>.score").first().apply {
-                    item.score = this.text()
-                }
-                it.select(".picsize>.title").first().apply {
-                    item.label = this.text()
-                }
+                item.link = it.attr("href")
+                item.img = completeUrl(it.attr("data-original"))
+                item.label = it.selectFirst("span.pic-text.text-right")?.ownText() ?: ""
+                item.score = ""
                 data.data?.add(item)
             }
         }
@@ -234,64 +202,73 @@ object NianlunParser {
      * 解析电影详情
      */
     fun parseVideoDetail(html: String): VideoDetail? {
-        val doc = Jsoup.parse(html)
-        doc?.apply {
-            val detail = VideoDetail()
-            //介绍信息
-            detail.infoList = mutableListOf()
-            select(".vod-n-l>p")?.forEach {
-                detail.infoList!!.add(it.text())
-            }
-            select(".vod-n-l>h1")?.forEach {
-                detail.title = it.text()
-            }
-
-            select("#resize_vod.main>.vod-l>.vod-n-img>img")?.first()?.apply {
-                detail.image = attr("src")
-            }
-
-            //简介
-            selectFirst(".vod-play-info.main>.vod-info-tab>.vod_content")?.apply {
-                detail.intro = ownText()
-            }
-
-            //解析播放列表
-            detail.source = mutableListOf()
-            select(".vod-play-info.main>#con_vod_1>.play-box")?.forEach {
-                if (it.id() == "xigua"
-                        || it.id() == "pan") {
-                    //西瓜和网盘过滤
-                    return@forEach
+        try {
+            val doc = Jsoup.parse(html)
+            doc?.apply {
+                val detail = VideoDetail()
+                //介绍信息
+                detail.intro = ""
+                detail.infoList = mutableListOf()
+                selectFirst(".container>.row>div>.stui-pannel>.stui-pannel-box>.stui-content__thumb>.stui-vodlist__thumb>img")?.let {
+                    detail.image = completeUrl(it.attr("data-original"))
                 }
-                val playSource = PlaySource()
-                playSource.name = "播放源"
-                playSource.items = mutableListOf()
-                //找播放源名称
-                select(".vod-play-info.main>#con_vod_1>.play-title>#${it.id()}>a").first()?.let { titleE ->
-                    playSource.name = titleE.ownText()
+                //解析一些电影信息
+                selectFirst(".container>.row>div>.stui-pannel>.stui-pannel-box>.stui-content__detail")?.let {
+                    it.selectFirst("h1.title")?.let {
+                        detail.title = it.ownText()
+                    }
+                    it.select("p.data>span.text-muted")?.forEachIndexed { index, element ->
+                        val ownerText = element.ownText()
+                        if (ownerText.contains("类型")) {
+                            element.nextElementSibling()?.let { a ->
+                                detail.infoList?.add("类型: ${a.ownText()}")
+                            }
+                        } else if (ownerText.contains("地区")) {
+                            element.nextElementSibling()?.let { a ->
+                                detail.infoList?.add("地区: ${a.ownText()}")
+                            }
+                        } else if (ownerText.contains("年份")) {
+                            element.nextElementSibling()?.let { a ->
+                                detail.infoList?.add("年份: ${a.ownText()}")
+                            }
+                        } else if (ownerText.contains("导演")) {
+                            element.nextElementSibling()?.let { a ->
+                                detail.infoList?.add("导演: ${a.ownText()}")
+                            }
+                        } else if (ownerText.contains("主演")) {
+                            element.parent()?.select("a")?.map {
+                                it.ownText()
+                            }?.let { list ->
+                                detail.infoList?.add("主演: ${TextUtils.join(" ", list.toTypedArray())}")
+                            }
+                        }
+                    }
                 }
-                it.select(".plau-ul-list>li>a").forEach { itemE ->
-                    val item = PlaySource.Item()
-                    item.name = itemE.attr("title")
-                    item.link = itemE.attr("href")
-                    playSource.items?.add(item)
-                }
-                detail.source?.add(playSource)
 
+                //解析播放源
+                select(".container>.row>div>.stui-pannel>div.stui-pannel-box.playlist")?.forEach {
+                    detail.source ?: run {
+                        detail.source = mutableListOf()
+                    }
+                    var playSource = PlaySource()
+                    it.selectFirst(".stui-pannel_hd>.stui-pannel__head>h3.title")?.let {
+                        playSource.name = it.ownText().trim()
+                    }
+                    playSource.items = it.select(".stui-pannel_bd>ul.stui-content__playlist>li>a")?.map {
+                        return@map PlaySource.Item().apply {
+                            name = it.ownText()
+                            link = it.attr("href")
+                        }
+                    }?.toMutableList()
+                    detail.source?.add(playSource)
+                }
+                return detail
             }
-            return detail
+            throw ParseException("解析失败")
+        } catch (e: Throwable) {
+            throw ParseException("解析失败", e)
         }
-        return null
     }
 
 
-    fun parsePlayPageUrl(html: String): String? {
-        val doc = Jsoup.parse(html)
-        doc?.apply {
-            select(".playerbox>iframe").first()?.apply {
-                return this.attr("src")
-            }
-        }
-        return null
-    }
 }

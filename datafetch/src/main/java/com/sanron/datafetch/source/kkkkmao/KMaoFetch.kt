@@ -1,13 +1,13 @@
 package com.sanron.datafetch.source.kkkkmao
 
+import com.sanron.datafetch.MediaSearch
 import com.sanron.datafetch.SourceManagerImpl
-import com.sanron.datafetch.WebHelper
 import com.sanron.datafetch.source.nianlun.NianlunFilter
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import org.jsoup.Jsoup
+import io.reactivex.android.schedulers.AndroidSchedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import java.io.IOException
@@ -87,20 +87,16 @@ class KMaoFetch : DataFetch {
 
     override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
         return getVideoPlayPageUrl(videoPageUrl)
+                .observeOn(AndroidSchedulers.mainThread())
                 .flatMap { playPageUrl ->
                     val referer = "http://m.kkkkmao.com/$videoPageUrl"
                     val header = mutableMapOf<String, String>()
                     header["Referer"] = referer
-                    Observable.create(ObservableOnSubscribe<String> { })
                     return@flatMap Observable.create(ObservableOnSubscribe<List<String>> {
-                        WebHelper.getHtml(SourceManagerImpl.context, playPageUrl, header, object : WebHelper.Callback {
-                            override fun success(result: String) {
-                                val doc = Jsoup.parse(result)
-                                val list = mutableListOf<String>()
-                                doc.select("video").forEach {
-                                    list.add(it.attr("src"))
-                                }
-                                it.onNext(list)
+                        val task = MediaSearch.search(SourceManagerImpl.context,
+                                playPageUrl, header, 1, object : MediaSearch.Callback {
+                            override fun success(result: List<String>) {
+                                it.onNext(result)
                                 it.onComplete()
                             }
 
@@ -108,6 +104,9 @@ class KMaoFetch : DataFetch {
                                 it.onError(IOException(msg))
                             }
                         })
+                        it.setCancellable {
+                            task.cancel()
+                        }
                     })
                 }
     }
@@ -128,13 +127,13 @@ class KMaoFetch : DataFetch {
     private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
         return getService(KmaoApi::class.java)
                 .tvList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
     private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
         return getService(KmaoApi::class.java)
-                .movieList(params["类型"]?.value ?: "movie", params["国家"]?.value
+                .movieList(params["类型"]?.value ?: "movie", params["地区"]?.value
                         ?: "", params["年代"]?.value ?: "", page)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
@@ -142,14 +141,14 @@ class KMaoFetch : DataFetch {
     private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
         return getService(KmaoApi::class.java)
                 .varietyList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
         return getService(KmaoApi::class.java)
                 .animList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 

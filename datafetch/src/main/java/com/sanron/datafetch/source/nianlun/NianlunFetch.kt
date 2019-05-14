@@ -1,5 +1,6 @@
 package com.sanron.datafetch.source.nianlun
 
+import com.sanron.datafetch.MediaSearch
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
 import com.sanron.datafetch_interface.DataFetch
@@ -7,10 +8,12 @@ import com.sanron.datafetch_interface.bean.*
 import com.sanron.datafetch_interface.exception.ParseException
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import org.jsoup.Jsoup
+import io.reactivex.android.schedulers.AndroidSchedulers
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import java.io.IOException
+import java.net.URLEncoder
 import java.util.*
 
 /**
@@ -76,36 +79,6 @@ class NianlunFetch : DataFetch {
                 .map { responseBody -> NianlunParser.parseVideoDetail(responseBody.string()) }
     }
 
-    override fun getVideoSource(url: String): Observable<List<String>> {
-        return getService(NianlunApi::class.java)
-                .html(url)
-                .flatMap { responseBody ->
-                    val sourceUrl = NianlunParser.parsePlayPageUrl(responseBody.string())
-                            ?: throw ParseException("解析url失败")
-                    val referer = "http://m.kkkkmao.com/$url"
-                    val header = mutableMapOf<String, String>()
-                    header["Referer"] = referer
-                    Observable.create(ObservableOnSubscribe<String> { })
-                    return@flatMap Observable.create(ObservableOnSubscribe<List<String>> {
-                        WebHelper.getHtml(SourceManagerImpl.context, sourceUrl, header, object : WebHelper.Callback {
-                            override fun success(result: String) {
-                                val doc = Jsoup.parse(result)
-                                val list = mutableListOf<String>()
-                                doc.select("video").forEach {
-                                    list.add(it.attr("src"))
-                                }
-                                it.onNext(list)
-                                it.onComplete()
-                            }
-
-                            override fun error(msg: String) {
-                                it.onError(IOException(msg))
-                            }
-                        })
-                    })
-                }
-    }
-
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> {
         if (type == TYPE_MOVIE) {
             return NianlunFilter.moveListFilter()
@@ -119,31 +92,95 @@ class NianlunFetch : DataFetch {
         return mapOf()
     }
 
-    private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
-        return getService(NianlunApi::class.java)
-                .tvList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
-                .map { s -> NianlunParser.parseVideoList(s.string()) }
-    }
 
     private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/vodshow/1")
+        params["地区"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
         return getService(NianlunApi::class.java)
-                .movieList(params["类型"]?.value ?: "movie", params["国家"]?.value
-                        ?: "", params["年代"]?.value ?: "", page)
+                .html(path.toString())
                 .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
-    private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+    private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/vodshow/2")
+        params["地区"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
         return getService(NianlunApi::class.java)
-                .varietyList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+                .html(path.toString())
+                .map { s -> NianlunParser.parseVideoList(s.string()) }
+    }
+
+
+    private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/vodshow/3")
+        params["地区"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        params["类型"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/class/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
+        return getService(NianlunApi::class.java)
+                .html(path.toString())
                 .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        "https://www.moyantv.com/index.php/vod/show/area/大陆/class/喜剧/id/1/year/2018.html"
+        val path = StringBuilder("/vodshow/4")
+        params["地区"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/area/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append("/page/").append(page)
+        params["年代"]?.value?.let {
+            if (it.isNotEmpty()) {
+                path.append("/year/").append(URLEncoder.encode(it, "utf-8"))
+            }
+        }
+        path.append(".html")
         return getService(NianlunApi::class.java)
-                .animList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["国家"]?.value ?: "", params["年代"]?.value ?: "", page)
+                .html(path.toString())
                 .map { s -> NianlunParser.parseVideoList(s.string()) }
     }
 
@@ -160,12 +197,93 @@ class NianlunFetch : DataFetch {
         return Observable.empty()
     }
 
+
     override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.create { emitter ->
+            val cancellable = NianlunVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, NianlunApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
+                override fun success(result: String) {
+                    emitter.onNext(result)
+                    emitter.onComplete()
+                }
+
+                override fun error(msg: String) {
+                    emitter.tryOnError(ParseException("解析失败"))
+                }
+            })
+            emitter.setCancellable {
+                cancellable.cancel()
+            }
+        }
+    }
+
+    override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
+        return Observable.create(ObservableOnSubscribe<JSONObject> { emitter ->
+            val cancellable = NianlunVideoUrlHelper.getVideoPageUrl2(SourceManagerImpl.context, NianlunApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
+                override fun success(result: String) {
+                    var json: JSONObject? = null
+                    try {
+                        json = JSONObject(result)
+                    } catch (e: JSONException) {
+                    }
+                    if (json == null) {
+                        emitter.tryOnError(ParseException("解析失败"))
+                    } else {
+                        emitter.onNext(json)
+                        emitter.onComplete()
+                    }
+                }
+
+                override fun error(msg: String) {
+                    emitter.tryOnError(ParseException("解析失败"))
+                }
+            })
+            emitter.setCancellable {
+                cancellable.cancel()
+            }
+        }).flatMap { jsonObj ->
+            val isSource = jsonObj.optBoolean("isSource")
+            val url = jsonObj.optString("url")
+            if (isSource) {
+                return@flatMap Observable.just(listOf(url))
+            }
+            return@flatMap Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
+                val cancellable = MediaSearch.search(SourceManagerImpl.context,
+                        url, null, 1, object : MediaSearch.Callback {
+                    override fun success(result: List<String>) {
+                        emitter.onNext(result)
+                        emitter.onComplete()
+                    }
+
+                    override fun error(msg: String) {
+                        emitter.tryOnError(ParseException("解析失败"))
+                    }
+                })
+                emitter.setCancellable {
+                    cancellable.cancel()
+                }
+            })
+//            return@flatMap Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
+//                val cancellable = NianlunVideoUrlHelper.getVideoSource(SourceManagerImpl.context, url, null, object : WebHelper.Callback {
+//                    override fun success(result: String) {
+//                        emitter.onNext(listOf(result))
+//                        emitter.onComplete()
+//                    }
+//
+//                    override fun error(msg: String) {
+//                        emitter.tryOnError(ParseException("解析失败"))
+//                    }
+//                })
+//                emitter.setCancellable {
+//                    cancellable.cancel()
+//                }
+//            })
+        }.subscribeOn(AndroidSchedulers.mainThread())
     }
 
     override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return getService(NianlunApi::class.java)
+                .search(word, page)
+                .map { responseBody -> NianlunParser.parseSearchResult(responseBody.string()) }
     }
 
 }

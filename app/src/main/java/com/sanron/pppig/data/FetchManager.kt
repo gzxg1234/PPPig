@@ -29,6 +29,8 @@ object FetchManager {
 
     lateinit var sourceManager: SourceManager
 
+    private val souceMap = mutableMapOf<String, Source>()
+
     val sp: SharedPreferences by lazy {
         return@lazy context.getSharedPreferences("FETCH_CONFIG", Context.MODE_PRIVATE)
     }
@@ -37,9 +39,7 @@ object FetchManager {
      * 切换视频数据源
      */
     fun changeSource(id: String, save: Boolean = false) {
-        sourceManager.getSourceList().find {
-            it.id == id
-        }?.let {
+        souceMap[id]?.let {
             Repo.dataFetch = it.fetch
             if (save) {
                 sp.edit()
@@ -49,24 +49,16 @@ object FetchManager {
         }
     }
 
-    fun getSourceById(id:String):Source?{
-        return FetchManager.sourceManager.getSourceList().find {
-            it.id == id
-        }
+    fun getSourceById(id: String): Source? {
+        return souceMap[id]
     }
 
     fun currentSource(): Source? {
-        return FetchManager.sourceManager.getSourceList()[currentSourceIndex()]
+        return souceMap[currentSourceId()]
     }
 
     fun currentSourceId(): String? {
         return sp.getString("currentFetchId", "")
-    }
-
-    fun currentSourceIndex(): Int {
-        return FetchManager.sourceManager.getSourceList().indexOfFirst {
-            it.id == currentSourceId()
-        }
     }
 
     private fun readFetchConfig() {
@@ -167,6 +159,9 @@ object FetchManager {
             }
             if (sm != null && !sm.getSourceList().isNullOrEmpty()) {
                 sourceManager = sm
+                sourceManager.getSourceList().forEach {
+                    souceMap[it.id] = it
+                }
                 sourceManager.initContext(context = PiApp.sInstance)
                 sourceManager.setHttpClient(Injector.provideOkHttpClient())
                 readFetchConfig()

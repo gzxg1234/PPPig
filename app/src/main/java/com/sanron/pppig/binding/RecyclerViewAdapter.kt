@@ -14,41 +14,6 @@ import com.sanron.pppig.common.PageLoader
  */
 
 
-@Suppress("UNCHECKED_CAST")
-@BindingAdapter(value = ["android:pageLoader"], requireAll = false)
-fun bindPageLoader(recyclerView: RecyclerView, pageLoader: PageLoader<*>) {
-    if (recyclerView.adapter == null || recyclerView.adapter !is BaseQuickAdapter<*, *> || pageLoader.lifecycleOwner == null) {
-        return
-    }
-    (recyclerView.adapter as BaseQuickAdapter<Any?, *>).apply {
-        setNewData(pageLoader.listData.value)
-        if (pageLoader.diffCallback == null) {
-            (pageLoader as PageLoader<Any>).listData.observe(pageLoader.lifecycleOwner!!, Observer {
-                notifyDataSetChanged()
-            })
-        } else {
-            pageLoader.diffResult.observe(pageLoader.lifecycleOwner!!, Observer {
-                it?.dispatchUpdatesTo(this)
-            })
-        }
-        pageLoader.scrollToTop.observe(pageLoader.lifecycleOwner!!, Observer {
-            recyclerView.scrollToPosition(0)
-        })
-        pageLoader.loadMoreState.observe(pageLoader.lifecycleOwner!!, Observer {
-            when (it) {
-                RecyclerViewAdapter.STATE_FAIL -> loadMoreFail()
-                RecyclerViewAdapter.STATE_END -> loadMoreEnd()
-                else -> {
-                    loadMoreComplete()
-                }
-            }
-        })
-        setOnLoadMoreListener({
-            pageLoader.loadMore()
-        }, recyclerView)
-    }
-}
-
 @BindingAdapter(value = ["android:adapterData"])
 fun setData(recyclerView: RecyclerView, data: List<*>) {
     val adapter = recyclerView.adapter

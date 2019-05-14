@@ -19,6 +19,8 @@ import android.widget.TextView
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
+import com.sanron.pppig.common.bindRecyclerView
+import com.sanron.pppig.common.bindRefreshLayout
 import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.FragmentVideoListBinding
 import com.sanron.pppig.module.mainhome.IMainChildFragment
@@ -48,8 +50,10 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
 
 
     override fun initData() {
-        buildFilter()
-        runInMainIdle(this) { refreshData() }
+        runInMainIdle(this) {
+            buildFilter()
+            refreshData()
+        }
     }
 
     override fun getLayout() = R.layout.fragment_video_list
@@ -76,14 +80,14 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
         dataBinding.apply {
             lifecycleOwner = this@VideoListFragment
             model = viewModel
-            model!!.pageLoader.lifecycleOwner = this@VideoListFragment
             recyclerView.pauseFrescoOnScroll()
             recyclerView.layoutManager = GridLayoutManager(context, 3)
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
             adapter = VideoAdapter(context!!, this@VideoListFragment, viewModel.pageLoader.listData.value)
             adapter.setOnItemClickListener { adapter1, view, position ->
-                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, FetchManager.currentSourceId()?:""))
+                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, FetchManager.currentSourceId()
+                        ?: ""))
             }
             adapter.lifecycleOwner = this@VideoListFragment
             adapter.bindToRecyclerView(recyclerView)
@@ -92,14 +96,20 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
             type = arguments?.getInt("type") ?: 0
             toggleFilterCmd.observe(this@VideoListFragment, Observer {
                 it?.let {
-                    showFilterWindow(it)
+                    setFilterWindowVisible(it)
                 }
             })
+            pageLoader.bindRecyclerView(this@VideoListFragment, dataBinding.recyclerView)
+            pageLoader.bindRefreshLayout(this@VideoListFragment, dataBinding.refreshLayout)
         }
     }
 
+    override fun onInvisible() {
+        super.onInvisible()
+        setFilterWindowVisible(false)
+    }
 
-    private fun showFilterWindow(show: Boolean) {
+    private fun setFilterWindowVisible(show: Boolean) {
         dataBinding.apply {
             llTags.clearAnimation()
             bgAnim?.end()
@@ -140,11 +150,13 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
             tvFilterName.text = filterName
             items.forEachIndexed { index, filterItem ->
                 val rb = context!!.inflater.inflate(R.layout.tag_button, rgItems, false) as RadioButton
+                //设置不保存view状态，解决页面切换回来后checked错误，其实也可以用View,generateId解决
+                rb.isSaveEnabled = false
                 rb.id = index
                 rb.text = filterItem.name
                 rgItems.addView(rb)
             }
-            rgItems.setOnCheckedChangeListener { group, checkedId ->
+            val onCheckedChange = { group: RadioGroup, checkedId: Int ->
                 viewModel.params[filterName] = items[checkedId]
                 val texts = mutableListOf<String>()
                 for ((n, v) in viewModel.params) {
@@ -154,6 +166,8 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
                 refreshData()
             }
             rgItems.check(0)
+            onCheckedChange(rgItems, 0)
+            rgItems.setOnCheckedChangeListener(RadioGroup.OnCheckedChangeListener(onCheckedChange))
             dataBinding.llTags.addView(filterView)
         }
     }

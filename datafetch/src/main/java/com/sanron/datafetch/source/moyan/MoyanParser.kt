@@ -237,16 +237,6 @@ object MoyanParser {
     }
 
 
-    fun parsePlayPageUrl(html: String): String? {
-        val doc = Jsoup.parse(html)
-        doc?.apply {
-            select(".playerbox>iframe").first()?.apply {
-                return this.attr("src")
-            }
-        }
-        return null
-    }
-
     fun parseSearchResult(html: String?): PageData<VideoItem>? {
         var data = PageData<VideoItem>()
         data.data = mutableListOf()

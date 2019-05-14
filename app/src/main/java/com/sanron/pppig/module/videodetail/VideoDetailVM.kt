@@ -46,7 +46,7 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
     fun loadData() {
         source.fetch.getVideoDetail(url ?: "")
                 .main()
-                .compose(addDisposable())
+                .compose(autoDispose())
                 .subscribe(object : BaseObserver<VideoDetail>() {
                     override fun onSubscribe(d: Disposable) {
                         super.onSubscribe(d)

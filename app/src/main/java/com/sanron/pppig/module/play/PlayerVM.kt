@@ -34,7 +34,7 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     fun loadData() {
         source.fetch.getVideoSource(playItem?.link ?: "")
                 .main()
-                .compose(addDisposable())
+                .compose(autoDispose("getVideoSourceUrl"))
                 .doOnSubscribe {
                     loading.value = true
                 }

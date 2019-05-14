@@ -2,6 +2,7 @@ package com.sanron.pppig.module.mainhome
 
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.util.Pools
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.View
@@ -29,7 +30,9 @@ class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog
         val listView = findViewById<LimitHeightRecyclerView>(R.id.recycler_view)
         var itemAdapter = ItemAdapter(context)
         listView.maxHeight = (ScreenUtils.getScreenHeight() * 0.5f).toInt()
-        val curSourcePos = FetchManager.currentSourceIndex()
+        val curSourcePos = FetchManager.sourceManager.getSourceList().indexOfFirst {
+            it.id == FetchManager.currentSourceId()
+        }
         listView.layoutManager = LinearLayoutManager(context)
         listView.itemAnimator = null
         itemAdapter.bindToRecyclerView(listView)

@@ -2,16 +2,10 @@ package com.sanron.datafetch
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import android.view.ViewGroup
-import android.webkit.JavascriptInterface
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 
 /**
  * Author:sanron
@@ -19,110 +13,98 @@ import android.webkit.WebViewClient
  * Description:
  * 抓取html内容，主要是动态页面的html
  */
-class WebHelper(val context: Context) {
+object WebHelper {
+    val TAG = WebHelper::class.java.simpleName
 
     interface Cancellable {
         fun cancel()
     }
 
-    companion object {
-        val TAG = "WebHlper"
+    private class Task(private val callback: Callback, private var webView: WebView) : Cancellable, Callback {
+        internal var canceled = false
 
-        fun getHtml(context: Context, url: String, header: Map<String, String>? = null, callback: Callback) {
-            evaluate(context, url, header, "Android.callback(document.documentElement.outerHTML)", callback)
-        }
-
-
-        fun evaluate(context: Context, url: String, header: Map<String, String>? = null, js: String, callback: Callback): Cancellable {
-            val webPageHelper = WebHelper(context)
+        override fun success(result: String) {
             runOnUiThread {
-                webPageHelper.evaluate(url, header, js, object : Callback {
-                    override fun success(result: String) {
-                        webPageHelper.destroy()
-                        callback.success(result)
-                    }
-
-                    override fun error(msg: String) {
-                        webPageHelper.destroy()
-                        callback.error(msg)
-                    }
-                })
-            }
-            return object : Cancellable {
-                override fun cancel() {
-                    webPageHelper.destroy()
+                if (!canceled) {
+                    callback.success(result)
                 }
+                cancel()
             }
         }
-    }
 
-    val webView: WebView by lazy {
-        createWebView()
-    }
-
-    private var jsObj: JsObj? = null
-
-    private val handler: Handler = Handler(Looper.getMainLooper())
-
-    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
-    private fun createWebView(): WebView {
-        return WebView(context).apply {
-            settings.javaScriptEnabled = true
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                settings.mixedContentMode = MIXED_CONTENT_ALWAYS_ALLOW
+        override fun error(msg: String) {
+            runOnUiThread {
+                if (!canceled) {
+                    callback.error(msg)
+                }
+                cancel()
             }
-            settings.domStorageEnabled = true
-            settings.databaseEnabled = true
-            settings.setAppCacheEnabled(true)
-            settings.allowFileAccess = true
+        }
+
+        override fun cancel() {
+            if (canceled) {
+                return
+            }
+            canceled = true
+            WebViewPool.recycle(webView)
         }
     }
 
     @SuppressLint("JavascriptInterface")
-    private fun resetJsObj(callback: Callback) {
-        jsObj?.destroy = true
+    private fun resetJsObj(webView: WebView, callback: Callback) {
         webView.removeJavascriptInterface("Android")
+        webView.addJavascriptInterface(JsObj(callback), "Android")
+    }
 
-        jsObj = JsObj()
-        jsObj?.callback = callback
-        webView.addJavascriptInterface(jsObj, "Android")
+    fun getHtml(context: Context, url: String, header: Map<String, String>? = null, callback: Callback): Cancellable {
+        return evaluate(context, url, header, "Android.callback(document.documentElement.outerHTML)", callback)
+    }
+
+    fun evaluate(context: Context, url: String, header: Map<String, String>?, js: String, callback: Callback): Cancellable {
+        val webView = WebViewPool.acquire(context)
+        var task = Task(callback, webView)
+        resetJsObj(webView, task)
+        webView.webChromeClient = object : WebChromeClient() {
+            var evaluated = false
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                super.onProgressChanged(view, newProgress)
+                if (newProgress == 100 && !evaluated && !task.canceled) {
+                    view?.evaluateJavascript("javascript:$js") {}
+                    evaluated = true
+                }
+            }
+        }
+
+        webView.webViewClient = object : WebViewClient() {
+
+            override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
+                if (url!=null && !isRequiredResource(url)) {
+                    //非网页加载必须的文件，过滤掉，加快加载速度
+                    return null
+                }
+                return super.shouldInterceptRequest(view, url)
+            }
+
+            override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+                super.onReceivedError(view, errorCode, description, failingUrl)
+                task.error("加载失败")
+            }
+        }
+        webView.loadUrl(url, header)
+        return task
     }
 
 
-    fun evaluate(url: String, header: Map<String, String>?, js: String, callback: Callback) {
-        resetJsObj(callback)
-        webView.stopLoading()
-        val s = {
-            webView.webChromeClient = object : WebChromeClient() {
-                override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                    super.onProgressChanged(view, newProgress)
-                    if (newProgress == 100) {
-                        view?.evaluateJavascript("javascript:$js") {}
-                    }
-                }
-
-            }
-
-            webView.webViewClient = object : WebViewClient() {
-                override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
-                    super.onReceivedError(view, errorCode, description, failingUrl)
-                    callback.error("加载失败")
-                }
-            }
-            webView.loadUrl(url, header)
+    /**
+     * 是否网页加载必要的文件js和html
+     */
+    private fun isRequiredResource(url: String): Boolean {
+        val uri = Uri.parse(url)
+        uri.lastPathSegment?.let {
+            return it.endsWith(".js")
+                    || it.endsWith(".html")
         }
-        if (Looper.getMainLooper().thread.id == Thread.currentThread().id) {
-            s()
-        } else {
-            handler.post(s)
-        }
-    }
-
-
-    fun destroy() {
-        (webView.parent as? ViewGroup)?.removeView(webView)
-        webView.stopLoading()
-        webView.destroy()
+        return false
     }
 
     interface Callback {
@@ -130,9 +112,7 @@ class WebHelper(val context: Context) {
         fun error(msg: String)
     }
 
-    class JsObj {
-        var callback: Callback? = null
-        var destroy = false
+    class JsObj(val callback: Callback) {
 
         @JavascriptInterface
         fun log(str: String) {
@@ -142,23 +122,13 @@ class WebHelper(val context: Context) {
         @JavascriptInterface
         fun error(errMsg: String) {
             Log.d(TAG, "errMsg:$errMsg")
-            MainHandler.post {
-                if (destroy) {
-                    return@post
-                }
-                callback?.error(errMsg)
-            }
+            callback.error(errMsg)
         }
 
         @JavascriptInterface
         fun callback(result: String) {
             Log.d(TAG, "result:$result")
-            MainHandler.post {
-                if (destroy) {
-                    return@post
-                }
-                callback?.success(result)
-            }
+            callback.success(result)
         }
     }
 }
