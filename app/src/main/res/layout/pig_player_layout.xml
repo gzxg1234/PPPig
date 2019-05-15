@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/black">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
 
     <RelativeLayout
         android:id="@+id/surface_container"
@@ -25,7 +25,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:background="#000000"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:id="@+id/layout_bottom"
@@ -54,7 +54,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:progressDrawable="@drawable/player_progress"
-            android:thumb="@drawable/player_thumb"/>
+            android:thumb="@drawable/player_thumb" />
 
         <TextView
             android:id="@+id/tv_time"
@@ -64,14 +64,26 @@
             android:layout_marginRight="4dp"
             android:textColor="@color/white"
             android:textSize="10dp"
-            tools:text="00:00/00:00"/>
+            tools:text="00:00/00:00" />
+
+        <TextView
+            android:id="@+id/tv_select_episode"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="选集"
+            android:textColor="@color/white"
+            android:textSize="14dp"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/fullscreen"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:padding="6dp"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter" />
 
     </LinearLayout>
 
@@ -82,7 +94,7 @@
         android:layout_height="2dp"
         android:layout_alignParentBottom="true"
         android:max="100"
-        android:progressDrawable="@drawable/player_progress"/>
+        android:progressDrawable="@drawable/player_progress" />
 
     <ImageView
         android:id="@+id/back_tiny"
@@ -90,7 +102,7 @@
         android:layout_height="24dp"
         android:layout_marginLeft="6dp"
         android:layout_marginTop="6dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/layout_top"
@@ -104,7 +116,7 @@
             android:layout_width="?actionBarSize"
             android:layout_height="?actionBarSize"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_chevron_left_white_24dp"/>
+            android:src="@drawable/ic_chevron_left_white_24dp" />
 
         <TextView
             android:id="@+id/title"
@@ -114,7 +126,8 @@
             android:paddingLeft="16dp"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="16dp"/>
+            android:textSize="16dp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -130,7 +143,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:matProg_barColor="@color/colorAccent"
-            app:matProg_progressIndeterminate="true"/>
+            app:matProg_progressIndeterminate="true" />
 
         <TextView
             android:id="@+id/tv_speed"
@@ -138,7 +151,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:textColor="@color/white"
-            android:textSize="12dp"/>
+            android:textSize="12dp" />
     </LinearLayout>
 
     <ImageView
@@ -148,7 +161,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter" />
 
     <ImageView
         android:id="@+id/small_close"
@@ -158,7 +171,7 @@
         android:paddingTop="10dp"
         android:scaleType="centerInside"
         android:src="@drawable/video_small_close"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/lock_screen"
@@ -169,7 +182,7 @@
         android:layout_marginLeft="50dp"
         android:scaleType="centerInside"
         android:src="@drawable/unlock"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 
     <LinearLayout
@@ -191,7 +204,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_volume_up_white_24dp"/>
+            android:src="@drawable/ic_volume_up_white_24dp" />
 
         <ProgressBar
             android:id="@+id/pb_volume"
@@ -203,7 +216,7 @@
             android:maxHeight="2dp"
             android:minHeight="2dp"
             android:progressDrawable="@drawable/player_adjust_progress"
-            tools:progress="40"/>
+            tools:progress="40" />
 
     </LinearLayout>
 
@@ -227,7 +240,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_brightness_high_white_24dp"/>
+            android:src="@drawable/ic_brightness_high_white_24dp" />
 
         <ProgressBar
             android:id="@+id/pb_brightness"
@@ -239,7 +252,7 @@
             android:maxHeight="2dp"
             android:minHeight="2dp"
             android:progressDrawable="@drawable/player_adjust_progress"
-            tools:progress="40"/>
+            tools:progress="40" />
     </LinearLayout>
 
     <LinearLayout
@@ -266,7 +279,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorAccent"
                 android:textSize="14dp"
-                tools:text="00:00"/>
+                tools:text="00:00" />
 
             <TextView
                 android:id="@+id/tv_duration"
@@ -274,7 +287,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="14dp"
-                tools:text="00:00"/>
+                tools:text="00:00" />
         </LinearLayout>
 
         <ProgressBar
@@ -285,7 +298,48 @@
             android:layout_marginTop="8dp"
             android:max="100"
             android:progressDrawable="@drawable/player_progress_accent"
-            tools:progress="50"/>
+            tools:progress="50" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_select_items"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3" />
+
+        <LinearLayout
+            android:id="@+id/ll_select_items_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="#e5e5e5"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_auto_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:checked="true"
+                android:text="自动播放下一集"
+                android:textColor="@color/textColor1"
+                android:textSize="12dp"
+                app:switchPadding="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_items"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:padding="16dp" />
+
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

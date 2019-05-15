@@ -1,14 +1,8 @@
 package com.sanron.pppig.module.videodetail
 
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import com.google.android.material.appbar.AppBarLayout
-import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +11,11 @@ import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.TranslateAnimation
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.chad.library.adapter.base.BaseViewHolder
+import com.google.android.material.appbar.AppBarLayout
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
@@ -104,16 +102,12 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
             }
         })
         viewModel.playSourceList.observe(this@VideoDetailAct, Observer {
-            it?.let { sourceList ->
-                if (sourceList.isEmpty()) {
-                    showToast("暂无可播放资源")
-                    return@let
-                }
-                val titles = sourceList.map { source ->
+            if (!it.isNullOrEmpty()) {
+                val titles = it.map { source ->
                     source.name
                 }
                 dataBinding.viewPager.adapter = SourceAdapter(viewModel.title.value,
-                        intent?.getStringExtra(ARG_SOURCE_ID) ?: "", sourceList)
+                        intent?.getStringExtra(ARG_SOURCE_ID) ?: "", it)
                 dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
             }
         })

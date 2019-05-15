@@ -2,7 +2,6 @@ package com.sanron.datafetch.source.kkkkmao
 
 import com.sanron.datafetch.MediaSearch
 import com.sanron.datafetch.SourceManagerImpl
-import com.sanron.datafetch.source.nianlun.NianlunFilter
 import com.sanron.datafetch_interface.DataFetch
 import com.sanron.datafetch_interface.bean.*
 import io.reactivex.Observable
@@ -113,13 +112,13 @@ class KMaoFetch : DataFetch {
 
     override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> {
         if (type == TYPE_MOVIE) {
-            return NianlunFilter.moveListFilter()
+            return KMaoFilter.moveListFilter()
         } else if (type == TYPE_TV) {
-            return NianlunFilter.tvListFilter()
+            return KMaoFilter.tvListFilter()
         } else if (type == TYPE_VARIETY) {
-            return NianlunFilter.varietyListFilter()
+            return KMaoFilter.varietyListFilter()
         } else if (type == TYPE_ANIM) {
-            return NianlunFilter.animListFilter()
+            return KMaoFilter.animListFilter()
         }
         return mapOf()
     }

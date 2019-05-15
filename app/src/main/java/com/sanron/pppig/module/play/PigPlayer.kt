@@ -1,21 +1,29 @@
-package com.sanron.pppig.widget.player
+package com.sanron.pppig.module.play
 
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.text.format.Formatter
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.SeekBar
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.sanron.pppig.R
+import com.sanron.pppig.util.dp2px
+import com.sanron.pppig.util.gap
+import com.sanron.pppig.util.limit
 import com.shuyu.gsyvideoplayer.utils.CommonUtil
-import com.shuyu.gsyvideoplayer.utils.Debuger
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
+import com.shuyu.gsyvideoplayer.utils.CommonUtil.hideNavKey
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
 
 /**
@@ -23,7 +31,7 @@ import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
  * Time:2019/5/10
  * Description:
  */
-class PigPlayer : StandardGSYVideoPlayer {
+class PigPlayer : FixPlayer {
 
     private val timeTextView: TextView by lazy {
         findViewById<TextView>(R.id.tv_time)
@@ -60,13 +68,33 @@ class PigPlayer : StandardGSYVideoPlayer {
     private val tvSpeed: TextView by lazy {
         findViewById<TextView>(R.id.tv_speed)
     }
+    private val tvSelectEpisode: TextView by lazy {
+        findViewById<TextView>(R.id.tv_select_episode).apply {
+            setOnClickListener(this@PigPlayer)
+        }
+    }
+    private val llSelectItemContent: View by lazy {
+        findViewById<View>(R.id.ll_select_items_content)
+    }
+    private val switchAutoNext: SwitchCompat by lazy {
+        findViewById<SwitchCompat>(R.id.switch_auto_next)
+    }
+    private val rvEpisodeItems: RecyclerView by lazy {
+        findViewById<RecyclerView>(R.id.rv_items)
+    }
+    private val selectEpisodeView: View by lazy {
+        findViewById<View>(R.id.ll_select_items).apply {
+            setOnClickListener(this@PigPlayer)
+        }
+    }
 
     private val activity = context as Activity
-
 
     fun getTopBar(): ViewGroup = mTopContainer
 
     private val taskHandler = Handler()
+
+    var itemAdapter = PlayerAct.ItemAdapter(context)
 
     private val syncSpeed = object : Runnable {
         override fun run() {
@@ -75,7 +103,14 @@ class PigPlayer : StandardGSYVideoPlayer {
         }
     }
 
-    constructor(context: Context?, fullFlag: Boolean?) : super(context, fullFlag)
+    constructor(context: Context?, fullFlag: Boolean?) : super(context, fullFlag) {
+        if (fullFlag == true) {
+            tvSelectEpisode.visibility = View.VISIBLE
+        } else {
+            tvSelectEpisode.visibility = View.GONE
+        }
+    }
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
@@ -83,10 +118,60 @@ class PigPlayer : StandardGSYVideoPlayer {
         super.init(context)
         enlargeImageRes = R.drawable.ic_fullscreen_white_24dp
         shrinkImageRes = R.drawable.ic_fullscreen_exit_white_24dp
+        post {
+            //init执行在基类构造方法里，此时dismissControlTime尚未初始化，需延迟设置
+            dismissControlTime = 4000
+        }
     }
 
     override fun getLayoutId(): Int {
         return R.layout.pig_player_layout
+    }
+
+    fun setPlayerViewModel(act: PlayerAct, vm: PlayerVM) {
+        rvEpisodeItems.layoutManager = GridLayoutManager(context, 3)
+        rvEpisodeItems.gap(context.dp2px(8f), context.dp2px(8f))
+        itemAdapter.setNewData(vm.playSourceList.value!![vm.currentSourcePos.value!!].items)
+        itemAdapter.setOnItemClickListener { adapter, view, position ->
+            vm.changePlayItem(position)
+        }
+        itemAdapter.bindToRecyclerView(rvEpisodeItems)
+        vm.currentItemPos.observe(act, Observer {
+            it?.let {
+                itemAdapter.selectedPos = it
+            }
+        })
+        vm.title.observe(act, Observer {
+            titleTextView.text = it
+        })
+        vm.autoNext.observe(act, Observer {
+            it?.let {
+                switchAutoNext.isChecked = it
+            }
+        })
+        switchAutoNext.setOnCheckedChangeListener { buttonView, isChecked ->
+            vm.setAutoNext(isChecked)
+        }
+    }
+
+    override fun seekTo(position: Long) {
+        super.seekTo(position.limit(0L, duration.toLong() - 1))
+    }
+
+    fun hideAllControl() {
+        if ((mCurrentState != GSYVideoView.CURRENT_STATE_NORMAL
+                        && mCurrentState != GSYVideoView.CURRENT_STATE_ERROR
+                        && mCurrentState != GSYVideoView.CURRENT_STATE_AUTO_COMPLETE)) {
+            if (activityContext != null) {
+                Handler(Looper.getMainLooper()).post {
+                    hideAllWidget()
+                    setViewShowState(mLockScreen, View.GONE)
+                    if (mHideKey && mIfCurrentIsFullscreen && mShowVKey) {
+                        hideNavKey(mContext)
+                    }
+                }
+            }
+        }
     }
 
     override fun showVolumeDialog(deltaY: Float, volumePercent: Int) {
@@ -122,6 +207,59 @@ class PigPlayer : StandardGSYVideoPlayer {
         seekPosLayout.visibility = View.GONE
     }
 
+    fun setSelectEpisodeVisible(v: Boolean) {
+        if (v) {
+            selectEpisodeView.visibility = View.VISIBLE
+            val slideIn = TranslateAnimation(Animation.RELATIVE_TO_SELF, 1f, Animation.RELATIVE_TO_SELF, 0f,
+                    Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f)
+            slideIn.duration = 200
+            slideIn.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                }
+
+                override fun onAnimationStart(animation: Animation?) {
+                }
+            })
+            slideIn.fillAfter = true
+            llSelectItemContent.startAnimation(slideIn)
+        } else {
+            val slideOut = TranslateAnimation(Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
+                    Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f)
+            slideOut.duration = 200
+            slideOut.fillAfter = true
+            slideOut.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    selectEpisodeView.visibility = View.GONE
+                }
+
+                override fun onAnimationStart(animation: Animation?) {
+                }
+            })
+            llSelectItemContent.startAnimation(slideOut)
+        }
+    }
+
+    override fun onClick(v: View?) {
+        super.onClick(v)
+        when (v!!.id) {
+            R.id.tv_select_episode -> {
+                if (mIfCurrentIsFullscreen) {
+                    hideAllControl()
+                    setSelectEpisodeVisible(true)
+                }
+            }
+            R.id.ll_select_items -> {
+                setSelectEpisodeVisible(false)
+            }
+        }
+    }
+
     override fun setViewShowState(view: View?, visibility: Int) {
         super.setViewShowState(view, visibility)
         if (view == loadingView) {
@@ -130,51 +268,13 @@ class PigPlayer : StandardGSYVideoPlayer {
             } else {
                 taskHandler.removeCallbacks(syncSpeed)
             }
-        }else if(view == mTopContainer){
-            if(!mIfCurrentIsFullscreen){
+        } else if (view == mTopContainer) {
+            if (!mIfCurrentIsFullscreen) {
                 if (visibility == View.VISIBLE) {
                     activity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 } else {
                     activity.window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 }
-            }
-        }
-    }
-    /**
-     * 获取当前播放进度
-     */
-    override fun getCurrentPositionWhenPlaying(): Int {
-        var position = 0
-        if (mCurrentState == CURRENT_STATE_PLAYING || mCurrentState == CURRENT_STATE_PAUSE
-                || mCurrentState == GSYVideoView.CURRENT_STATE_PLAYING_BUFFERING_START) {
-            try {
-                position = gsyVideoManager.currentPosition.toInt()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return position
-            }
-        }
-        return if (position == 0 && mCurrentPosition > 0) {
-            mCurrentPosition.toInt()
-        } else position
-    }
-
-
-    override fun changeUiToNormal() {
-        super.changeUiToNormal()
-        setProgressAndTime(0,0,0,0)
-
-    }
-
-    override fun setSecondaryProgress(secProgress: Int) {
-        if (mProgressBar != null) {
-            if (secProgress >= 0 && !gsyVideoManager.isCacheFile) {
-                mProgressBar.secondaryProgress = secProgress
-            }
-        }
-        if (mBottomProgressBar != null) {
-            if (secProgress >= 0 && !gsyVideoManager.isCacheFile) {
-                mBottomProgressBar.secondaryProgress = secProgress
             }
         }
     }
@@ -198,12 +298,12 @@ class PigPlayer : StandardGSYVideoPlayer {
             secProgress = gsyVideoManager.bufferedPercentage
         }
         if (secProgress > 94) secProgress = 100
-        setSecondaryProgress(secProgress)
+        super.setSecondaryProgress(secProgress)
 
         timeTextView.text = CommonUtil.stringForTime(currentTime) + "/" + CommonUtil.stringForTime(totalTime)
         if (mBottomProgressBar != null) {
-            if (progress >=0) mBottomProgressBar.progress = progress
-            setSecondaryProgress(secProgress)
+            if (progress >= 0) mBottomProgressBar.progress = progress
+            super.setSecondaryProgress(secProgress)
         }
     }
 

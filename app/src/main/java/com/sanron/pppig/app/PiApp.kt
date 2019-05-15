@@ -9,7 +9,9 @@ import com.facebook.cache.disk.DiskCacheConfig
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.sanron.pppig.BuildConfig
+import com.sanron.pppig.module.play.PigVideoManager
 import com.shuyu.gsyvideoplayer.player.IjkPlayerManager
+import com.shuyu.gsyvideoplayer.player.PlayerFactory
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
@@ -37,10 +39,14 @@ class PiApp : Application() {
         sInstance = this
         initFresco()
         initBugly()
-        IjkPlayerManager.setLogLevel(IjkMediaPlayer.IJK_LOG_DEFAULT)
+        initGsyPlay()
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
     }
 
+    private fun initGsyPlay() {
+        PlayerFactory.setPlayManager(PigVideoManager::class.java)
+        IjkPlayerManager.setLogLevel(if (BuildConfig.DEBUG) IjkMediaPlayer.IJK_LOG_INFO else IjkMediaPlayer.IJK_LOG_SILENT)
+    }
 
     private fun initBugly() {
         val context = applicationContext

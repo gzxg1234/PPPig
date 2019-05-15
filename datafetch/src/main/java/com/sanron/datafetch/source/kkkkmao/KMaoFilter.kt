@@ -8,20 +8,30 @@ import java.util.*
  * @author chenrong
  * @date 2019/5/12
  */
-object KMaoFilter{
+object KMaoFilter {
 
 
     internal fun moveListFilter(): Map<String, List<FilterItem>> {
         val types = listOf(
-                FilterItem("全部", "movie"),
-                FilterItem("喜剧", "Comedy"),
-                FilterItem("动作", "Action"),
-                FilterItem("预告片", "yugaopian"),
-                FilterItem("科幻", "Sciencefiction"),
-                FilterItem("惊悚", "Horror"),
-                FilterItem("爱情", "Love"),
-                FilterItem("战争", "War"),
-                FilterItem("剧情", "Drama")
+                FilterItem("全部", ""),
+                FilterItem("动作", "8"),
+                FilterItem("惊悚", "43"),
+                FilterItem("犯罪", "40"),
+                FilterItem("冒险", "35"),
+                FilterItem("武侠", "44"),
+                FilterItem("悬疑", "42"),
+                FilterItem("家庭", "129"),
+                FilterItem("科幻", "11"),
+                FilterItem("恐怖", "12"),
+                FilterItem("爱情", "10"),
+                FilterItem("喜剧", "9"),
+                FilterItem("生活", "34"),
+                FilterItem("战争", "13"),
+                FilterItem("灾难", "38"),
+                FilterItem("古装", "37"),
+                FilterItem("警匪", "39"),
+                FilterItem("文艺", "29"),
+                FilterItem("青春", "31")
         )
         val countrys = listOf(
                 FilterItem("全部", ""),

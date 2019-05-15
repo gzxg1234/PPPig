@@ -1,16 +1,15 @@
 package com.sanron.pppig.module.play
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
 import com.chad.library.adapter.base.BaseViewHolder
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.lib.StatusBarHelper
@@ -37,12 +36,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer
  */
 class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
-    private var itemPos: Int = 0
-    private var pagePos: Int = 0
-    private lateinit var sourceList: List<PlaySource>
     lateinit var orientationUtils: OrientationUtils
-
-    var title: String? = null
 
     companion object {
         const val ARG_PLAY_SOURCE = "play_source_list"
@@ -66,21 +60,22 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = intent?.getStringExtra(ARG_TITLE)
-        sourceList = intent?.getSerializableExtra(ARG_PLAY_SOURCE) as List<PlaySource>
-        pagePos = intent?.getIntExtra(ARG_SOURCE_POS, 0)!!
-        itemPos = intent?.getIntExtra(ARG_ITEM_POS, 0)!!
         StatusBarHelper.with(this)
                 .setStatusBarColor(0x60000000)
                 .setLayoutBelowStatusBar(true)
                 .setPaddingTop(dataBinding.playerView.getTopBar())
-        viewModel.setSource(intent?.getStringExtra(ARG_SOURCE_ID) ?: "")
         dataBinding.lifecycleOwner = this
         dataBinding.model = viewModel
+        initPlayer()
+        setupObserver()
+        viewModel.initIntent(intent)
+    }
+
+    private fun setupObserver() {
         viewModel.videoSourceList.observe(this, Observer {
             if (!it.isNullOrEmpty()) {
-                dataBinding.playerView.setUp(it[0], false, null)
-                dataBinding.playerView.startPlayLogic()
+                dataBinding.playerView.currentPlayer.setUp(it[0], false, viewModel.title.value)
+                dataBinding.playerView.currentPlayer.startPlayLogic()
             }
         })
 
@@ -94,9 +89,40 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             }
         })
 
+
+        viewModel.playSourceList.observe(this, Observer {
+            it?.let {
+                dataBinding.viewPager.adapter = SourceAdapter(it)
+                val titles = it.map { source ->
+                    source.name
+                }
+                dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
+            }
+        })
+        viewModel.title.observe(this, Observer {
+            dataBinding.playerView.titleTextView.text = it
+        })
+        viewModel.currentItem.observe(this, Observer {
+            (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
+                    viewModel.currentSourcePos.value ?: -1,
+                    viewModel.currentItemPos.value ?: -1)
+            dataBinding.tabLayout.currentTab = viewModel.currentSourcePos.value ?: 0
+            dataBinding.playerView.currentPlayer.release()
+            dataBinding.playerView.currentPlayer.onVideoReset()
+        })
+        viewModel.onItemsReverse.observe(this, Observer {
+            it?.let { pos ->
+                (dataBinding.viewPager.adapter as SourceAdapter).notifySourceChange(pos)
+                (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
+                        viewModel.currentSourcePos.value ?: -1,
+                        viewModel.currentItemPos.value ?: -1)
+            }
+        })
+    }
+
+    private fun initPlayer() {
         orientationUtils = OrientationUtils(this, dataBinding.playerView)
         orientationUtils.isEnable = false
-
         dataBinding.playerView.apply {
             titleTextView.text = title
             (gsyVideoManager as? GSYVideoBaseManager)?.let {
@@ -119,10 +145,16 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                     orientationUtils.isEnable = true
                 }
 
+                override fun onAutoComplete(url: String?, vararg objects: Any?) {
+                    super.onAutoComplete(url, *objects)
+                    viewModel.onPlayComplete()
+                }
+
                 override fun onQuitFullscreen(url: String?, vararg objects: Any) {
                     super.onQuitFullscreen(url, *objects)
                     orientationUtils.backToProtVideo()
                 }
+
             })
             setLockClickListener { _, lock -> orientationUtils.isEnable = !lock }
             fullscreenButton.setOnClickListener(object : View.OnClickListener {
@@ -131,22 +163,14 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                     orientationUtils.resolveByClick()
 
                     //第一个true是否需要隐藏actionbar，第二个true是否需要隐藏statusbar
-                    dataBinding.playerView.startWindowFullscreen(this@PlayerAct, true, true)
+                    val player = dataBinding.playerView.startWindowFullscreen(this@PlayerAct, true, true)
+                    (player as PigPlayer).setPlayerViewModel(this@PlayerAct, viewModel)
                 }
             })
             backButton.setOnClickListener {
                 onBackPressed()
             }
         }
-
-        dataBinding.viewPager.adapter = SourceAdapter(sourceList).apply {
-            setSelectPos(pagePos, itemPos)
-        }
-        val titles = sourceList.map { source ->
-            source.name
-        }
-        dataBinding.tabLayout.setViewPager(dataBinding.viewPager, titles.toTypedArray())
-        dataBinding.tabLayout.currentTab = pagePos
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -156,9 +180,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
     }
 
     override fun onBackPressed() {
-        if (orientationUtils != null) {
-            orientationUtils.backToProtVideo()
-        }
+        orientationUtils.backToProtVideo()
         if (GSYVideoManager.backFromWindowFull(this)) {
             return
         }
@@ -174,7 +196,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     override fun initData() {
         super.initData()
-        sourceList[pagePos].items?.get(itemPos)?.let { loadItem(it) }
+        viewModel.startPlayCurrent()
     }
 
     override fun onResume() {
@@ -187,19 +209,15 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         super.onPause()
     }
 
-    private fun loadItem(item: PlaySource.Item) {
-        dataBinding.playerView.release()
-        dataBinding.playerView.onVideoReset()
-        dataBinding.playerView.titleTextView.text = "$title-${item.name}"
-        viewModel.playItem = item
-        viewModel.loadData()
-    }
-
     inner class SourceAdapter(val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
 
         private val pageViewList = SparseArray<androidx.recyclerview.widget.RecyclerView>()
         private var pagePos = -1
         private var itemPos = -1
+
+        fun notifySourceChange(pos: Int) {
+            (pageViewList[pos]?.adapter as? ItemAdapter)?.notifyDataSetChanged()
+        }
 
         fun setSelectPos(page: Int, pos: Int) {
             for (i in 0 until pageViewList.size()) {
@@ -220,7 +238,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             val recyclerView = androidx.recyclerview.widget.RecyclerView(context)
             recyclerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             val dp16 = context.dp2px(16f)
-            recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 4)
+            recyclerView.layoutManager = GridLayoutManager(context, 4)
             recyclerView.setPadding(dp16, dp16, dp16, dp16)
             recyclerView.clipChildren = false
             recyclerView.clipToPadding = false
@@ -230,8 +248,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             adapter.bindToRecyclerView(recyclerView)
             adapter.setOnItemClickListener { _, _, position2 ->
                 data?.get(position)?.items?.get(position2)?.let {
-                    setSelectPos(position, position2)
-                    loadItem(it)
+                    viewModel.changePlayItem(position, position2)
                 }
             }
             if (position == pagePos) {

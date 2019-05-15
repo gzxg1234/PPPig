@@ -20,7 +20,7 @@ interface KmaoApi {
     @GET("$BASE_URL/{path}")
     fun html(@Path(encoded = true, value = "path") path: String): Observable<ResponseBody>
 
-    @GET("$BASE_URL/{type}/index_{page}___{year}___{country}_1.html")
+    @GET("$BASE_URL/movie/index_{page}_{type}__{year}___{country}_1.html")
     fun movieList(@Path("type") type: String,
                   @Path("country") country: String,
                   @Path("year") year: String,

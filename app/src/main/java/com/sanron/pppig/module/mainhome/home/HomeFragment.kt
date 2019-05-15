@@ -1,30 +1,30 @@
 package com.sanron.pppig.module.mainhome.home
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.databinding.DataBindingUtil
-import androidx.core.app.SharedElementCallback
-import androidx.recyclerview.widget.RecyclerView
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.app.SharedElementCallback
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.vlayout.DelegateAdapter
 import com.alibaba.android.vlayout.LayoutHelper
 import com.alibaba.android.vlayout.VirtualLayoutManager
 import com.alibaba.android.vlayout.layout.GridLayoutHelper
 import com.alibaba.android.vlayout.layout.SingleLayoutHelper
 import com.facebook.drawee.view.SimpleDraweeView
-import com.sanron.pppig.R
-import com.sanron.pppig.app.Intents
-import com.sanron.pppig.app.PiApp
-import com.sanron.pppig.base.LazyFragment
 import com.sanron.datafetch_interface.bean.Banner
 import com.sanron.datafetch_interface.bean.Home
 import com.sanron.datafetch_interface.bean.HomeCat
 import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
+import com.sanron.pppig.app.PiApp
+import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.FragmentHomeBinding
 import com.sanron.pppig.databinding.ItemVideoBinding
@@ -115,9 +115,12 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
             })
             adapter = DelegateAdapter(layoutManager, true)
             recyclerView.adapter = adapter
+            refreshLayout.handleScrollHorizontalConflict = true
+            recyclerView.handleScrollHorizontalConflict = true
         }
         viewModel.toVideoDetail.observe(this, Observer {
-            val intent = Intents.videoDetail(context!!, it?.link,FetchManager.currentSourceId()?:"")
+            val intent = Intents.videoDetail(context!!, it?.link, FetchManager.currentSourceId()
+                    ?: "")
             startActivity(intent)
         })
         activity?.setExitSharedElementCallback(object : SharedElementCallback() {
@@ -151,7 +154,8 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
                         sdv.setImageURI(item.image)
                         tv.text = item.title
                         view.setOnClickListener { _ ->
-                            startActivity(Intents.videoDetail(context!!,item.link,FetchManager.currentSourceId()?:""))
+                            startActivity(Intents.videoDetail(context!!, item.link, FetchManager.currentSourceId()
+                                    ?: ""))
                         }
                         return view
                     }
@@ -221,7 +225,8 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         binding.model = ItemVideoVM(PiApp.sInstance)
         binding.root.setOnClickListener {
             val item = binding.model!!.item.value!!
-            val intent = Intents.videoDetail(context, item.link,FetchManager.currentSourceId()?:"")
+            val intent = Intents.videoDetail(context, item.link, FetchManager.currentSourceId()
+                    ?: "")
             fragment.startActivity(intent)
         }
         return viewHolder

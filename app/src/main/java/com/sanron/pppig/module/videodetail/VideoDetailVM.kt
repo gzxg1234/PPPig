@@ -59,7 +59,14 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
                         image.value = t.image
                         title.value = t.title
                         playSourceList.value = t.source
-                        intro.value = t.intro
+                        if (playSourceList.value.isNullOrEmpty()) {
+                            toastMsg.value = "暂无可播放资源"
+                        }
+                        intro.value = if (t.intro.isNullOrEmpty()) {
+                            "暂无介绍"
+                        } else {
+                            t.intro
+                        }
                         loading.value = false
                     }
 

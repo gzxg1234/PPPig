@@ -91,6 +91,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
             }
             adapter.lifecycleOwner = this@VideoListFragment
             adapter.bindToRecyclerView(recyclerView)
+            refreshLayout.handleScrollHorizontalConflict = true
         }
         viewModel.apply {
             type = arguments?.getInt("type") ?: 0

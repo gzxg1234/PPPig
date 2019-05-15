@@ -19,6 +19,19 @@ import com.sanron.pppig.widget.SimpleSizeDrawable
  *Time:2019/4/15
  *Description:
  */
+
+fun View.gone() {
+    this.visibility = View.GONE
+}
+
+fun View.invisible() {
+    this.visibility = View.INVISIBLE
+}
+
+fun View.visible() {
+    this.visibility = View.VISIBLE
+}
+
 fun View.setPadding(paddingLeft: Int? = null, paddingTop: Int? = null, paddingRight: Int? = null, paddingBottom: Int? = null) {
     this.setPadding(paddingLeft ?: this.paddingLeft,
             paddingTop ?: this.paddingTop,

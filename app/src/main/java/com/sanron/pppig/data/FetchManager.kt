@@ -2,7 +2,6 @@ package com.sanron.pppig.data
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.SourceManager
 import com.sanron.pppig.app.PiApp
@@ -31,9 +30,8 @@ object FetchManager {
 
     private val souceMap = mutableMapOf<String, Source>()
 
-    val sp: SharedPreferences by lazy {
-        return@lazy context.getSharedPreferences("FETCH_CONFIG", Context.MODE_PRIVATE)
-    }
+    private var currentSourceId by AppPref.AppSP("currentSourceId", "")
+    private var fetchVersion by AppPref.AppSP("fetchVersion", -1)
 
     /**
      * 切换视频数据源
@@ -42,9 +40,7 @@ object FetchManager {
         souceMap[id]?.let {
             Repo.dataFetch = it.fetch
             if (save) {
-                sp.edit()
-                        .putString("currentFetchId", id)
-                        .apply()
+                currentSourceId = id
             }
         }
     }
@@ -58,7 +54,7 @@ object FetchManager {
     }
 
     fun currentSourceId(): String? {
-        return sp.getString("currentFetchId", "")
+        return currentSourceId
     }
 
     private fun readFetchConfig() {
@@ -70,15 +66,6 @@ object FetchManager {
         }
     }
 
-    private fun getFetchVersion(): Int {
-        return sp.getInt("fetchVersion", -1)
-    }
-
-    private fun setFetchVersion(v: Int): Boolean {
-        return sp.edit()
-                .putInt("fetchVersion", v)
-                .commit()
-    }
 
     /**
      * jar包路径
@@ -90,7 +77,7 @@ object FetchManager {
     /**
      * assets内置包名称
      */
-    private fun getAssetsFetchJarFileName(context: Context): String {
+    private fun getAssetsFetchJarFileName(): String {
         return "fetch.jar"
     }
 
@@ -120,7 +107,6 @@ object FetchManager {
     fun init(context: Context, success: () -> Unit, failed: (String) -> Unit) {
         this.context = context.applicationContext
         thread {
-            val fetchVersion = getFetchVersion()
             val jarPath = File(getJarPath(context))
             var sm: SourceManager? = null
             if (fetchVersion == -1) {
@@ -128,7 +114,7 @@ object FetchManager {
                 var assetJarInputStream: InputStream? = null
                 var jarOutStream: OutputStream? = null
                 try {
-                    assetJarInputStream = context.assets.open(getAssetsFetchJarFileName(context))
+                    assetJarInputStream = context.assets.open(getAssetsFetchJarFileName())
                     jarPath.delete()
                     if (!jarPath.createNewFile()) {
                         MainHandler.post {
@@ -139,7 +125,7 @@ object FetchManager {
                     assetJarInputStream.copyTo(jarOutStream)
                     sm = loadSourceManager(jarPath.absolutePath)
                     if (sm != null && !sm.getSourceList().isNullOrEmpty()) {
-                        setFetchVersion(sm.getVersion())
+                        fetchVersion = sm.getVersion()
                     }
                 } catch (e: IOException) {
                     MainHandler.post {
