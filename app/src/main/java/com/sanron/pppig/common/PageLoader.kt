@@ -1,9 +1,9 @@
 package com.sanron.pppig.common
 
-import android.arch.lifecycle.*
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.lifecycle.*
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.sanron.datafetch_interface.bean.PageData
 import com.sanron.pppig.base.BaseObserver
@@ -105,7 +105,7 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
 }
 
 
-fun PageLoader<*>.bindRecyclerView(lifecycleOwner: LifecycleOwner, recyclerView: RecyclerView) {
+fun PageLoader<*>.bindRecyclerView(lifecycleOwner: LifecycleOwner, recyclerView: androidx.recyclerview.widget.RecyclerView) {
     if (recyclerView.adapter == null || recyclerView.adapter !is BaseQuickAdapter<*, *> || lifecycleOwner == null) {
         return
     }
@@ -138,7 +138,7 @@ fun PageLoader<*>.bindRecyclerView(lifecycleOwner: LifecycleOwner, recyclerView:
     }
 }
 
-fun PageLoader<*>.bindRefreshLayout(lifecycleOwner: LifecycleOwner, refreshLayout: SwipeRefreshLayout) {
+fun PageLoader<*>.bindRefreshLayout(lifecycleOwner: LifecycleOwner, refreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout) {
     refreshLayout.setOnRefreshListener {
         this.refreshing.value = true
         this.refresh()

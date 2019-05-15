@@ -1,19 +1,19 @@
 package com.sanron.pppig.util
 
 import android.animation.Animator
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import android.content.Context
-import android.databinding.Observable
-import android.databinding.ObservableField
+import androidx.databinding.Observable
+import androidx.databinding.ObservableField
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.animation.Animation
 import com.sanron.pppig.BR

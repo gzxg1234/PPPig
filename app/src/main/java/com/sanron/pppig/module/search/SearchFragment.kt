@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.search
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
@@ -76,7 +76,7 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
             lifecycleOwner = this@SearchFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
-            recyclerView.layoutManager = GridLayoutManager(context, 3)
+            recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
             adapter = VideoAdapter(context!!, this@SearchFragment, viewModel.pageLoader.listData.value)

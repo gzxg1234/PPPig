@@ -1,6 +1,6 @@
 package com.sanron.pppig.binding
 
-import android.databinding.*
+import androidx.databinding.*
 import android.view.View
 import android.widget.ImageView
 import com.facebook.drawee.view.SimpleDraweeView

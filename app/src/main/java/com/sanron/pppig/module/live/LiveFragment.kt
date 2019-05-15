@@ -1,6 +1,6 @@
 package com.sanron.pppig.module.live
 
-import android.databinding.ViewDataBinding
+import androidx.databinding.ViewDataBinding
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.base.LazyFragment

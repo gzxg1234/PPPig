@@ -1,6 +1,6 @@
 package com.sanron.pppig.widget
 
-import android.support.v4.view.PagerAdapter
+import androidx.viewpager.widget.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
 
@@ -9,7 +9,7 @@ import android.view.ViewGroup
  * Time:2019/2/21
  * Description:
  */
-abstract class ViewPagerAdapter<T>(private val data: List<T>?) : PagerAdapter() {
+abstract class ViewPagerAdapter<T>(private val data: List<T>?) : androidx.viewpager.widget.PagerAdapter() {
 
     override fun getCount(): Int {
         return data?.size ?: 0

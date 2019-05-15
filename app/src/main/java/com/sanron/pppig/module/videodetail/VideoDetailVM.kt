@@ -1,7 +1,7 @@
 package com.sanron.pppig.module.videodetail
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.bean.PlaySource
 import com.sanron.datafetch_interface.bean.VideoDetail

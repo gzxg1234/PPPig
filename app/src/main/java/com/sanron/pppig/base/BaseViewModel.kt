@@ -1,7 +1,7 @@
 package com.sanron.pppig.base
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.sanron.pppig.util.SingleLiveEvent
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.CompositeDisposable

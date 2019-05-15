@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.mainhome
 
-import android.arch.lifecycle.ViewModelProviders
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import android.util.SparseArray
 import com.flyco.tablayout.listener.OnTabSelectListener
 import com.sanron.datafetch_interface.bean.VideoListType
@@ -77,9 +77,9 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
 
-    private class PageAdapter(val videoTypeList: List<VideoListType>, var fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private class PageAdapter(val videoTypeList: List<VideoListType>, var fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-        private val fragments = SparseArray<Fragment>()
+        private val fragments = SparseArray<androidx.fragment.app.Fragment>()
         val TITLES = mutableListOf<String>()
 
         init {
@@ -98,13 +98,13 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
             transaction.commitNowAllowingStateLoss()
         }
 
-        fun getFragment(pos: Int): Fragment = fragments[pos]
+        fun getFragment(pos: Int): androidx.fragment.app.Fragment = fragments[pos]
 
-        override fun getItem(i: Int): Fragment {
+        override fun getItem(i: Int): androidx.fragment.app.Fragment {
             return (when (i) {
                 0 -> HomeFragment()
                 else -> VideoListFragment.new(videoTypeList[i - 1].type)
-            } as Fragment).apply { fragments.put(i, this) }
+            } as androidx.fragment.app.Fragment).apply { fragments.put(i, this) }
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

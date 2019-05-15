@@ -1,11 +1,11 @@
 package com.sanron.pppig.module.mainhome.home
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
-import android.support.v4.app.SharedElementCallback
-import android.support.v7.widget.RecyclerView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.databinding.DataBindingUtil
+import androidx.core.app.SharedElementCallback
+import androidx.recyclerview.widget.RecyclerView
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -108,7 +108,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
             layoutManager = VirtualLayoutManager(context!!)
             recyclerView.layoutManager = layoutManager
             layoutManager.setNestedScrolling(false)
-            recyclerView.setRecycledViewPool(RecyclerView.RecycledViewPool().apply {
+            recyclerView.setRecycledViewPool(androidx.recyclerview.widget.RecyclerView.RecycledViewPool().apply {
                 setMaxRecycledViews(TYPE_VIDEO, 9)
                 setMaxRecycledViews(TYPE_BANNER, 1)
                 setMaxRecycledViews(TYPE_TITLE, 5)
@@ -178,7 +178,7 @@ class TitleAdapter(binding: ItemVideoListTitleBinding, val homeCat: HomeCat, mar
         return TYPE_TITLE
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val binding = DataBindingUtil.getBinding<ItemVideoListTitleBinding>(holder.itemView)!!
         val icon = when (homeCat.type) {
             HomeCat.MOVIE -> R.drawable.ic_title_movie
@@ -192,7 +192,7 @@ class TitleAdapter(binding: ItemVideoListTitleBinding, val homeCat: HomeCat, mar
     }
 }
 
-class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem>?) : DelegateAdapter.Adapter<RecyclerView.ViewHolder>() {
+class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem>?) : DelegateAdapter.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 
     val context = fragment.context!!
 
@@ -208,13 +208,13 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         return helper
     }
 
-    override fun onBindViewHolder(p0: RecyclerView.ViewHolder, p1: Int) {
+    override fun onBindViewHolder(p0: androidx.recyclerview.widget.RecyclerView.ViewHolder, p1: Int) {
         val binding = DataBindingUtil.getBinding<ItemVideoBinding>(p0.itemView)!!
         binding.model!!.item.value = items!![p1]
         binding.executePendingBindings()
     }
 
-    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(p0: ViewGroup, p1: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemVideoBinding>(p0.context.inflater, R.layout.item_video, p0, false)
         val viewHolder = SimpleViewHolder(binding.root)
         binding.lifecycleOwner = p0.context as LifecycleOwner

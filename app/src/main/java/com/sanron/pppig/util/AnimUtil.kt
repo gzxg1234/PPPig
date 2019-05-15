@@ -1,6 +1,6 @@
 package com.sanron.pppig.util
 
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation

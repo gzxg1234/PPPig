@@ -1,11 +1,11 @@
 package com.sanron.pppig.module.main
 
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.bottomnavigation.LabelVisibilityMode
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import com.google.android.material.bottomnavigation.LabelVisibilityMode
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
@@ -42,9 +42,9 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainViewModel>() {
         }
     }
 
-    private class HomePageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private class HomePageAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-        override fun getItem(i: Int): Fragment {
+        override fun getItem(i: Int): androidx.fragment.app.Fragment {
             if (i == 0) {
                 return MainFragment()
             } else if (i == 1) {

@@ -1,10 +1,10 @@
 package com.sanron.pppig.base
 
-import android.arch.lifecycle.Observer
-import android.databinding.DataBindingUtil
-import android.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +15,7 @@ import com.sanron.pppig.util.showToast
  * Time:2019/2/20
  * Description:
  */
-abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : Fragment() {
+abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : androidx.fragment.app.Fragment() {
 
     private var mDataBinding: T? = null
 

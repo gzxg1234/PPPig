@@ -1,7 +1,7 @@
 package com.sanron.pppig.base
 
-import android.databinding.ViewDataBinding
-import android.support.annotation.CallSuper
+import androidx.databinding.ViewDataBinding
+import androidx.annotation.CallSuper
 
 import com.sanron.pppig.util.CLog
 

@@ -5,10 +5,10 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import android.text.TextUtils
 import android.view.View
 import android.view.animation.Animation
@@ -81,7 +81,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
             lifecycleOwner = this@VideoListFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
-            recyclerView.layoutManager = GridLayoutManager(context, 3)
+            recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
             adapter = VideoAdapter(context!!, this@VideoListFragment, viewModel.pageLoader.listData.value)

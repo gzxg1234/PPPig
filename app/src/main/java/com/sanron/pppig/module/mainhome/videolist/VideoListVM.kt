@@ -1,7 +1,7 @@
 package com.sanron.pppig.module.mainhome.videolist
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.sanron.datafetch_interface.bean.FilterItem
 import com.sanron.datafetch_interface.bean.PageData
 import com.sanron.datafetch_interface.bean.VideoItem

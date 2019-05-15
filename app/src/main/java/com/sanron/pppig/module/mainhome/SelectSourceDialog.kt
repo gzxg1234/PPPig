@@ -2,8 +2,8 @@ package com.sanron.pppig.module.mainhome
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.util.Pools
-import android.support.v7.widget.LinearLayoutManager
+import androidx.core.util.Pools
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +33,7 @@ class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog
         val curSourcePos = FetchManager.sourceManager.getSourceList().indexOfFirst {
             it.id == FetchManager.currentSourceId()
         }
-        listView.layoutManager = LinearLayoutManager(context)
+        listView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         listView.itemAnimator = null
         itemAdapter.bindToRecyclerView(listView)
         itemAdapter.setNewData(FetchManager.sourceManager.getSourceList())

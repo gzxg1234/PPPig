@@ -10,9 +10,11 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.SeekBar
 import android.widget.TextView
 import com.sanron.pppig.R
 import com.shuyu.gsyvideoplayer.utils.CommonUtil
+import com.shuyu.gsyvideoplayer.utils.Debuger
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
 
@@ -156,6 +158,7 @@ class PigPlayer : StandardGSYVideoPlayer {
             mCurrentPosition.toInt()
         } else position
     }
+
 
     override fun changeUiToNormal() {
         super.changeUiToNormal()

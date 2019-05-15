@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.mainhome.videolist
 
 import android.app.Application
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import android.content.Context
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import com.chad.library.adapter.base.BaseViewHolder
 import com.sanron.datafetch_interface.bean.VideoItem
 import com.sanron.pppig.R

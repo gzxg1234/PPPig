@@ -1,6 +1,6 @@
 package com.sanron.pppig.util
 
-import android.support.annotation.Size
+import androidx.annotation.Size
 
 /**
  *Author:sanron

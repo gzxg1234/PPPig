@@ -1,12 +1,12 @@
 package com.sanron.pppig.module.play
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
@@ -101,8 +101,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             titleTextView.text = title
             (gsyVideoManager as? GSYVideoBaseManager)?.let {
                 it.optionModelList = mutableListOf()
-                //SeekTo设置优化某些视频在SeekTo的时候，会跳回到拖动前的位置
-                it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1))
                 //解决m3u8文件拖动问题 比如:一个3个多少小时的音频文件，开始播放几秒中，然后拖动到2小时左右的时间，要loading 10分钟
                 it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "fastseek"))
                 //打开重试
@@ -151,7 +149,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         dataBinding.tabLayout.currentTab = pagePos
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         dataBinding.playerView.onConfigurationChanged(this, newConfig, orientationUtils,
                 true, true)
@@ -199,7 +197,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     inner class SourceAdapter(val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
 
-        private val pageViewList = SparseArray<RecyclerView>()
+        private val pageViewList = SparseArray<androidx.recyclerview.widget.RecyclerView>()
         private var pagePos = -1
         private var itemPos = -1
 
@@ -219,10 +217,10 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
         override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
             val context = container.context
-            val recyclerView = RecyclerView(context)
+            val recyclerView = androidx.recyclerview.widget.RecyclerView(context)
             recyclerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             val dp16 = context.dp2px(16f)
-            recyclerView.layoutManager = GridLayoutManager(context, 4)
+            recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 4)
             recyclerView.setPadding(dp16, dp16, dp16, dp16)
             recyclerView.clipChildren = false
             recyclerView.clipToPadding = false

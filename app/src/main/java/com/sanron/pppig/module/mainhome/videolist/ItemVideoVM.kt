@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.mainhome.videolist
 
 import android.app.Application
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.sanron.datafetch_interface.bean.VideoItem
 import com.sanron.pppig.base.BaseViewModel
 

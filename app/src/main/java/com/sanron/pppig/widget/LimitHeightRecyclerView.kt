@@ -1,7 +1,7 @@
 package com.sanron.pppig.widget
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 
 /**
@@ -10,7 +10,7 @@ import android.util.AttributeSet
  * Description:
  * 限制最大高度RecyclerView
  */
-class LimitHeightRecyclerView : RecyclerView {
+class LimitHeightRecyclerView : androidx.recyclerview.widget.RecyclerView {
 
 
     var maxHeight = -1

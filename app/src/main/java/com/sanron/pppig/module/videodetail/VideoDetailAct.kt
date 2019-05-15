@@ -1,14 +1,14 @@
 package com.sanron.pppig.module.videodetail
 
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.v4.app.ActivityCompat
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import com.google.android.material.appbar.AppBarLayout
+import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -208,10 +208,10 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
 
         override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
             val context = container.context
-            val recyclerView = RecyclerView(context)
+            val recyclerView = androidx.recyclerview.widget.RecyclerView(context)
             recyclerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             val dp16 = context.dp2px(16f)
-            recyclerView.layoutManager = GridLayoutManager(context, 4)
+            recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 4)
             recyclerView.setPadding(dp16, dp16, dp16, dp16)
             recyclerView.clipChildren = false
             recyclerView.clipToPadding = false

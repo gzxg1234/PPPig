@@ -1,7 +1,7 @@
 package com.sanron.pppig.module.mainhome.home
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.sanron.datafetch_interface.bean.Home
 import com.sanron.datafetch_interface.bean.VideoItem
 import com.sanron.pppig.base.BaseObserver

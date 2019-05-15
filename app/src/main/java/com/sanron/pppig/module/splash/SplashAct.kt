@@ -2,7 +2,7 @@ package com.sanron.pppig.module.splash
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.base.BaseViewModel

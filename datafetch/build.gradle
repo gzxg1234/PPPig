@@ -11,7 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
 
@@ -28,16 +28,16 @@ dependencies {
 //    compileOnly fileTree(dir: 'libs', include: ['fetch_interface.jar'])
     compileOnly project(':datafetch_interface')
 
-    compileOnly 'io.reactivex.rxjava2:rxjava:2.2.3'
-    compileOnly 'com.squareup.retrofit2:retrofit:2.4.0'
-    compileOnly 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    compileOnly 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    compileOnly 'io.reactivex.rxjava2:rxjava:2.2.8'
+    compileOnly 'com.squareup.retrofit2:retrofit:2.5.0'
+    compileOnly 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    compileOnly 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    compileOnly 'com.squareup.okhttp3:okhttp:3.11.0'
+    compileOnly 'com.squareup.okhttp3:okhttp:3.12.3'
 
     //jsoup
     implementation 'org.jsoup:jsoup:1.11.3'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 }

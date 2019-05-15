@@ -45,7 +45,7 @@
                     android:textSize="13dp"
                     tools:text="快看影视" />
 
-                <android.support.v7.widget.AppCompatImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:scaleType="fitCenter"
@@ -95,7 +95,7 @@
             app:tl_textUnselectColor="#999"
             app:tl_textsize="16dp" />
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

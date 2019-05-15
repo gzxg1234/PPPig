@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.search
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import android.util.SparseArray
 import android.view.inputmethod.EditorInfo
 import com.sanron.datafetch_interface.Source
@@ -57,7 +57,7 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
         (dataBinding.viewPager.adapter as PageAdapter).setWord(word)
     }
 
-    private class PageAdapter(val sourceList: List<Source>, fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private class PageAdapter(val sourceList: List<Source>, fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
         private val fragments = SparseArray<SearchFragment>()
         private var word: String = ""
@@ -72,7 +72,7 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
             }
         }
 
-        override fun getItem(i: Int): Fragment {
+        override fun getItem(i: Int): androidx.fragment.app.Fragment {
             return SearchFragment.new(sourceList[i].id, word).let { fragment ->
                 fragments.put(i, fragment)
                 return@let fragment

@@ -1,7 +1,7 @@
 package com.sanron.pppig.widget
 
 import android.content.Context
-import android.support.v4.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
@@ -13,7 +13,7 @@ import android.view.ViewConfiguration
  * Description:
  * 下拉刷新
  */
-class PiRefreshLayout : SwipeRefreshLayout {
+class PiRefreshLayout : androidx.swiperefreshlayout.widget.SwipeRefreshLayout {
 
     private var startY: Float = 0f
     private var startX: Float = 0f

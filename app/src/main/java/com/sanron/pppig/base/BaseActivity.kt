@@ -1,10 +1,10 @@
 package com.sanron.pppig.base
 
-import android.arch.lifecycle.Observer
-import android.databinding.DataBindingUtil
-import android.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.sanron.pppig.util.runInMainIdle
 import com.sanron.pppig.util.showToast
 
