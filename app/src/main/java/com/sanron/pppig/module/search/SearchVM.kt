@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.search
 
 import android.app.Application
-import com.sanron.datafetch_interface.Source
-import com.sanron.datafetch_interface.bean.PageData
-import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.datafetch_interface.video.VideoSource
+import com.sanron.datafetch_interface.video.bean.PageData
+import com.sanron.datafetch_interface.video.bean.VideoItem
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.PageLoader
 import com.sanron.pppig.data.FetchManager
@@ -18,13 +18,13 @@ class SearchVM(application: Application) : BaseViewModel(application) {
 
     var word = ""
 
-    private var source: Source? = null
+    private var mVideoSource: VideoSource? = null
     var pageLoader = PageLoader { page ->
         getRequest(page)
     }
 
-    fun setSource(id:String){
-        source = FetchManager.getSourceById(id)
+    fun setSource(id: String) {
+        mVideoSource = FetchManager.getSourceById(id)
     }
 
     fun refresh() {
@@ -35,6 +35,6 @@ class SearchVM(application: Application) : BaseViewModel(application) {
     }
 
     private fun getRequest(page: Int): Observable<PageData<VideoItem>> {
-        return source!!.fetch.getSearchResult(word, page).compose(autoDispose())
+        return mVideoSource!!.dataFetch.getSearchResult(word, page).compose(autoDispose())
     }
 }

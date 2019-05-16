@@ -2,9 +2,9 @@ package com.sanron.pppig.module.mainhome.videolist
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import com.sanron.datafetch_interface.bean.FilterItem
-import com.sanron.datafetch_interface.bean.PageData
-import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.datafetch_interface.video.bean.FilterItem
+import com.sanron.datafetch_interface.video.bean.PageData
+import com.sanron.datafetch_interface.video.bean.VideoItem
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.PageLoader
 import com.sanron.pppig.data.Repo

@@ -1,7 +1,7 @@
 package com.sanron.pppig.data
 
-import com.sanron.datafetch_interface.DataFetch
-import com.sanron.datafetch_interface.bean.*
+import com.sanron.datafetch_interface.video.VideoDataFetch
+import com.sanron.datafetch_interface.video.bean.*
 import io.reactivex.Observable
 
 /**
@@ -9,26 +9,26 @@ import io.reactivex.Observable
  * Time:2019/2/20
  * Description:
  */
-object Repo : DataFetch {
+object Repo : VideoDataFetch{
 
-    lateinit var dataFetch: DataFetch
+    lateinit var sVideoDataFetch: VideoDataFetch
 
-    override fun getHomeData(): Observable<Home> = dataFetch.getHomeData()
+    override fun getHomeData(): Observable<Home> = sVideoDataFetch.getHomeData()
 
-    override fun getTopMovie(): Observable<PageData<VideoItem>> = dataFetch.getTopMovie()
+    override fun getTopMovie(): Observable<PageData<VideoItem>> = sVideoDataFetch.getTopMovie()
 
-    override fun getVideoDetail(path: String): Observable<VideoDetail> = dataFetch.getVideoDetail(path)
+    override fun getVideoDetail(path: String): Observable<VideoDetail> = sVideoDataFetch.getVideoDetail(path)
 
-    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> = dataFetch.getVideoPlayPageUrl(videoPageUrl)
+    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> = sVideoDataFetch.getVideoPlayPageUrl(videoPageUrl)
 
-    override fun getVideoSource(url: String) = dataFetch.getVideoSource(url)
+    override fun getVideoSource(url: String) = sVideoDataFetch.getVideoSource(url)
 
-    override fun getVideoListTypes(): List<VideoListType> = dataFetch.getVideoListTypes()
+    override fun getVideoListTypes(): List<VideoListType> = sVideoDataFetch.getVideoListTypes()
 
-    override fun getVideoList(type: Int, param: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> = dataFetch.getVideoList(type, param, page)
+    override fun getVideoList(type: Int, param: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> = sVideoDataFetch.getVideoList(type, param, page)
 
-    override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> = dataFetch.getVideoListFilter(type)
+    override fun getVideoListFilter(type: Int): Map<String, List<FilterItem>> = sVideoDataFetch.getVideoListFilter(type)
 
-    override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> = dataFetch.getSearchResult(word, page)
+    override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> = sVideoDataFetch.getSearchResult(word, page)
 }
 

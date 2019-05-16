@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.chad.library.adapter.base.BaseViewHolder
-import com.sanron.datafetch_interface.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlaySource
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity

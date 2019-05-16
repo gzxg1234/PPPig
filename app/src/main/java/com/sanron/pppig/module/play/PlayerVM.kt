@@ -6,8 +6,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
-import com.sanron.datafetch_interface.Source
-import com.sanron.datafetch_interface.bean.PlaySource
+import com.sanron.datafetch_interface.video.VideoSource
+import com.sanron.datafetch_interface.video.bean.PlaySource
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.MsgFactory
@@ -51,7 +51,7 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     //视频源地址缓存
     var videoUrlCache = mutableMapOf<String, List<String>>()
 
-    lateinit var source: Source
+    lateinit var mVideoSource: VideoSource
 
     init {
         autoNext.value = AppPref.autoPlayNext
@@ -65,7 +65,8 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
         currentItemList.value = playSourceList.value?.get(currentSourcePos.value!!)?.items
         currentItemPos.value = intent.getIntExtra(PlayerAct.ARG_ITEM_POS, 0)
         currentItem.value = playSourceList.value?.get(currentSourcePos.value!!)?.items?.get(currentItemPos.value!!)
-        source = FetchManager.getSourceById(intent.getStringExtra(PlayerAct.ARG_SOURCE_ID) ?: "")!!
+        mVideoSource = FetchManager.getSourceById(intent.getStringExtra(PlayerAct.ARG_SOURCE_ID)
+                ?: "")!!
     }
 
     fun changePlayItem(itemPos: Int) {
@@ -94,7 +95,7 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
                 return
             }
 
-            source.fetch.getVideoSource(nextItemLink)
+            mVideoSource.dataFetch.getVideoSource(nextItemLink)
                     .compose(autoDispose())
                     .subscribe(object : BaseObserver<List<String>>() {
                         override fun onNext(t: List<String>) {
@@ -114,7 +115,7 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
             return
         }
 
-        source.fetch.getVideoSource(link)
+        mVideoSource.dataFetch.getVideoSource(link)
                 .main()
                 .compose(autoDispose("getVideoSourceUrl"))
                 .doOnSubscribe {
@@ -151,9 +152,11 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
                 playSourceList[currentSourcePos].items?.let {
                     currentItemPos.value?.let { currentItemPos ->
                         playSourceList[currentSourcePos].items?.let {
-                            it.reverse()
-                            this@PlayerVM.currentItemPos.value = it.size - currentItemPos - 1
-                            onItemsReverse.value = currentSourcePos
+                            if (it.size > 1) {
+                                it.reverse()
+                                this@PlayerVM.currentItemPos.value = it.size - currentItemPos - 1
+                                onItemsReverse.value = currentSourcePos
+                            }
                         }
                     }
                 }

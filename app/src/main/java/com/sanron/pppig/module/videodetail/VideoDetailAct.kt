@@ -16,7 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.chad.library.adapter.base.BaseViewHolder
 import com.google.android.material.appbar.AppBarLayout
-import com.sanron.datafetch_interface.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlaySource
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents

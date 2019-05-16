@@ -15,7 +15,7 @@ import com.sanron.pppig.common.PageLoader
 
 
 @BindingAdapter(value = ["android:adapterData"])
-fun setData(recyclerView: androidx.recyclerview.widget.RecyclerView, data: List<*>) {
+fun setData(recyclerView: RecyclerView, data: List<*>?) {
     val adapter = recyclerView.adapter
     if (adapter is BaseQuickAdapter<*, *>) {
         if (adapter.data == data) {
@@ -27,14 +27,14 @@ fun setData(recyclerView: androidx.recyclerview.widget.RecyclerView, data: List<
 }
 
 @BindingAdapter(value = ["android:diffResult"])
-fun setDiffResult(recyclerView: androidx.recyclerview.widget.RecyclerView, diffResult: DiffUtil.DiffResult) {
+fun setDiffResult(recyclerView: RecyclerView, diffResult: DiffUtil.DiffResult?) {
     recyclerView.adapter?.apply {
-        diffResult.dispatchUpdatesTo(this)
+        diffResult?.dispatchUpdatesTo(this)
     }
 }
 
 @BindingAdapter(value = ["android:loadMoreState", "android:loadMoreEnable", "android:onLoadMore"], requireAll = false)
-fun bindBaseAdapter(recyclerView: androidx.recyclerview.widget.RecyclerView, state: Int?, loadMoreEnable: Boolean?, loadMoreListener: BaseQuickAdapter.RequestLoadMoreListener?) {
+fun bindBaseAdapter(recyclerView: RecyclerView, state: Int?, loadMoreEnable: Boolean?, loadMoreListener: BaseQuickAdapter.RequestLoadMoreListener?) {
     if (recyclerView.adapter == null || recyclerView.adapter !is BaseQuickAdapter<*, *>) {
         return
     }

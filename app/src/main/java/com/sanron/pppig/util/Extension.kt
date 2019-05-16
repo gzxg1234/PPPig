@@ -37,12 +37,12 @@ val MainHandler by lazy {
 /**
  * 当主线程空闲时执行
  */
-fun runInMainIdle(lifecycleOwner: LifecycleOwner,run: () -> Unit) {
+fun runInMainIdle(lifecycleOwner: LifecycleOwner?,run: () -> Unit) {
     val idleHandler = MessageQueue.IdleHandler {
         run()
         false
     }
-    lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+    lifecycleOwner?.lifecycle?.addObserver(object : LifecycleObserver {
         @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         fun destroy() {
             Looper.myQueue().removeIdleHandler(idleHandler)

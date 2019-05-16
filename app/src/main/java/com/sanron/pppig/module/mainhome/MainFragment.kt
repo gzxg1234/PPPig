@@ -1,12 +1,11 @@
 package com.sanron.pppig.module.mainhome
 
-import androidx.lifecycle.ViewModelProviders
+import android.util.SparseArray
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
-import android.util.SparseArray
+import androidx.lifecycle.ViewModelProviders
 import com.flyco.tablayout.listener.OnTabSelectListener
-import com.sanron.datafetch_interface.bean.VideoListType
+import com.sanron.datafetch_interface.video.bean.VideoListType
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
@@ -16,6 +15,7 @@ import com.sanron.pppig.data.Repo
 import com.sanron.pppig.databinding.FragmentMainBinding
 import com.sanron.pppig.module.mainhome.home.HomeFragment
 import com.sanron.pppig.module.mainhome.videolist.VideoListFragment
+import com.sanron.pppig.widget.BaseFragmentPageAdapter
 
 /**
  * Author:sanron
@@ -30,8 +30,8 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
         return ViewModelProviders.of(this).get(MainFragViewModel::class.java)
     }
 
-    override fun onVisible(first: Boolean) {
-        super.onVisible(first)
+    override fun onActive(first: Boolean) {
+        super.onActive(first)
         StatusBarHelper.with(activity)
                 .setLightIcon()
                 .setPaddingTop(dataBinding.topBar)
@@ -49,7 +49,7 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
             }
 
             override fun onTabReselect(position: Int) {
-                (pageAdapter.getFragment(position) as IMainChildFragment).onReselect()
+                (pageAdapter.getFragment(position) as? IMainChildFragment)?.onReselect()
             }
         })
         dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
@@ -65,7 +65,7 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
 
     private fun onRepoChange() {
         dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
-        (dataBinding.viewPager.adapter as? PageAdapter)?.removeAll()
+        (dataBinding.viewPager.adapter as? PageAdapter)?.clearFragments()
         dataBinding.viewPager.adapter = PageAdapter(Repo.getVideoListTypes(), childFragmentManager).apply { pageAdapter = this }
         dataBinding.tabLayout.setViewPager(dataBinding.viewPager)
         dataBinding.tabLayout.currentTab = 0
@@ -77,9 +77,10 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
 
-    private class PageAdapter(val videoTypeList: List<VideoListType>, var fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
+    private class PageAdapter(val videoTypeList: List<VideoListType>, val fm: FragmentManager)
+        : BaseFragmentPageAdapter(fm) {
 
-        private val fragments = SparseArray<androidx.fragment.app.Fragment>()
+        private val fragments = SparseArray<Fragment>()
         val TITLES = mutableListOf<String>()
 
         init {
@@ -89,22 +90,13 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
             }
         }
 
-        fun removeAll() {
-            val transaction = fm.beginTransaction()
-            for (i in 0 until fragments.size()) {
-                transaction
-                        .remove(fragments.valueAt(i))
-            }
-            transaction.commitNowAllowingStateLoss()
-        }
+        fun getFragment(pos: Int): Fragment = fragments[pos]
 
-        fun getFragment(pos: Int): androidx.fragment.app.Fragment = fragments[pos]
-
-        override fun getItem(i: Int): androidx.fragment.app.Fragment {
+        override fun getItem(i: Int): Fragment {
             return (when (i) {
                 0 -> HomeFragment()
                 else -> VideoListFragment.new(videoTypeList[i - 1].type)
-            } as androidx.fragment.app.Fragment).apply { fragments.put(i, this) }
+            } as Fragment).apply { fragments.put(i, this) }
         }
 
         override fun getPageTitle(position: Int): CharSequence? {

@@ -1,9 +1,9 @@
 package com.sanron.pppig.module.search
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProviders
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
@@ -58,14 +58,14 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
     }
 
     fun setWord(word: String) {
-        if (view != null) {
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             viewModel.word = word
             adapter.data.clear()
             adapter.notifyDataSetChanged()
             if (isActive) {
                 viewModel.refresh()
             } else {
-                reInitDataInVisible()
+                reloadDataInNextActive()
             }
         }
     }

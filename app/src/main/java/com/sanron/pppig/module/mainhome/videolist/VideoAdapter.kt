@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import android.content.Context
 import androidx.databinding.DataBindingUtil
 import com.chad.library.adapter.base.BaseViewHolder
-import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.datafetch_interface.video.bean.VideoItem
 import com.sanron.pppig.R
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.databinding.ItemVideoBinding

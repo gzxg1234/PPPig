@@ -191,6 +191,9 @@ dependencies {
     implementation('com.shuyu:gsyVideoPlayer-java:7.0.1')
     implementation('com.shuyu:gsyVideoPlayer-ex_so:7.0.1')
 
+    //load状态切换
+    implementation 'com.kingja.loadsir:loadsir:1.3.6'
+
     //加载框
     implementation 'com.pnikosis:materialish-progress:1.7'
     //leakcanary内存泄漏检测

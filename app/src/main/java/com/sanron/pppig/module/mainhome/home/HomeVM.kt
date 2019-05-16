@@ -2,8 +2,8 @@ package com.sanron.pppig.module.mainhome.home
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import com.sanron.datafetch_interface.bean.Home
-import com.sanron.datafetch_interface.bean.VideoItem
+import com.sanron.datafetch_interface.video.bean.Home
+import com.sanron.datafetch_interface.video.bean.VideoItem
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.MsgFactory
@@ -20,7 +20,7 @@ class HomeVM(application: Application) : BaseViewModel(application) {
 
 
     val homeData = MutableLiveData<Home>()
-    val refresh = MutableLiveData<Boolean>()
+    val refresh = SingleLiveEvent<Boolean>()
     val toVideoDetail = SingleLiveEvent<VideoItem>()
 
     init {

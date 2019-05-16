@@ -2,8 +2,6 @@ package com.sanron.pppig.module.mainhome
 
 import android.content.Context
 import android.os.Bundle
-import androidx.core.util.Pools
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +9,7 @@ import android.widget.RadioButton
 import android.widget.TextView
 import com.blankj.utilcode.util.ScreenUtils
 import com.chad.library.adapter.base.BaseViewHolder
-import com.sanron.datafetch_interface.Source
+import com.sanron.datafetch_interface.video.VideoSource
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseDialog
 import com.sanron.pppig.base.CBaseAdapter
@@ -19,7 +17,7 @@ import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.util.getColorCompat
 import com.sanron.pppig.widget.LimitHeightRecyclerView
 
-class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog(context) {
+class SelectSourceDialog(context: Context, val onChange: () -> Unit) : BaseDialog(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +28,13 @@ class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog
         val listView = findViewById<LimitHeightRecyclerView>(R.id.recycler_view)
         var itemAdapter = ItemAdapter(context)
         listView.maxHeight = (ScreenUtils.getScreenHeight() * 0.5f).toInt()
-        val curSourcePos = FetchManager.sourceManager.getSourceList().indexOfFirst {
+        val curSourcePos = FetchManager.sourceManager.getVideoSourceList().indexOfFirst {
             it.id == FetchManager.currentSourceId()
         }
         listView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         listView.itemAnimator = null
         itemAdapter.bindToRecyclerView(listView)
-        itemAdapter.setNewData(FetchManager.sourceManager.getSourceList())
+        itemAdapter.setNewData(FetchManager.sourceManager.getVideoSourceList())
         itemAdapter.selectedPos = curSourcePos
         itemAdapter.setOnItemClickListener { adapter, view, position ->
             itemAdapter.selectedPos = position
@@ -53,7 +51,7 @@ class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog
         }
     }
 
-    class ItemAdapter(context: Context) : CBaseAdapter<Source, BaseViewHolder>(context, R.layout.item_source) {
+    class ItemAdapter(context: Context) : CBaseAdapter<VideoSource, BaseViewHolder>(context, R.layout.item_source) {
 
         var selectedPos: Int = -1
             set(value) {
@@ -63,7 +61,7 @@ class SelectSourceDialog(context: Context,val onChange: () -> Unit) : BaseDialog
                 notifyItemChanged(field)
             }
 
-        override fun convert(helper: BaseViewHolder?, item: Source?) {
+        override fun convert(helper: BaseViewHolder?, item: VideoSource?) {
             val tvName = helper?.getView<TextView>(R.id.tv_text)!!
             val rb = helper.getView<RadioButton>(R.id.rb_check)!!
             tvName.text = item?.name

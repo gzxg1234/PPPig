@@ -1,7 +1,7 @@
 package com.sanron.pppig.module.mainhome
 
 import android.app.Application
-import com.sanron.datafetch_interface.bean.Home
+import com.sanron.datafetch_interface.video.bean.Home
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.data.Repo

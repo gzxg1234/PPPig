@@ -1,9 +1,6 @@
 package com.sanron.pppig.base
 
 import androidx.databinding.ViewDataBinding
-import androidx.annotation.CallSuper
-
-import com.sanron.pppig.util.CLog
 
 
 /**
@@ -18,73 +15,52 @@ abstract class LazyFragment<T : ViewDataBinding, M : BaseViewModel> : BaseFragme
 
     var isActive = false
 
-    private var mInitedData = false
+    private var mDataLoaded = false
 
     //加载数据
     abstract fun initData()
 
-    @CallSuper
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        val change = isVisibleToUser != userVisibleHint
-        super.setUserVisibleHint(isVisibleToUser)
-        if (isResumed && change) {
-            if (userVisibleHint) {
-                invokeVisible()
-            } else {
-                invokeInvisible()
-            }
-        }
-    }
-
-    private fun invokeInvisible() {
+    private fun invokeInactive() {
         isActive = false
-        onInvisible()
+        onInActive()
     }
 
-    private fun invokeVisible() {
+    private fun invokeActive() {
         isActive = true
-        onVisible(mFirstVisible)
+        onActive(mFirstVisible)
         if (mFirstVisible) {
             mFirstVisible = false
         }
-        if (!mInitedData) {
+        if (!mDataLoaded) {
             initData()
-            mInitedData = true
+            mDataLoaded = true
         }
     }
 
     /**
      * 重置initData为false，在下一次可见时再次调用initdata
      */
-    protected fun reInitDataInVisible() {
-        mInitedData = false
+    protected fun reloadDataInNextActive() {
+        mDataLoaded = false
     }
 
-    protected open fun onVisible(first: Boolean) {
-        CLog.d(TAG, this.javaClass.simpleName + " onVisible")
+    protected open fun onActive(first: Boolean) {
     }
 
-    protected open fun onInvisible() {
-        CLog.d(TAG, this.javaClass.simpleName + " onInvisible")
+    protected open fun onInActive() {
     }
-
 
     override fun onResume() {
         super.onResume()
-        if (userVisibleHint && !isHidden) {
-            invokeVisible()
-        }
+        invokeActive()
     }
 
     override fun onPause() {
         super.onPause()
-        if (userVisibleHint && !isHidden) {
-            onInvisible()
-        }
+        invokeInactive()
     }
 
     companion object {
-
         private val TAG = LazyFragment::class.java.simpleName
     }
 

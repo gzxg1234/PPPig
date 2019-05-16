@@ -2,8 +2,8 @@ package com.sanron.pppig.data
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.sanron.datafetch_interface.Source
 import com.sanron.datafetch_interface.SourceManager
+import com.sanron.datafetch_interface.video.VideoSource
 import com.sanron.pppig.app.PiApp
 import com.sanron.pppig.util.CLog
 import com.sanron.pppig.util.MainHandler
@@ -28,7 +28,7 @@ object FetchManager {
 
     lateinit var sourceManager: SourceManager
 
-    private val souceMap = mutableMapOf<String, Source>()
+    private val videoSourceMap = mutableMapOf<String, VideoSource>()
 
     private var currentSourceId by AppPref.AppSP("currentSourceId", "")
     private var fetchVersion by AppPref.AppSP("fetchVersion", -1)
@@ -37,20 +37,20 @@ object FetchManager {
      * 切换视频数据源
      */
     fun changeSource(id: String, save: Boolean = false) {
-        souceMap[id]?.let {
-            Repo.dataFetch = it.fetch
+        videoSourceMap[id]?.let {
+            Repo.sVideoDataFetch = it.dataFetch
             if (save) {
                 currentSourceId = id
             }
         }
     }
 
-    fun getSourceById(id: String): Source? {
-        return souceMap[id]
+    fun getSourceById(id: String): VideoSource? {
+        return videoSourceMap[id]
     }
 
-    fun currentSource(): Source? {
-        return souceMap[currentSourceId()]
+    fun currentSource(): VideoSource? {
+        return videoSourceMap[currentSourceId()]
     }
 
     fun currentSourceId(): String? {
@@ -60,7 +60,7 @@ object FetchManager {
     private fun readFetchConfig() {
         val id = currentSourceId()
         if (id.isNullOrEmpty()) {
-            changeSource(sourceManager.getSourceList()[0].id, true)
+            changeSource(sourceManager.getVideoSourceList()[0].id, true)
         } else {
             changeSource(id, false)
         }
@@ -124,7 +124,7 @@ object FetchManager {
                     jarOutStream = jarPath.outputStream()
                     assetJarInputStream.copyTo(jarOutStream)
                     sm = loadSourceManager(jarPath.absolutePath)
-                    if (sm != null && !sm.getSourceList().isNullOrEmpty()) {
+                    if (sm != null && !sm.getVideoSourceList().isNullOrEmpty()) {
                         fetchVersion = sm.getVersion()
                     }
                 } catch (e: IOException) {
@@ -143,10 +143,10 @@ object FetchManager {
             } else {
                 sm = loadSourceManager(jarPath.absolutePath)
             }
-            if (sm != null && !sm.getSourceList().isNullOrEmpty()) {
+            if (sm != null && !sm.getVideoSourceList().isNullOrEmpty()) {
                 sourceManager = sm
-                sourceManager.getSourceList().forEach {
-                    souceMap[it.id] = it
+                sourceManager.getVideoSourceList().forEach {
+                    videoSourceMap[it.id] = it
                 }
                 sourceManager.initContext(context = PiApp.sInstance)
                 sourceManager.setHttpClient(Injector.provideOkHttpClient())

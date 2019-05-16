@@ -8,7 +8,6 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
 import android.text.TextUtils
 import android.view.View
 import android.view.animation.Animation
@@ -105,8 +104,8 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
         }
     }
 
-    override fun onInvisible() {
-        super.onInvisible()
+    override fun onInActive() {
+        super.onInActive()
         setFilterWindowVisible(false)
     }
 

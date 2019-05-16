@@ -1,11 +1,9 @@
 package com.sanron.pppig.common
 
 import androidx.lifecycle.*
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.sanron.datafetch_interface.bean.PageData
+import com.sanron.datafetch_interface.video.bean.PageData
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.binding.RecyclerViewAdapter
 import com.sanron.pppig.util.SingleLiveEvent
@@ -27,7 +25,7 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
         value = mutableListOf()
     }
 
-    val refreshing = MutableLiveData<Boolean>().apply {
+    val refreshing = SingleLiveEvent<Boolean>().apply {
         value = false
     }
 

@@ -2,9 +2,9 @@ package com.sanron.pppig.module.videodetail
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import com.sanron.datafetch_interface.Source
-import com.sanron.datafetch_interface.bean.PlaySource
-import com.sanron.datafetch_interface.bean.VideoDetail
+import com.sanron.datafetch_interface.video.VideoSource
+import com.sanron.datafetch_interface.video.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.VideoDetail
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
 import com.sanron.pppig.common.MsgFactory
@@ -37,14 +37,14 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
         loading.value = false
     }
 
-    lateinit var source: Source
+    lateinit var mVideoSource: VideoSource
 
     fun setSource(sourceId: String) {
-        source = FetchManager.getSourceById(sourceId)!!
+        mVideoSource = FetchManager.getSourceById(sourceId)!!
     }
 
     fun loadData() {
-        source.fetch.getVideoDetail(url ?: "")
+        mVideoSource.dataFetch.getVideoDetail(url ?: "")
                 .main()
                 .compose(autoDispose())
                 .subscribe(object : BaseObserver<VideoDetail>() {

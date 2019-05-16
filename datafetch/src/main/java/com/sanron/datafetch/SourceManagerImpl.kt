@@ -2,11 +2,13 @@ package com.sanron.datafetch
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.sanron.datafetch.source.kkkkmao.KMaoFetch
-import com.sanron.datafetch.source.moyan.MoyanFetch
-import com.sanron.datafetch.source.nianlun.NianlunFetch
-import com.sanron.datafetch_interface.Source
+import com.sanron.datafetch.livesource.haoqu.HaoquFetch
+import com.sanron.datafetch.videosource.kkkkmao.KMaoDataFetch
+import com.sanron.datafetch.videosource.moyan.MoyanDataFetch
+import com.sanron.datafetch.videosource.nianlun.NianlunDataFetch
 import com.sanron.datafetch_interface.SourceManager
+import com.sanron.datafetch_interface.live.LiveSource
+import com.sanron.datafetch_interface.video.VideoSource
 import okhttp3.OkHttpClient
 
 /**
@@ -31,11 +33,16 @@ class SourceManagerImpl : SourceManager {
         internal lateinit var okHttpClient: OkHttpClient
 
         var SOURCE_LIST = listOf(
-                Source("kkkkmao", "快看影视", KMaoFetch()),
-                Source("moyan", "陌颜影视", MoyanFetch()),
-                Source("nianlun", "年轮影视", NianlunFetch())
+                VideoSource("kkkkmao", "快看影视", KMaoDataFetch()),
+                VideoSource("moyan", "陌颜影视", MoyanDataFetch()),
+                VideoSource("nianlun", "年轮影视", NianlunDataFetch())
+        )
+        var LIVE_LIST = listOf(
+                LiveSource("haoqu", "好趣", HaoquFetch())
         )
     }
 
-    override fun getSourceList(): List<Source> = SOURCE_LIST
+    override fun getLiveSourceList(): List<LiveSource> = LIVE_LIST
+
+    override fun getVideoSourceList(): List<VideoSource> = SOURCE_LIST
 }

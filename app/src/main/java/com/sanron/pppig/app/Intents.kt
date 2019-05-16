@@ -2,7 +2,7 @@ package com.sanron.pppig.app
 
 import android.content.Context
 import android.content.Intent
-import com.sanron.datafetch_interface.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlaySource
 import com.sanron.pppig.module.play.PlayerAct
 import com.sanron.pppig.module.search.SearchAct
 import com.sanron.pppig.module.videodetail.VideoDetailAct

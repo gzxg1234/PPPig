@@ -1,12 +1,11 @@
 package com.sanron.pppig.module.search
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import android.util.SparseArray
 import android.view.inputmethod.EditorInfo
-import com.sanron.datafetch_interface.Source
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.sanron.datafetch_interface.video.VideoSource
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
@@ -15,6 +14,7 @@ import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.ActivitySearchBinding
 import com.sanron.pppig.util.bindClear
 import com.sanron.pppig.util.getColorCompat
+import com.sanron.pppig.widget.BaseFragmentPageAdapter
 
 /**
  *
@@ -42,11 +42,10 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
         dataBinding.etWord.setOnEditorActionListener { v, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 startSearch(v.text.toString())
-                return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
-        dataBinding.viewPager.adapter = PageAdapter(FetchManager.sourceManager.getSourceList(), supportFragmentManager)
+        dataBinding.viewPager.adapter = PageAdapter(FetchManager.sourceManager.getVideoSourceList(), supportFragmentManager)
         dataBinding.tabLayout.setViewPager(dataBinding.viewPager)
     }
 
@@ -57,11 +56,11 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
         (dataBinding.viewPager.adapter as PageAdapter).setWord(word)
     }
 
-    private class PageAdapter(val sourceList: List<Source>, fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
+    private class PageAdapter(val videoSourceList: List<VideoSource>, fm: FragmentManager) : BaseFragmentPageAdapter(fm) {
 
         private val fragments = SparseArray<SearchFragment>()
         private var word: String = ""
-        private var titles: List<String> = sourceList.map {
+        private var titles: List<String> = videoSourceList.map {
             it.name
         }
 
@@ -72,8 +71,8 @@ class SearchAct : BaseActivity<ActivitySearchBinding, BaseViewModel>() {
             }
         }
 
-        override fun getItem(i: Int): androidx.fragment.app.Fragment {
-            return SearchFragment.new(sourceList[i].id, word).let { fragment ->
+        override fun getItem(i: Int): Fragment {
+            return SearchFragment.new(videoSourceList[i].id, word).let { fragment ->
                 fragments.put(i, fragment)
                 return@let fragment
             }
