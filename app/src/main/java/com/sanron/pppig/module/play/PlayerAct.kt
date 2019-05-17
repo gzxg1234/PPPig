@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.chad.library.adapter.base.BaseViewHolder
 import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.lib.StatusBarHelper
@@ -92,7 +93,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             }
         })
 
-        viewModel.playSourceList.observe(this, Observer {
+        viewModel.playLineList.observe(this, Observer {
             it?.let {
                 dataBinding.viewPager.adapter = SourceAdapter(it)
                 val titles = it.map { source ->
@@ -104,20 +105,37 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         viewModel.title.observe(this, Observer {
             dataBinding.playerView.titleTextView.text = it
         })
+
+        viewModel.currentTab.observe(this, Observer {
+            it?.let {
+                dataBinding.tabLayout.currentTab = it
+            }
+        })
+        dataBinding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                if (viewModel.currentTab.value != position) {
+                    viewModel.currentTab.value = position
+                }
+            }
+        })
         viewModel.currentItem.observe(this, Observer {
-            (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
-                    viewModel.currentSourcePos.value ?: -1,
-                    viewModel.currentItemPos.value ?: -1)
-            dataBinding.tabLayout.currentTab = viewModel.currentSourcePos.value ?: 0
             dataBinding.playerView.currentPlayer.release()
             dataBinding.playerView.currentPlayer.onVideoReset()
+        })
+        viewModel.currentItemPos.observe(this, Observer {
+            (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
+                    viewModel.currentPlayTab.value ?: -1,
+                    it ?: -1)
         })
         viewModel.onItemsReverse.observe(this, Observer {
             it?.let { pos ->
                 (dataBinding.viewPager.adapter as SourceAdapter).notifySourceChange(pos)
-                (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
-                        viewModel.currentSourcePos.value ?: -1,
-                        viewModel.currentItemPos.value ?: -1)
             }
         })
     }
@@ -280,10 +298,8 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
         var selectedPos = -1
             set(value) {
-                val f = field
                 field = value
-                notifyItemChanged(f)
-                notifyItemChanged(field)
+                notifyDataSetChanged()
             }
 
         override fun convert(helper: BaseViewHolder?, item: PlayLine.Item?) {

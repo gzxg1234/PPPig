@@ -1,4 +1,4 @@
-package com.sanron.datafetch
+package com.sanron.datafetch.livesource.ika112
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,6 +7,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.sanron.datafetch.*
+import com.sanron.datafetch_interface.video.bean.PlayLine
 
 /**
  * Author:sanron
@@ -14,9 +16,9 @@ import android.webkit.WebViewClient
  * Description:
  * 抓取html内容，主要是动态页面的html
  */
-object MediaSearch {
+object Ika112MediaSearch {
 
-    val TAG = MediaSearch::class.java.simpleName
+    val TAG = Ika112MediaSearch::class.java.simpleName
 
     interface Cancellable {
         fun cancel()
@@ -53,7 +55,10 @@ object MediaSearch {
     }
 
 
-    fun search(context: Context, url: String, header: Map<String, String>?, maxSize: Int = 1, callback: Callback): Cancellable {
+    fun search(context: Context, playItem: PlayLine.Item, callback: Callback): Cancellable {
+
+        val pageUrl = playItem.get<String?>("pageUrl")
+        val url = playItem.get<String?>("url")
         val webView = WebViewPool.acquire(context)
         val task = Task(callback, webView)
 
@@ -68,6 +73,19 @@ object MediaSearch {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
                 if (newProgress == 100 && !task.canceled) {
+                    val js = "window.addEventListener(\"onready\", function() {\n" +
+                            "            Android.log(\"onready\");\n" +
+                            "            var player = document.getElementById(\"vstPlayer\");\n" +
+                            "            Android.log('vstPlayer=' + player);\n" +
+                            "            player.volume = 0.0;\n" +
+                            "        });\n" +
+                            "        window.addEventListener(\"onload\", function() {\n" +
+                            "            Android.log(\"onload\");\n" +
+                            "            startPlayer($url);\n" +
+                            "        });"
+                    view?.evaluateJavascript(js) {
+                        FetchLog.d(TAG, "evaluate js success")
+                    }
                 }
             }
         }
@@ -81,8 +99,8 @@ object MediaSearch {
             override fun shouldInterceptRequest(view: WebView?, url: String?): WebResourceResponse? {
                 if (url != null) {
                     if (isMediaRequest(url)) {
-                        list.add(url)
-                        if (list.size == maxSize) {
+                        if (list.size < 1) {
+                            list.add(url)
                             MainHandler.removeCallbacks(timeout)
                             task.success(list)
                         }
@@ -100,7 +118,7 @@ object MediaSearch {
                 task.error("加载失败")
             }
         }
-        webView.loadUrl(url, header)
+        webView.loadUrl(pageUrl)
         return task
     }
 

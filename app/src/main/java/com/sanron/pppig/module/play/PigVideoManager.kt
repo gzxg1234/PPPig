@@ -22,6 +22,10 @@ class PigVideoManager : Exo2PlayerManager() {
         field.set(this, createFixMediaPlayer(context, msg, cacheManager))
     }
 
+    override fun getDuration(): Long {
+        return super.getDuration()
+    }
+
     private fun createFixMediaPlayer(context: Context, msg: Message, cacheManager: ICacheManager?): IjkExo2MediaPlayer {
         var mediaPlayer = FixExo2MediaPlayer(context)
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)

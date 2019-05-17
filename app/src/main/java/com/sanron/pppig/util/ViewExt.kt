@@ -1,14 +1,13 @@
 package com.sanron.pppig.util
 
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dinuscxj.itemdecoration.LinearDividerItemDecoration
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.sanron.pppig.widget.GridDividerItemDecoration
@@ -50,10 +49,10 @@ fun View.setMargin(left: Int? = null, top: Int? = null, right: Int? = null, bott
     }
 }
 
-fun androidx.recyclerview.widget.RecyclerView.pauseFrescoOnScroll() {
-    addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
-            if (newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE) {
+fun RecyclerView.pauseFrescoOnScroll() {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 Fresco.getImagePipeline().resume()
             } else {
                 Fresco.getImagePipeline().pause()
@@ -71,9 +70,9 @@ inline fun ViewGroup.childForEach(action: (index: Int, v: View) -> Unit) {
 /**
  * 设置间距
  */
-fun androidx.recyclerview.widget.RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) {
-    if (layoutManager is androidx.recyclerview.widget.GridLayoutManager) {
-        val ori = if ((layoutManager as androidx.recyclerview.widget.GridLayoutManager).orientation == androidx.recyclerview.widget.GridLayoutManager.HORIZONTAL)
+fun RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) {
+    if (layoutManager is GridLayoutManager) {
+        val ori = if ((layoutManager as GridLayoutManager).orientation == GridLayoutManager.HORIZONTAL)
             GridDividerItemDecoration.GRID_DIVIDER_HORIZONTAL
         else
             GridDividerItemDecoration.GRID_DIVIDER_VERTICAL
@@ -82,7 +81,7 @@ fun androidx.recyclerview.widget.RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) 
             setVerticalDivider(SimpleSizeDrawable(height = vGap))
         })
     } else if (layoutManager is androidx.recyclerview.widget.LinearLayoutManager) {
-        val ori = if ((layoutManager as androidx.recyclerview.widget.LinearLayoutManager).orientation == androidx.recyclerview.widget.GridLayoutManager.HORIZONTAL)
+        val ori = if ((layoutManager as androidx.recyclerview.widget.LinearLayoutManager).orientation == GridLayoutManager.HORIZONTAL)
             LinearDividerItemDecoration.LINEAR_DIVIDER_HORIZONTAL
         else
             LinearDividerItemDecoration.LINEAR_DIVIDER_VERTICAL

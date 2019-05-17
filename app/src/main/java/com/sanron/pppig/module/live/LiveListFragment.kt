@@ -34,6 +34,8 @@ class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
     private val itemLoadService: LoadService<Any> by lazy {
         LoadSir.getDefault().register(dataBinding.listItem) {
             viewModel.loadItemList()
+        }.apply {
+            loadLayout.setBackgroundColor(context!!.getColorCompat(R.color.white))
         }
     }
 

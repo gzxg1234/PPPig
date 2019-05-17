@@ -19,8 +19,10 @@ object HaoquUrlHelper {
                 "      var ___getPlayUrl = null;\n" +
                 "      ___getPlayUrl = function() {\n" +
                 "        try {\n" +
+                "          Android.log('setSignal='+typeof(setSignal))\n" +
                 "          if (typeof(setSignal) != 'undefined') {\n" +
                 "            setSignal('');\n" +
+                "            Android.log('signal='+typeof(signal));\n" +
                 "            if (typeof(signal) != 'undefined' && signal) {\n" +
                 "              var data = signal.split('\$')\n" +
                 "              var url = data[1]\n" +

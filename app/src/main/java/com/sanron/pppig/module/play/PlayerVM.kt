@@ -29,29 +29,36 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
 
     var videoName = ""
 
-    var autoNext = MutableLiveData<Boolean>()
+    val autoNext = MutableLiveData<Boolean>()
 
-    var title = MutableLiveData<String>()
+    val title = MutableLiveData<String>()
 
-    var currentSourcePos = MutableLiveData<Int>()
+    val playLineList = MutableLiveData<List<PlayLine>>()
 
-    var currentItemPos = MutableLiveData<Int>()
+    //用户当前查看的线路pos
+    val currentTab = MutableLiveData<Int>()
 
-    var currentItemList = MutableLiveData<List<PlayLine.Item>>()
+    //用户当前播放源对应的线路pos
+    val currentPlayTab = MutableLiveData<Int>()
 
-    var currentItem = MutableLiveData<PlayLine.Item>()
+    //用户当前播放源pos
+    val currentItemPos = MutableLiveData<Int>()
 
-    var loading = MutableLiveData<Boolean>()
+    //用户当前播放源list
+    val currentItemList = MutableLiveData<List<PlayLine.Item>>()
 
-    var playSourceList = MutableLiveData<List<PlayLine>>()
+    //用户当前播放源
+    val currentItem = MutableLiveData<PlayLine.Item>()
 
-    var videoSourceList = MutableLiveData<List<String>>()
+    val loading = MutableLiveData<Boolean>()
+
+    val videoSourceList = MutableLiveData<List<String>>()
 
     //列表逆序事件
-    var onItemsReverse = SingleLiveEvent<Int>()
+    val onItemsReverse = SingleLiveEvent<Int>()
 
     //视频源地址缓存
-    var videoUrlCache = mutableMapOf<PlayLine.Item, List<String>>()
+    val videoUrlCache = mutableMapOf<PlayLine.Item, List<String>>()
 
     var playType = -1
 
@@ -65,11 +72,12 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     fun initIntent(intent: Intent?) {
         videoName = intent?.getStringExtra(PlayerAct.ARG_TITLE) ?: ""
         title.value = videoName
-        playSourceList.value = intent?.getSerializableExtra(PlayerAct.ARG_PLAY_LINES) as List<PlayLine>
-        currentSourcePos.value = intent.getIntExtra(PlayerAct.ARG_SOURCE_POS, 0)
-        currentItemList.value = playSourceList.value?.get(currentSourcePos.value!!)?.items
+        playLineList.value = intent?.getSerializableExtra(PlayerAct.ARG_PLAY_LINES) as List<PlayLine>
+        currentTab.value = intent.getIntExtra(PlayerAct.ARG_SOURCE_POS, 0)
+        currentPlayTab.value = currentTab.value
+        currentItemList.value = playLineList.value?.get(currentPlayTab.value!!)?.items
         currentItemPos.value = intent.getIntExtra(PlayerAct.ARG_ITEM_POS, 0)
-        currentItem.value = playSourceList.value?.get(currentSourcePos.value!!)?.items?.get(currentItemPos.value!!)
+        currentItem.value = playLineList.value?.get(currentPlayTab.value!!)?.items?.get(currentItemPos.value!!)
         playType = intent.getIntExtra(PlayerAct.ARG_PLAY_TYPE, PlayerAct.TYPE_VIDEO)
         if (playType == PlayerAct.TYPE_VIDEO) {
             videoSource = FetchManager.getVideoSourceById(intent.getStringExtra(PlayerAct.ARG_SOURCE_ID)
@@ -81,13 +89,13 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     }
 
     fun changePlayItem(itemPos: Int) {
-        changePlayItem(currentSourcePos.value!!, itemPos)
+        changePlayItem(currentPlayTab.value!!, itemPos)
     }
 
     fun changePlayItem(sourcePos: Int, itemPos: Int) {
-        currentSourcePos.value = sourcePos
+        currentPlayTab.value = sourcePos
         currentItemPos.value = itemPos
-        currentItemList.value = playSourceList.value?.get(currentSourcePos.value!!)?.items
+        currentItemList.value = playLineList.value?.get(currentPlayTab.value!!)?.items
         currentItem.value = currentItemList.value?.get(itemPos)
         title.value = videoName + "-" + currentItem.value!!.name
         startPlayCurrent()
@@ -168,15 +176,19 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     }
 
     fun reverseList() {
-        playSourceList.value?.let { playSourceList ->
-            currentSourcePos.value?.let { currentSourcePos ->
-                playSourceList[currentSourcePos].items?.let {
-                    currentItemPos.value?.let { currentItemPos ->
-                        playSourceList[currentSourcePos].items?.let {
-                            if (it.size > 1) {
-                                it.reverse()
-                                this@PlayerVM.currentItemPos.value = it.size - currentItemPos - 1
-                                onItemsReverse.value = currentSourcePos
+        playLineList.value?.let { playSourceList ->
+            currentTab.value?.let { currentTab ->
+                currentPlayTab.value?.let { currentPlayTab ->
+                    playSourceList[currentPlayTab].items?.let {
+                        currentItemPos.value?.let { currentItemPos ->
+                            playSourceList[currentTab].items?.let {
+                                if (it.size > 1) {
+                                    it.reverse()
+                                    onItemsReverse.value = currentTab
+                                    if (currentTab == currentPlayTab) {
+                                        this@PlayerVM.currentItemPos.value = it.size - currentItemPos - 1
+                                    }
+                                }
                             }
                         }
                     }

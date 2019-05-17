@@ -2,7 +2,6 @@ package com.sanron.datafetch
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.webkit.*
@@ -20,7 +19,7 @@ object WebHelper {
         fun cancel()
     }
 
-    private class Task(private val callback: Callback, private var webView: WebView) : Cancellable, Callback {
+    private class Task(private val callback: Callback, private var webView: SpiderWebView) : Cancellable, Callback {
         internal var canceled = false
 
         override fun success(result: String) {

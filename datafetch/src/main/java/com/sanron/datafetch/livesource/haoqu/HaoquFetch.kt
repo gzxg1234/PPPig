@@ -1,10 +1,9 @@
 package com.sanron.datafetch.livesource.haoqu
 
-import com.sanron.datafetch.BuildConfig
 import com.sanron.datafetch.MediaSearch
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
-import com.sanron.datafetch.videosource.moyan.MoyanApi
+import com.sanron.datafetch.http.HttpUtil
 import com.sanron.datafetch_interface.exception.ParseException
 import com.sanron.datafetch_interface.live.LiveDataFetch
 import com.sanron.datafetch_interface.live.bean.LiveCat
@@ -14,8 +13,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import java.nio.charset.Charset
 
 /**
@@ -24,22 +21,12 @@ import java.nio.charset.Charset
  *Description:
  */
 class HaoquFetch : LiveDataFetch {
-    private val mRetrofit: Retrofit by lazy {
-        return@lazy Retrofit.Builder()
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
-                .client(SourceManagerImpl.okHttpClient)
-                .validateEagerly(BuildConfig.DEBUG)
-                .baseUrl(MoyanApi.BASE_URL)
-                .build()
+    companion object{
+        const val BASE_URL = "http://m.haoqu.net"
     }
-
-    private val api: HaoquApi by lazy {
-        mRetrofit.create(HaoquApi::class.java)
-    }
-
 
     override fun getLiveCats(): Observable<List<LiveCat>> {
-        return api.html("zhibo")
+        return HttpUtil.api.url("$BASE_URL/zhibo")
                 .map { it ->
                     return@map HaoquParser.parserCat(String(it.bytes(), Charset.forName("gb2312")))
                 }
@@ -50,7 +37,7 @@ class HaoquFetch : LiveDataFetch {
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
-            return api.html(link)
+            return HttpUtil.api.url(link)
                     .map {
                         return@map HaoquParser.parseItem(String(it.bytes(), Charset.forName("gb2312")))
                     }
@@ -62,7 +49,7 @@ class HaoquFetch : LiveDataFetch {
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
-            return api.html(link)
+            return HttpUtil.api.url(link)
                     .map {
                         return@map HaoquParser.parsePlayLine(String(it.bytes(), Charset.forName("gb2312")))
                     }
@@ -70,7 +57,7 @@ class HaoquFetch : LiveDataFetch {
     }
 
     override fun getLiveSourceUrl(item: PlayLine.Item): Observable<List<String>> {
-        val link = "${HaoquApi.BASE_URL}/e/extend/tv.php?id=${item.get<String?>("id")}"
+        val link = "$BASE_URL/e/extend/tv.php?id=${item.get<String?>("id")}"
         return Observable.create(ObservableOnSubscribe<JSONObject> { emitter ->
             val task = HaoquUrlHelper.getVideoSource(SourceManagerImpl.context,
                     link, null, object : WebHelper.Callback {

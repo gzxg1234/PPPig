@@ -1,5 +1,6 @@
 package com.sanron.datafetch.livesource.haoqu
 
+import com.sanron.datafetch.completeUrl
 import com.sanron.datafetch_interface.live.bean.LiveCat
 import com.sanron.datafetch_interface.live.bean.LiveItem
 import com.sanron.datafetch_interface.video.bean.PlayLine
@@ -18,7 +19,7 @@ object HaoquParser {
             it.select(".list-box.J-medal>.xhbox>li>a")?.forEach {
                 val item = LiveItem()
                 item.name = it.ownText()
-                item["link"] = it.attr("href")
+                item["link"] = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
                 items.add(item)
             }
         }
@@ -49,7 +50,7 @@ object HaoquParser {
             it.select(".nav-box>.J-tabset>li>a")?.forEach {
                 val cat = LiveCat()
                 cat.name = it.ownText()
-                cat["link"] = it.attr("href")
+                cat["link"] = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
                 if (cat.name?.contains("省级") == true) {
                     return@forEach
                 }

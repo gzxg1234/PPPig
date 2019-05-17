@@ -3,6 +3,7 @@ package com.sanron.datafetch
 import android.annotation.SuppressLint
 import android.content.Context
 import com.sanron.datafetch.livesource.haoqu.HaoquFetch
+import com.sanron.datafetch.livesource.ika112.IkaFetch
 import com.sanron.datafetch.videosource.kkkkmao.KMaoDataFetch
 import com.sanron.datafetch.videosource.moyan.MoyanDataFetch
 import com.sanron.datafetch.videosource.nianlun.NianlunDataFetch
@@ -38,7 +39,8 @@ class SourceManagerImpl : SourceManager {
                 VideoSource("nianlun", "年轮影视", NianlunDataFetch())
         )
         var LIVE_LIST = listOf(
-                LiveSource("haoqu", "好趣", HaoquFetch())
+                LiveSource("ika", "爱看直播", IkaFetch()),
+                LiveSource("haoqu", "多趣直播", HaoquFetch())
         )
     }
 

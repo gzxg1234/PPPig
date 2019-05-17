@@ -1,16 +1,18 @@
 package com.sanron.pppig.module.play
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
+import android.os.Message
 import android.util.AttributeSet
 import android.view.*
+import android.widget.SeekBar
 import com.shuyu.gsyvideoplayer.R
+import com.shuyu.gsyvideoplayer.utils.CommonUtil.hideNavKey
 import com.shuyu.gsyvideoplayer.utils.Debuger
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
-import java.util.*
 
 /**
  *Author:sanron
@@ -20,15 +22,40 @@ import java.util.*
  */
 open class FixPlayer : StandardGSYVideoPlayer {
 
-    private inner class SyncProgressTask : TimerTask() {
-        override fun run() {
-            if (mCurrentState == GSYVideoView.CURRENT_STATE_PLAYING || mCurrentState == GSYVideoView.CURRENT_STATE_PAUSE) {
-                Handler(Looper.getMainLooper()).post { setTextAndProgress(-1) }
+
+    private var startHideControlAfterStopTracking = false
+    private var trackingProgress = false
+
+    private val hideControl = 0
+    private val syncProgress = 1
+
+    private val taskHandler: Handler = @SuppressLint("HandlerLeak")
+    object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when (msg.what) {
+                hideControl -> {
+                    if ((mCurrentState != GSYVideoView.CURRENT_STATE_NORMAL
+                                    && mCurrentState != GSYVideoView.CURRENT_STATE_ERROR
+                                    && mCurrentState != GSYVideoView.CURRENT_STATE_AUTO_COMPLETE)) {
+                        if (activityContext != null) {
+                            hideAllWidget()
+                            setViewShowState(mLockScreen, View.GONE)
+                            if (mHideKey && mIfCurrentIsFullscreen && mShowVKey) {
+                                hideNavKey(mContext)
+                            }
+                        }
+                    }
+                }
+                syncProgress -> {
+                    if (mCurrentState == GSYVideoView.CURRENT_STATE_PLAYING || mCurrentState == GSYVideoView.CURRENT_STATE_PAUSE) {
+                        setTextAndProgress(-1)
+                    }
+                    sendEmptyMessageDelayed(syncProgress, 300)
+                }
             }
         }
     }
-
-    private var syncProgressTask: SyncProgressTask? = null
 
     constructor(context: Context?, fullFlag: Boolean?) : super(context, fullFlag)
     constructor(context: Context?) : super(context)
@@ -53,6 +80,32 @@ open class FixPlayer : StandardGSYVideoPlayer {
         (mContext as Activity).window.attributes = lpa
     }
 
+
+    override fun startDismissControlViewTimer() {
+        cancelDismissControlViewTimer()
+        taskHandler.sendEmptyMessageDelayed(hideControl, mDismissControlTime.toLong())
+    }
+
+    override fun cancelDismissControlViewTimer() {
+        taskHandler.removeMessages(hideControl)
+    }
+
+    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+        super.onStartTrackingTouch(seekBar)
+        trackingProgress = true
+        startHideControlAfterStopTracking = taskHandler.hasMessages(hideControl)
+        cancelDismissControlViewTimer()
+        cancelProgressTimer()
+    }
+
+    override fun onStopTrackingTouch(seekBar: SeekBar?) {
+        super.onStopTrackingTouch(seekBar)
+        trackingProgress = false
+        startProgressTimer()
+        if (startHideControlAfterStopTracking) {
+            startDismissControlViewTimer()
+        }
+    }
 
     /**
      * 双击
@@ -79,6 +132,9 @@ open class FixPlayer : StandardGSYVideoPlayer {
                 if (!mChangePosition && !mChangeVolume && !mBrightness) {
                     val old = mChangePosition
                     touchSurfaceMoveFullLogic(absDeltaX, absDeltaY)
+                    if (duration == 0) {
+                        mChangePosition = false
+                    }
                     if (mChangePosition && !old) {
                         mDownX = e2.x
                         deltaX = 0f
@@ -178,17 +234,15 @@ open class FixPlayer : StandardGSYVideoPlayer {
             updateProcessTimer.cancel()
             updateProcessTimer = null
         }
-        if (syncProgressTask != null) {
-            syncProgressTask?.cancel()
-            syncProgressTask = null
-        }
+        taskHandler.removeMessages(syncProgress)
     }
 
     override fun startProgressTimer() {
         cancelProgressTimer()
-        updateProcessTimer = Timer()
-        syncProgressTask = SyncProgressTask()
-        updateProcessTimer.schedule(syncProgressTask, 0, 300)
+        if (trackingProgress) {
+            return
+        }
+        taskHandler.sendEmptyMessage(syncProgress)
     }
 
     override fun setTextAndProgress(secProgress: Int) {
@@ -202,7 +256,8 @@ open class FixPlayer : StandardGSYVideoPlayer {
         }
     }
 
-    override fun setSecondaryProgress(secProgress: Int) {
+    override fun setSecondaryProgress(secProgressArg: Int) {
+        val secProgress = if (duration == 0) 0 else secProgressArg
         if (mProgressBar != null) {
             if (secProgress >= 0 && !gsyVideoManager.isCacheFile) {
                 mProgressBar.secondaryProgress = secProgress

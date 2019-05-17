@@ -1,5 +1,6 @@
 package com.sanron.pppig.module.play
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
@@ -96,8 +97,6 @@ class PigPlayer : FixPlayer {
 
     private var itemAdapter = PlayerAct.ItemAdapter(context)
 
-    var isLive = false
-
     private val syncSpeed = object : Runnable {
         override fun run() {
             tvSpeed.text = context.getString(R.string.player_loading_text, Formatter.formatFileSize(context, netSpeed))
@@ -122,6 +121,9 @@ class PigPlayer : FixPlayer {
         shrinkImageRes = R.drawable.ic_fullscreen_exit_white_24dp
         post {
             //init执行在基类构造方法里，此时dismissControlTime尚未初始化，需延迟设置
+            mProgressBar.setOnTouchListener { v, event ->
+                return@setOnTouchListener duration == 0
+            }
             dismissControlTime = 4000
         }
     }
@@ -133,7 +135,7 @@ class PigPlayer : FixPlayer {
     fun setPlayerViewModel(act: PlayerAct, vm: PlayerVM) {
         rvEpisodeItems.layoutManager = GridLayoutManager(context, 3)
         rvEpisodeItems.gap(context.dp2px(8f), context.dp2px(8f))
-        itemAdapter.setNewData(vm.playSourceList.value!![vm.currentSourcePos.value!!].items)
+        itemAdapter.setNewData(vm.playLineList.value!![vm.currentPlayTab.value!!].items)
         itemAdapter.setOnItemClickListener { adapter, view, position ->
             vm.changePlayItem(position)
         }
@@ -195,6 +197,9 @@ class PigPlayer : FixPlayer {
     }
 
     override fun showProgressDialog(deltaX: Float, seekTime: String?, seekTimePosition: Int, totalTime: String?, totalTimeDuration: Int) {
+        if (duration == 0) {
+            return
+        }
         seekPosLayout.visibility = View.VISIBLE
         if (totalTimeDuration > 0) {
             pbSeekPos.progress = seekTimePosition * 100 / totalTimeDuration
@@ -214,7 +219,7 @@ class PigPlayer : FixPlayer {
     }
 
     override fun startProgressTimer() {
-        if (isLive) {
+        if (duration == 0) {
             return
         }
         super.startProgressTimer()
@@ -292,9 +297,18 @@ class PigPlayer : FixPlayer {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onPrepared() {
+        super.onPrepared()
+    }
+
+
     override fun setProgressAndTime(progress: Int, secProgress1: Int, currentTime: Int, totalTime: Int) {
         super.setProgressAndTime(progress, secProgress1, currentTime, totalTime)
         var secProgress = secProgress1
+        if (totalTime == 0) {
+            secProgress = 0
+        }
 
         if (mGSYVideoProgressListener != null && mCurrentState == GSYVideoView.CURRENT_STATE_PLAYING) {
             mGSYVideoProgressListener.onProgress(progress, secProgress, currentTime, totalTime)

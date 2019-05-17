@@ -1,6 +1,7 @@
 package com.sanron.datafetch.videosource.kkkkmao
 
 import com.sanron.datafetch.FetchLog
+import com.sanron.datafetch.completeUrl
 import com.sanron.datafetch_interface.exception.ParseException
 import com.sanron.datafetch_interface.video.bean.*
 import org.jsoup.Jsoup
@@ -28,9 +29,9 @@ object KKMaoParser {
         items?.let {
             items.forEach {
                 val banner = Banner()
-                banner.link = it.attr("href")
+                banner.link = it.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                 it.select("img").first()?.let {
-                    banner.image = it.attr("data-src")
+                    banner.image = it.attr("data-src").completeUrl(KMaoDataFetch.BASE_URL)
                 }
                 it.select(".sTxt>em").first()?.let {
                     banner.title = it.text()
@@ -62,9 +63,9 @@ object KKMaoParser {
                 els?.forEach {
                     val item = VideoItem()
                     item.name = it.attr("title")
-                    item.link = it.attr("href")
+                    item.link = it.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                     it.select(".picsize>img").first()?.apply {
-                        item.img = this.attr("src")
+                        item.img = this.attr("src").completeUrl(KMaoDataFetch.BASE_URL)
                     }
                     it.select(".title").first()?.apply {
                         item.label = this.text()
@@ -120,10 +121,10 @@ object KKMaoParser {
             }
             doc.select(".main.top>.list_vod>#vod_list>li>a")?.forEach {
                 val item = VideoItem()
-                item.link = it.attr("href")
+                item.link = it.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                 item.name = it.attr("title")
                 it.select(".picsize>img").first().apply {
-                    item.img = this.attr("src")
+                    item.img = this.attr("src").completeUrl(KMaoDataFetch.BASE_URL)
                 }
                 it.select(".picsize>.score").first().apply {
                     item.score = this.text()
@@ -144,8 +145,8 @@ object KKMaoParser {
             doc.select(".main>.all_tab.top>ul.new_tab_img>li>a")?.forEach {
                 val item = VideoItem()
                 item.name = it.attr("title")
-                item.link = it.attr("href")
-                item.img = it.selectFirst(".picsize>.loading")?.attr("src") ?: ""
+                item.link = it.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
+                item.img = it.selectFirst(".picsize>.loading")?.attr("src").completeUrl(KMaoDataFetch.BASE_URL)
                 data.data?.add(item)
             }
             data.hasMore = doc.selectFirst(".ui-vpages>a.next")?.let {
@@ -164,10 +165,10 @@ object KKMaoParser {
         doc?.let {
             doc.select(".main.top>.all_tab>#resize_list>li>a")?.forEach {
                 val item = VideoItem()
-                item.link = it.attr("href")
+                item.link = it.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                 item.name = it.attr("title")
                 it.select(".picsize>img").first().apply {
-                    item.img = this.attr("src")
+                    item.img = this.attr("src").completeUrl(KMaoDataFetch.BASE_URL)
                 }
                 it.select(".picsize>.name").first().apply {
                     item.label = this.text()
@@ -234,7 +235,7 @@ object KKMaoParser {
             }
 
             select("#resize_vod.main>.vod-l>.vod-n-img>img")?.first()?.apply {
-                detail.image = attr("src")
+                detail.image = attr("src").completeUrl(KMaoDataFetch.BASE_URL)
             }
 
             //简介
@@ -260,7 +261,7 @@ object KKMaoParser {
                 it.select(".plau-ul-list>li>a").forEach { itemE ->
                     val item = PlayLine.Item()
                     item.name = itemE.attr("title")
-                    item["link"] = itemE.attr("href")
+                    item["link"] = itemE.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                     playSource.items?.add(item)
                 }
                 detail.mLine?.add(playSource)

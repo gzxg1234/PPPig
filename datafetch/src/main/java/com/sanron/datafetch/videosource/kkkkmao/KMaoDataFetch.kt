@@ -2,13 +2,14 @@ package com.sanron.datafetch.videosource.kkkkmao
 
 import com.sanron.datafetch.MediaSearch
 import com.sanron.datafetch.SourceManagerImpl
+import com.sanron.datafetch.http.HttpUtil
+import com.sanron.datafetch.http.HttpUtil.api
+import com.sanron.datafetch.urlEncode
 import com.sanron.datafetch_interface.video.VideoDataFetch
 import com.sanron.datafetch_interface.video.bean.*
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import java.io.IOException
 
 /**
@@ -18,7 +19,9 @@ import java.io.IOException
  */
 class KMaoDataFetch : VideoDataFetch {
 
+
     companion object {
+        const val BASE_URL = "http://m.kkkkmao.com"
         const val TYPE_MOVIE = 1
         const val TYPE_TV = 2
         const val TYPE_VARIETY = 3
@@ -35,20 +38,10 @@ class KMaoDataFetch : VideoDataFetch {
         return TYPES
     }
 
-    private val mRetrofit: Retrofit by lazy {
-        return@lazy Retrofit.Builder()
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
-                .client(SourceManagerImpl.okHttpClient)
-                .baseUrl("https://m.kkkkmao.com")
-                .build()
-    }
-    private val api: KmaoApi by lazy {
-        mRetrofit.create(KmaoApi::class.java)
-    }
 
     override fun getHomeData(): Observable<Home> {
-        return api
-                .home()
+        return HttpUtil.api
+                .url(BASE_URL)
                 .map { s ->
                     val data = KKMaoParser.parseHome(s.string())
                     return@map data
@@ -57,19 +50,19 @@ class KMaoDataFetch : VideoDataFetch {
 
     override fun getTopMovie(): Observable<PageData<VideoItem>> {
         return api
-                .topMovie()
+                .url("$BASE_URL/top_mov.html")
                 .map { s -> KKMaoParser.parseTopMovie(s.string()) }
     }
 
-    override fun getVideoDetail(path: String): Observable<VideoDetail> {
+    override fun getVideoDetail(url: String): Observable<VideoDetail> {
         return api
-                .html(path)
+                .url(url)
                 .map { responseBody -> KKMaoParser.parseVideoDetail(responseBody.string()) }
     }
 
     override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
         return api
-                .html(item["link"] ?: "")
+                .url(item["link"] ?: "")
                 .map { responseBody ->
                     return@map KKMaoParser.parsePlayPageUrl(responseBody.string())
                 }
@@ -80,9 +73,8 @@ class KMaoDataFetch : VideoDataFetch {
         return getVideoPlayPageUrl(item)
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap { playPageUrl ->
-                    val referer = "http://m.kkkkmao.com/$link"
                     val header = mutableMapOf<String, String>()
-                    header["Referer"] = referer
+                    header["Referer"] = link ?: ""
                     return@flatMap Observable.create(ObservableOnSubscribe<List<String>> {
                         val task = MediaSearch.search(SourceManagerImpl.context,
                                 playPageUrl, header, 1, object : MediaSearch.Callback {
@@ -116,30 +108,50 @@ class KMaoDataFetch : VideoDataFetch {
     }
 
     private fun getTvList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+        val url = "$BASE_URL/tv/index" +
+                "_$page}" +
+                "_${params["类型"]?.value.urlEncode()}" +
+                "_${params["状态"]?.value.urlEncode()}" +
+                "_${params["年代"]?.value.urlEncode()}" +
+                "___${params["地区"]?.value.urlEncode()}_1.html"
         return api
-                .tvList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
+                .url(url)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
     private fun getMovieList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+        val url = "$BASE_URL/movie/index" +
+                "_$page}" +
+                "_${params["类型"]?.value.urlEncode()}" +
+                "__${params["年代"]?.value.urlEncode()}" +
+                "___${params["地区"]?.value.urlEncode()}_1.html"
         return api
-                .movieList(params["类型"]?.value ?: "movie", params["地区"]?.value
-                        ?: "", params["年代"]?.value ?: "", page)
+                .url(url)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
     private fun getVarietyList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+//        /Arts/index_{page}_{type}_{end}_{year}___{country}_1.html
+        val url = "$BASE_URL/Arts/index" +
+                "_$page}" +
+                "_${params["类型"]?.value.urlEncode()}" +
+                "_${params["状态"]?.value.urlEncode()}" +
+                "_${params["年代"]?.value.urlEncode()}" +
+                "___${params["地区"]?.value.urlEncode()}_1.html"
         return api
-                .varietyList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
+                .url(url)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
     private fun getAnimList(params: Map<String, FilterItem>, page: Int): Observable<PageData<VideoItem>> {
+        val url = "$BASE_URL/Animation/index" +
+                "_$page" +
+                "_${params["类型"]?.value.urlEncode()}" +
+                "_${params["状态"]?.value.urlEncode()}" +
+                "_${params["年代"]?.value.urlEncode()}" +
+                "___${params["地区"]?.value.urlEncode()}_1.html"
         return api
-                .animList(params["类型"]?.value ?: "", params["状态"]?.value
-                        ?: "", params["地区"]?.value ?: "", params["年代"]?.value ?: "", page)
+                .url(url)
                 .map { s -> KKMaoParser.parseVideoList(s.string()) }
     }
 
@@ -157,8 +169,13 @@ class KMaoDataFetch : VideoDataFetch {
     }
 
     override fun getSearchResult(word: String, page: Int): Observable<PageData<VideoItem>> {
+//        /vod-search-wd-{word}-p-{page}
+        val url = "$BASE_URL/vod-search" +
+                "-wd-${word.urlEncode()}" +
+                "-p-$page" +
+                ".html"
         return api
-                .search(word, page)
+                .url(url)
                 .map { responseBody -> KKMaoParser.parseSearchResult(responseBody.string()) }
     }
 }
