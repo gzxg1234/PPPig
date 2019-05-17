@@ -94,7 +94,9 @@ class PigPlayer : FixPlayer {
 
     private val taskHandler = Handler()
 
-    var itemAdapter = PlayerAct.ItemAdapter(context)
+    private var itemAdapter = PlayerAct.ItemAdapter(context)
+
+    var isLive = false
 
     private val syncSpeed = object : Runnable {
         override fun run() {
@@ -207,7 +209,18 @@ class PigPlayer : FixPlayer {
         seekPosLayout.visibility = View.GONE
     }
 
-    fun setSelectEpisodeVisible(v: Boolean) {
+    override fun setSeekOnStart(seekOnStart: Long) {
+        super.setSeekOnStart(seekOnStart)
+    }
+
+    override fun startProgressTimer() {
+        if (isLive) {
+            return
+        }
+        super.startProgressTimer()
+    }
+
+    private fun setSelectItemVisible(v: Boolean) {
         if (v) {
             selectEpisodeView.visibility = View.VISIBLE
             val slideIn = TranslateAnimation(Animation.RELATIVE_TO_SELF, 1f, Animation.RELATIVE_TO_SELF, 0f,
@@ -251,11 +264,11 @@ class PigPlayer : FixPlayer {
             R.id.tv_select_episode -> {
                 if (mIfCurrentIsFullscreen) {
                     hideAllControl()
-                    setSelectEpisodeVisible(true)
+                    setSelectItemVisible(true)
                 }
             }
             R.id.ll_select_items -> {
-                setSelectEpisodeVisible(false)
+                setSelectItemVisible(false)
             }
         }
     }

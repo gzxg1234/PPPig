@@ -4,8 +4,8 @@ import android.text.TextUtils
 import com.sanron.datafetch.FetchLog
 import com.sanron.datafetch.videosource.kkkkmao.KKMaoParser
 import com.sanron.datafetch.videosource.moyan.MoyanParser
-import com.sanron.datafetch_interface.video.bean.*
 import com.sanron.datafetch_interface.exception.ParseException
+import com.sanron.datafetch_interface.video.bean.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.regex.Pattern
@@ -247,20 +247,20 @@ object NianlunParser {
 
                 //解析播放源
                 select(".container>.row>div>.stui-pannel>div.stui-pannel-box.playlist")?.forEach {
-                    detail.source ?: run {
-                        detail.source = mutableListOf()
+                    detail.mLine ?: run {
+                        detail.mLine = mutableListOf()
                     }
-                    var playSource = PlaySource()
+                    var playSource = PlayLine()
                     it.selectFirst(".stui-pannel_hd>.stui-pannel__head>h3.title")?.let {
                         playSource.name = it.ownText().trim()
                     }
                     playSource.items = it.select(".stui-pannel_bd>ul.stui-content__playlist>li>a")?.map {
-                        return@map PlaySource.Item().apply {
+                        return@map PlayLine.Item().apply {
                             name = it.ownText()
-                            link = it.attr("href")
+                            set("link", it.attr("href"))
                         }
                     }?.toMutableList()
-                    detail.source?.add(playSource)
+                    detail.mLine?.add(playSource)
                 }
                 return detail
             }

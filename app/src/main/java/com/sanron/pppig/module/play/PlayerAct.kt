@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.chad.library.adapter.base.BaseViewHolder
-import com.sanron.datafetch_interface.video.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
@@ -39,11 +39,14 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
     lateinit var orientationUtils: OrientationUtils
 
     companion object {
-        const val ARG_PLAY_SOURCE = "play_source_list"
+        const val ARG_PLAY_LINES = "play_line_list"
         const val ARG_TITLE = "title"
         const val ARG_SOURCE_POS = "page_pos"
         const val ARG_ITEM_POS = "item_pos"
+        const val ARG_PLAY_TYPE = "play_type"
         const val ARG_SOURCE_ID = "source_id"
+        const val TYPE_VIDEO = 0
+        const val TYPE_LIVE = 1
     }
 
     val loadingView: LoadingView by lazy {
@@ -60,6 +63,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.initIntent(intent)
         StatusBarHelper.with(this)
                 .setStatusBarColor(0x60000000)
                 .setLayoutBelowStatusBar(true)
@@ -68,7 +72,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         dataBinding.model = viewModel
         initPlayer()
         setupObserver()
-        viewModel.initIntent(intent)
     }
 
     private fun setupObserver() {
@@ -88,7 +91,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 }
             }
         })
-
 
         viewModel.playSourceList.observe(this, Observer {
             it?.let {
@@ -127,10 +129,18 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             titleTextView.text = title
             (gsyVideoManager as? GSYVideoBaseManager)?.let {
                 it.optionModelList = mutableListOf()
-                //解决m3u8文件拖动问题 比如:一个3个多少小时的音频文件，开始播放几秒中，然后拖动到2小时左右的时间，要loading 10分钟
-                it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "fastseek"))
-                //打开重试
+                it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1))
                 it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1))
+                if (viewModel.playType == PlayerAct.TYPE_LIVE) {
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48))
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probesize", 10240))
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "flush_packets", 1))
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0))
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1))
+                } else {
+                    //解决m3u8文件拖动问题 比如:一个3个多少小时的音频文件，开始播放几秒中，然后拖动到2小时左右的时间，要loading 10分钟
+                    it.optionModelList.add(VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "fastseek"))
+                }
             }
             setIsTouchWiget(true)
             isRotateViewAuto = false
@@ -209,7 +219,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         super.onPause()
     }
 
-    inner class SourceAdapter(val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
+    inner class SourceAdapter(val data: List<PlayLine>?) : ViewPagerAdapter<PlayLine>(data) {
 
         private val pageViewList = SparseArray<androidx.recyclerview.widget.RecyclerView>()
         private var pagePos = -1
@@ -233,7 +243,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             this.itemPos = pos
         }
 
-        override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
+        override fun getView(container: ViewGroup, position: Int, item: PlayLine): View {
             val context = container.context
             val recyclerView = androidx.recyclerview.widget.RecyclerView(context)
             recyclerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -266,7 +276,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         }
     }
 
-    class ItemAdapter(context: Context) : CBaseAdapter<PlaySource.Item, BaseViewHolder>(context, R.layout.item_play_item) {
+    class ItemAdapter(context: Context) : CBaseAdapter<PlayLine.Item, BaseViewHolder>(context, R.layout.item_play_item) {
 
         var selectedPos = -1
             set(value) {
@@ -276,7 +286,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 notifyItemChanged(field)
             }
 
-        override fun convert(helper: BaseViewHolder?, item: PlaySource.Item?) {
+        override fun convert(helper: BaseViewHolder?, item: PlayLine.Item?) {
             val text = helper!!.itemView as TextView
             text.text = item?.name
             text.isSelected = helper.adapterPosition == selectedPos

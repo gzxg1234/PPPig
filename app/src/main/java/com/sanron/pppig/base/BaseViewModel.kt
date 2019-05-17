@@ -20,6 +20,11 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
 
     val toastMsg = SingleLiveEvent<String>()
 
+    /**
+     * 显示加载中，值为Dispose的tag值
+     */
+    val rxShowLoading = SingleLiveEvent<Disposable>()
+
     private fun autoDispose(disposable: Disposable) {
         if (!mCompositeDisposable.isDisposed) {
             mCompositeDisposable.add(disposable)
@@ -28,12 +33,23 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+
+    fun <T> withLoading(): ObservableTransformer<T, T> {
+        return ObservableTransformer { upstream ->
+            upstream.doOnSubscribe { disposable ->
+                rxShowLoading.value = disposable
+            }.doFinally {
+                rxShowLoading.value = null
+            }
+        }
+    }
+
     fun <T> autoDispose(tag: String? = null): ObservableTransformer<T, T> {
         return ObservableTransformer { upstream ->
             upstream.doOnSubscribe { disposable ->
                 tag?.let {
                     mCompositeMap.remove(tag)?.dispose()
-                    mCompositeMap.put(tag,disposable)
+                    mCompositeMap.put(tag, disposable)
                 }
                 autoDispose(disposable)
             }

@@ -12,9 +12,12 @@ import com.kingja.loadsir.core.LoadSir
 import com.sanron.datafetch_interface.live.bean.LiveCat
 import com.sanron.datafetch_interface.live.bean.LiveItem
 import com.sanron.pppig.R
+import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.base.LazyFragment
 import com.sanron.pppig.base.state.bindStateValue
+import com.sanron.pppig.databinding.FragmentLiveListBinding
+import com.sanron.pppig.module.play.PlayerAct
 import com.sanron.pppig.util.getColorCompat
 
 /**
@@ -22,7 +25,7 @@ import com.sanron.pppig.util.getColorCompat
  *Time:2019/5/16
  *Description:
  */
-class LiveListFragment : LazyFragment<com.sanron.pppig.databinding.FragmentLiveListBinding, LiveListVM>() {
+class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
     private val catLoadService: LoadService<Any> by lazy {
         LoadSir.getDefault().register(dataBinding.llContent) {
             viewModel.loadCatList()
@@ -71,7 +74,19 @@ class LiveListFragment : LazyFragment<com.sanron.pppig.databinding.FragmentLiveL
             bindToRecyclerView(dataBinding.listCat)
         }
         dataBinding.listItem.layoutManager = LinearLayoutManager(context)
-        LiveItemAdapter(context!!).bindToRecyclerView(dataBinding.listItem)
+        LiveItemAdapter(context!!).apply {
+            setOnItemClickListener { adapter, view, position ->
+                viewModel.onClickItem(position)
+            }
+            bindToRecyclerView(dataBinding.listItem)
+        }
+
+        viewModel.toPlayPage.observe(this, Observer {
+            it?.let {
+                startActivity(Intents.playVideo(context!!, it.first.name, it.second, 0, 0, PlayerAct.TYPE_LIVE,
+                        viewModel.liveSourceId))
+            }
+        })
         viewModel.init(arguments!!)
     }
 

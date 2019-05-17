@@ -21,7 +21,7 @@ class SelectSourceDialog(context: Context, val onChange: () -> Unit) : BaseDialo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setGrivity(Gravity.BOTTOM)
+        setGravity(Gravity.BOTTOM)
         setContentView(R.layout.dlg_select_source)
         width = ViewGroup.LayoutParams.MATCH_PARENT
         height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -29,7 +29,7 @@ class SelectSourceDialog(context: Context, val onChange: () -> Unit) : BaseDialo
         var itemAdapter = ItemAdapter(context)
         listView.maxHeight = (ScreenUtils.getScreenHeight() * 0.5f).toInt()
         val curSourcePos = FetchManager.sourceManager.getVideoSourceList().indexOfFirst {
-            it.id == FetchManager.currentSourceId()
+            it.id == FetchManager.currentVideoSourceId()
         }
         listView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
         listView.itemAnimator = null

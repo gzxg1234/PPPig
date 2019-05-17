@@ -1,13 +1,13 @@
 package com.sanron.pppig.base
 
-import androidx.lifecycle.Observer
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
+import com.sanron.pppig.common.LoadingDlg
 import com.sanron.pppig.util.showToast
 
 /**
@@ -20,6 +20,10 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : androidx.f
     private var mDataBinding: T? = null
 
     private var mViewModel: M? = null
+
+    val loadingDialog: LoadingDlg by lazy {
+        LoadingDlg(context!!)
+    }
 
     protected var dataBinding: T
         private set(value) {}
@@ -43,7 +47,18 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : androidx.f
         mViewModel?.toastMsg?.observe(this@BaseFragment, Observer {
             showToast(it)
         })
+        mViewModel?.rxShowLoading?.observe(this, Observer { b ->
+            if (b != null) {
+                loadingDialog.setOnCancelListener {
+                    b.dispose()
+                }
+                loadingDialog.show()
+            } else {
+                loadingDialog.dismiss()
+            }
+        })
     }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (mDataBinding == null) {

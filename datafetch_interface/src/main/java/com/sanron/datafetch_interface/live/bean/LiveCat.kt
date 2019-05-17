@@ -1,17 +1,14 @@
 package com.sanron.datafetch_interface.live.bean
 
-import io.reactivex.Observable
+import com.sanron.datafetch_interface.BaseBean
 
 /**
  *Author:sanron
  *Time:2019/5/16
  *Description:
  */
-class LiveCat {
+class LiveCat : BaseBean() {
 
     var name: String? = ""
 
-    var link:String?=""
-
-    var items: Observable<List<LiveItem>>? = null
 }

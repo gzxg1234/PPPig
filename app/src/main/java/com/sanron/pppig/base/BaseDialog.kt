@@ -21,7 +21,7 @@ open class BaseDialog(context: Context) : Dialog(context) {
         window?.setBackgroundDrawable(ColorDrawable(0))
     }
 
-    fun setGrivity(value: Int) {
+    fun setGravity(value: Int) {
         window?.let {
             it.attributes.gravity = value
             if (value == Gravity.BOTTOM) {

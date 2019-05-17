@@ -24,7 +24,7 @@ class SearchVM(application: Application) : BaseViewModel(application) {
     }
 
     fun setSource(id: String) {
-        mVideoSource = FetchManager.getSourceById(id)
+        mVideoSource = FetchManager.getVideoSourceById(id)
     }
 
     fun refresh() {

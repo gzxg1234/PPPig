@@ -42,7 +42,7 @@ class KMaoDataFetch : VideoDataFetch {
                 .baseUrl("https://m.kkkkmao.com")
                 .build()
     }
-    private val api:KmaoApi by lazy {
+    private val api: KmaoApi by lazy {
         mRetrofit.create(KmaoApi::class.java)
     }
 
@@ -67,19 +67,20 @@ class KMaoDataFetch : VideoDataFetch {
                 .map { responseBody -> KKMaoParser.parseVideoDetail(responseBody.string()) }
     }
 
-    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
+    override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
         return api
-                .html(videoPageUrl)
+                .html(item["link"] ?: "")
                 .map { responseBody ->
                     return@map KKMaoParser.parsePlayPageUrl(responseBody.string())
                 }
     }
 
-    override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
-        return getVideoPlayPageUrl(videoPageUrl)
+    override fun getVideoSource(item: PlayLine.Item): Observable<List<String>> {
+        val link: String? = item["link"]
+        return getVideoPlayPageUrl(item)
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap { playPageUrl ->
-                    val referer = "http://m.kkkkmao.com/$videoPageUrl"
+                    val referer = "http://m.kkkkmao.com/$link"
                     val header = mutableMapOf<String, String>()
                     header["Referer"] = referer
                     return@flatMap Observable.create(ObservableOnSubscribe<List<String>> {

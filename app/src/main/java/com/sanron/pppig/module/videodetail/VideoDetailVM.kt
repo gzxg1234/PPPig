@@ -3,7 +3,7 @@ package com.sanron.pppig.module.videodetail
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import com.sanron.datafetch_interface.video.VideoSource
-import com.sanron.datafetch_interface.video.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.datafetch_interface.video.bean.VideoDetail
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
@@ -27,7 +27,7 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
     val infoList = MutableLiveData<List<String>>()
     val intro = MutableLiveData<String>()
 
-    val playSourceList = MutableLiveData<List<PlaySource>>()
+    val playSourceList = MutableLiveData<List<PlayLine>>()
 
     var url: String? = null
 
@@ -40,7 +40,7 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
     lateinit var mVideoSource: VideoSource
 
     fun setSource(sourceId: String) {
-        mVideoSource = FetchManager.getSourceById(sourceId)!!
+        mVideoSource = FetchManager.getVideoSourceById(sourceId)!!
     }
 
     fun loadData() {
@@ -58,7 +58,7 @@ class VideoDetailVM(application: Application) : BaseViewModel(application) {
                         infoList.value = t.infoList
                         image.value = t.image
                         title.value = t.title
-                        playSourceList.value = t.source
+                        playSourceList.value = t.mLine
                         if (playSourceList.value.isNullOrEmpty()) {
                             toastMsg.value = "暂无可播放资源"
                         }

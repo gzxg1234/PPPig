@@ -52,7 +52,7 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
                 (pageAdapter.getFragment(position) as? IMainChildFragment)?.onReselect()
             }
         })
-        dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
+        dataBinding.tvCurrentSource.text = FetchManager.currentVideoSource()?.name
         dataBinding.llSearch.setOnClickListener {
             startActivity(Intents.search(context!!))
         }
@@ -64,7 +64,7 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
     private fun onRepoChange() {
-        dataBinding.tvCurrentSource.text = FetchManager.currentSource()?.name
+        dataBinding.tvCurrentSource.text = FetchManager.currentVideoSource()?.name
         (dataBinding.viewPager.adapter as? PageAdapter)?.clearFragments()
         dataBinding.viewPager.adapter = PageAdapter(Repo.getVideoListTypes(), childFragmentManager).apply { pageAdapter = this }
         dataBinding.tabLayout.setViewPager(dataBinding.viewPager)

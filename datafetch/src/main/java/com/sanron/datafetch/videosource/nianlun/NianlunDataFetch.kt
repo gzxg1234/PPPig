@@ -190,7 +190,8 @@ class NianlunDataFetch : VideoDataFetch {
     }
 
 
-    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
+    override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
+        val videoPageUrl = item.get<String?>("link")
         return Observable.create { emitter ->
             val cancellable = NianlunVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, NianlunApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {
@@ -208,9 +209,11 @@ class NianlunDataFetch : VideoDataFetch {
         }
     }
 
-    override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
+    override fun getVideoSource(item: PlayLine.Item): Observable<List<String>> {
+        val videoPageUrl = item.get<String?>("link")
         return Observable.create(ObservableOnSubscribe<JSONObject> { emitter ->
-            val cancellable = NianlunVideoUrlHelper.getVideoPageUrl2(SourceManagerImpl.context, NianlunApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
+            val cancellable = NianlunVideoUrlHelper.getVideoPageUrl2(SourceManagerImpl.context,
+                    NianlunApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {
                     var json: JSONObject? = null
                     try {

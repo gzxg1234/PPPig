@@ -1,11 +1,13 @@
 package com.sanron.datafetch_interface.video.bean
 
+import com.sanron.datafetch_interface.BaseBean
+
 /**
  * Author:sanron
  * Time:2019/4/24
  * Description:
  */
-class VideoDetail {
+class VideoDetail: BaseBean() {
 
     var title: String? = null
 
@@ -13,7 +15,7 @@ class VideoDetail {
 
     var infoList: MutableList<String>? = null
 
-    var source: MutableList<PlaySource>? = null
+    var mLine: MutableList<PlayLine>? = null
 
     var intro: String? = null
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:app="http://schemas.android.com/apk/res-auto"
-             android:layout_width="match_parent"
-             android:layout_height="60dp"
-             android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/loading"
@@ -16,8 +16,9 @@
             style="@style/Widget.AppCompat.ProgressBar"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:indeterminate="true"
-            app:matProg_barColor="@color/colorAccent"/>
+            app:matProg_barColor="@color/colorAccent"
+            app:matProg_circleRadius="40dp"
+            app:matProg_progressIndeterminate="true" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +26,7 @@
             android:layout_marginLeft="16dp"
             android:text="努力加载中，请稍等"
             android:textColor="@color/textColor2"
-            android:textSize="16dp"/>
+            android:textSize="16dp" />
     </LinearLayout>
 
     <TextView
@@ -35,7 +36,7 @@
         android:gravity="center"
         android:text="加载失败，点击重试"
         android:textColor="@color/textColor2"
-        android:textSize="16dp"/>
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/end"
@@ -44,5 +45,5 @@
         android:gravity="center"
         android:text="没有更多数据嘞"
         android:textColor="@color/textColor2"
-        android:textSize="16dp"/>
+        android:textSize="16dp" />
 </FrameLayout>

@@ -1,8 +1,8 @@
 package com.sanron.datafetch.videosource.kkkkmao
 
 import com.sanron.datafetch.FetchLog
-import com.sanron.datafetch_interface.video.bean.*
 import com.sanron.datafetch_interface.exception.ParseException
+import com.sanron.datafetch_interface.video.bean.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.regex.Pattern
@@ -243,14 +243,14 @@ object KKMaoParser {
             }
 
             //解析播放列表
-            detail.source = mutableListOf()
+            detail.mLine = mutableListOf()
             select(".vod-play-info.main>#con_vod_1>.play-box")?.forEach {
                 if (it.id() == "xigua"
                         || it.id() == "pan") {
                     //西瓜和网盘过滤
                     return@forEach
                 }
-                val playSource = PlaySource()
+                val playSource = PlayLine()
                 playSource.name = "播放源"
                 playSource.items = mutableListOf()
                 //找播放源名称
@@ -258,12 +258,12 @@ object KKMaoParser {
                     playSource.name = titleE.ownText()
                 }
                 it.select(".plau-ul-list>li>a").forEach { itemE ->
-                    val item = PlaySource.Item()
+                    val item = PlayLine.Item()
                     item.name = itemE.attr("title")
-                    item.link = itemE.attr("href")
+                    item["link"] = itemE.attr("href")
                     playSource.items?.add(item)
                 }
-                detail.source?.add(playSource)
+                detail.mLine?.add(playSource)
 
             }
             return detail

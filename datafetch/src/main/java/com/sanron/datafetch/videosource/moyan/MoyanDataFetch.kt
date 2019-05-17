@@ -3,7 +3,6 @@ package com.sanron.datafetch.videosource.moyan
 import com.sanron.datafetch.BuildConfig
 import com.sanron.datafetch.SourceManagerImpl
 import com.sanron.datafetch.WebHelper
-import com.sanron.datafetch.videosource.kkkkmao.KmaoApi
 import com.sanron.datafetch_interface.exception.ParseException
 import com.sanron.datafetch_interface.video.VideoDataFetch
 import com.sanron.datafetch_interface.video.bean.*
@@ -67,7 +66,8 @@ class MoyanDataFetch : VideoDataFetch {
                 .map { responseBody -> MoyanParser.parseVideoDetail(responseBody.string()) }
     }
 
-    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> {
+    override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
+        val videoPageUrl = item.get<String?>("link")
         return Observable.create(ObservableOnSubscribe<String> { emitter ->
             val cancellable = MoyanVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, MoyanApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {
@@ -85,8 +85,8 @@ class MoyanDataFetch : VideoDataFetch {
         }).subscribeOn(AndroidSchedulers.mainThread())
     }
 
-    override fun getVideoSource(videoPageUrl: String): Observable<List<String>> {
-        return getVideoPlayPageUrl(videoPageUrl)
+    override fun getVideoSource(item: PlayLine.Item): Observable<List<String>> {
+        return getVideoPlayPageUrl(item)
                 .flatMap { videoPlayPageUrl ->
                     return@flatMap Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
                         val cancellable = MoyanVideoUrlHelper.getVideoSource(SourceManagerImpl.context, videoPlayPageUrl, null, object : WebHelper.Callback {

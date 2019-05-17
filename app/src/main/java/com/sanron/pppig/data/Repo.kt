@@ -19,9 +19,9 @@ object Repo : VideoDataFetch{
 
     override fun getVideoDetail(path: String): Observable<VideoDetail> = sVideoDataFetch.getVideoDetail(path)
 
-    override fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String> = sVideoDataFetch.getVideoPlayPageUrl(videoPageUrl)
+    override fun getVideoPlayPageUrl(item:PlayLine.Item): Observable<String> = sVideoDataFetch.getVideoPlayPageUrl(item)
 
-    override fun getVideoSource(url: String) = sVideoDataFetch.getVideoSource(url)
+    override fun getVideoSource(item:PlayLine.Item) = sVideoDataFetch.getVideoSource(item)
 
     override fun getVideoListTypes(): List<VideoListType> = sVideoDataFetch.getVideoListTypes()
 

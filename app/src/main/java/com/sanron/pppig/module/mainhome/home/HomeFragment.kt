@@ -118,7 +118,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
             recyclerView.handleScrollHorizontalConflict = true
         }
         viewModel.toVideoDetail.observe(this, Observer {
-            val intent = Intents.videoDetail(context!!, it?.link, FetchManager.currentSourceId()
+            val intent = Intents.videoDetail(context!!, it?.link, FetchManager.currentVideoSourceId()
                     ?: "")
             startActivity(intent)
         })
@@ -153,7 +153,7 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
                         sdv.setImageURI(item.image)
                         tv.text = item.title
                         view.setOnClickListener { _ ->
-                            startActivity(Intents.videoDetail(context!!, item.link, FetchManager.currentSourceId()
+                            startActivity(Intents.videoDetail(context!!, item.link, FetchManager.currentVideoSourceId()
                                     ?: ""))
                         }
                         return view
@@ -224,7 +224,7 @@ class VideoAdapter(val fragment: HomeFragment, private val items: List<VideoItem
         binding.model = ItemVideoVM(PiApp.sInstance)
         binding.root.setOnClickListener {
             val item = binding.model!!.item.value!!
-            val intent = Intents.videoDetail(context, item.link, FetchManager.currentSourceId()
+            val intent = Intents.videoDetail(context, item.link, FetchManager.currentVideoSourceId()
                     ?: "")
             fragment.startActivity(intent)
         }

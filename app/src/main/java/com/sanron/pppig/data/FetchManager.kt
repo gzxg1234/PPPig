@@ -3,6 +3,7 @@ package com.sanron.pppig.data
 import android.annotation.SuppressLint
 import android.content.Context
 import com.sanron.datafetch_interface.SourceManager
+import com.sanron.datafetch_interface.live.LiveSource
 import com.sanron.datafetch_interface.video.VideoSource
 import com.sanron.pppig.app.PiApp
 import com.sanron.pppig.util.CLog
@@ -29,8 +30,9 @@ object FetchManager {
     lateinit var sourceManager: SourceManager
 
     private val videoSourceMap = mutableMapOf<String, VideoSource>()
+    private val liveSourceMap = mutableMapOf<String, LiveSource>()
 
-    private var currentSourceId by AppPref.AppSP("currentSourceId", "")
+    private var currentSourceId by AppPref.AppSP("currentVideoSourceId", "")
     private var fetchVersion by AppPref.AppSP("fetchVersion", -1)
 
     /**
@@ -45,20 +47,24 @@ object FetchManager {
         }
     }
 
-    fun getSourceById(id: String): VideoSource? {
+    fun getLiveSourceById(id: String): LiveSource? {
+        return liveSourceMap[id]
+    }
+
+    fun getVideoSourceById(id: String): VideoSource? {
         return videoSourceMap[id]
     }
 
-    fun currentSource(): VideoSource? {
-        return videoSourceMap[currentSourceId()]
+    fun currentVideoSource(): VideoSource? {
+        return videoSourceMap[currentVideoSourceId()]
     }
 
-    fun currentSourceId(): String? {
+    fun currentVideoSourceId(): String? {
         return currentSourceId
     }
 
     private fun readFetchConfig() {
-        val id = currentSourceId()
+        val id = currentVideoSourceId()
         if (id.isNullOrEmpty()) {
             changeSource(sourceManager.getVideoSourceList()[0].id, true)
         } else {
@@ -147,6 +153,9 @@ object FetchManager {
                 sourceManager = sm
                 sourceManager.getVideoSourceList().forEach {
                     videoSourceMap[it.id] = it
+                }
+                sourceManager.getLiveSourceList().forEach {
+                    liveSourceMap[it.id] = it
                 }
                 sourceManager.initContext(context = PiApp.sInstance)
                 sourceManager.setHttpClient(Injector.provideOkHttpClient())

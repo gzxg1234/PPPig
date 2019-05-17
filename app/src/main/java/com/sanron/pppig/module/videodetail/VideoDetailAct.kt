@@ -16,7 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.chad.library.adapter.base.BaseViewHolder
 import com.google.android.material.appbar.AppBarLayout
-import com.sanron.datafetch_interface.video.bean.PlaySource
+import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
@@ -198,9 +198,9 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
     }
 
 
-    class SourceAdapter(val title: String?, val sourceId: String, val data: List<PlaySource>?) : ViewPagerAdapter<PlaySource>(data) {
+    class SourceAdapter(val title: String?, val sourceId: String, val data: List<PlayLine>?) : ViewPagerAdapter<PlayLine>(data) {
 
-        override fun getView(container: ViewGroup, position: Int, item: PlaySource): View {
+        override fun getView(container: ViewGroup, position: Int, item: PlayLine): View {
             val context = container.context
             val recyclerView = androidx.recyclerview.widget.RecyclerView(context)
             recyclerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -215,16 +215,17 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
             adapter.bindToRecyclerView(recyclerView)
             adapter.setOnItemClickListener { _, _, position2 ->
                 if (!data.isNullOrEmpty()) {
-                    (context as Activity).startActivity(Intents.playVideo(context, title, data, position, position2, sourceId))
+                    (context as Activity).startActivity(Intents.playVideo(context, title, data,
+                            position, position2, PlayerAct.TYPE_VIDEO, sourceId))
                 }
             }
             return recyclerView
         }
     }
 
-    class ItemAdapter(context: Context) : CBaseAdapter<PlaySource.Item, BaseViewHolder>(context, R.layout.item_play_item) {
+    class ItemAdapter(context: Context) : CBaseAdapter<PlayLine.Item, BaseViewHolder>(context, R.layout.item_play_item) {
 
-        override fun convert(helper: BaseViewHolder?, item: PlaySource.Item?) {
+        override fun convert(helper: BaseViewHolder?, item: PlayLine.Item?) {
             val text = helper!!.itemView as TextView
             text.text = item?.name
         }

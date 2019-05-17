@@ -85,7 +85,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
 
             adapter = VideoAdapter(context!!, this@VideoListFragment, viewModel.pageLoader.listData.value)
             adapter.setOnItemClickListener { adapter1, view, position ->
-                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, FetchManager.currentSourceId()
+                startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, FetchManager.currentVideoSourceId()
                         ?: ""))
             }
             adapter.lifecycleOwner = this@VideoListFragment

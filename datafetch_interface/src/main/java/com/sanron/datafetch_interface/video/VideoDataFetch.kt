@@ -29,12 +29,12 @@ interface VideoDataFetch {
     /**
      * 获取视频播放页url
      */
-    fun getVideoPlayPageUrl(videoPageUrl: String): Observable<String>
+    fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String>
 
     /**
      * 获取视频播放源
      */
-    fun getVideoSource(videoPageUrl: String): Observable<List<String>>
+    fun getVideoSource(item: PlayLine.Item): Observable<List<String>>
 
     /**
      * 获取视频列表分类
