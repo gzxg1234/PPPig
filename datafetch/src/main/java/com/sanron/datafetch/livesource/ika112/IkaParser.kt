@@ -18,9 +18,9 @@ object IkaParser {
         Jsoup.parse(html)?.let {
             it.getElementsByAttributeValue("data-role", "listview").first()?.let {
                 it.select("li>a")?.forEach {
-                    val item = LiveItem()
+                    val item = IkaLiveItem()
                     item.name = it.ownText()
-                    item["url"] = it.attr("href").completeUrl(IkaFetch.BASE_URL)
+                    item.link = it.attr("href").completeUrl(IkaFetch.BASE_URL)
                     items.add(item)
                 }
             }
@@ -33,9 +33,9 @@ object IkaParser {
         Jsoup.parse(html)?.let {
             it.getElementsByAttributeValue("data-role", "listview").first()?.let {
                 it.select("li>a")?.forEach {
-                    val cat = LiveCat()
+                    val cat = IkaLiveCat()
                     cat.name = it.ownText()
-                    cat["link"] = it.attr("href").completeUrl(IkaFetch.BASE_URL)
+                    cat.link = it.attr("href").completeUrl(IkaFetch.BASE_URL)
                     cats.add(cat)
                 }
             }
@@ -49,9 +49,9 @@ object IkaParser {
             doc.select("select#playURL>option")?.forEach { e ->
                 val playLine = PlayLine()
                 playLine.name = e.ownText()
-                playLine.items = mutableListOf(PlayLine.Item().apply {
+                playLine.items = mutableListOf(IkaPlayItem().apply {
                     name = "直播"
-                    set("url", e.attr("value"))
+                    url = e.attr("value")
                 })
                 playLineList.add(playLine)
             }

@@ -61,7 +61,6 @@ class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
 
     override fun initView() {
         dataBinding.model = viewModel
-        dataBinding.lifecycleOwner = this
         catLoadService.bindStateValue(this, viewModel.catLoadingState)
         itemLoadService.bindStateValue(this, viewModel.itemLoadingState)
         dataBinding.listCat.layoutManager = LinearLayoutManager(context)

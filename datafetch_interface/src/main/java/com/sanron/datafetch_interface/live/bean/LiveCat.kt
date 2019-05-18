@@ -7,7 +7,7 @@ import com.sanron.datafetch_interface.BaseBean
  *Time:2019/5/16
  *Description:
  */
-class LiveCat : BaseBean() {
+open class LiveCat : BaseBean() {
 
     var name: String? = ""
 

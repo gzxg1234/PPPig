@@ -12,7 +12,7 @@ class PlayLine : BaseBean() {
     var name: String? = null
     var items: MutableList<Item>? = null
 
-    class Item : BaseBean() {
+    open class Item : BaseBean() {
         var name: String? = null
     }
 }

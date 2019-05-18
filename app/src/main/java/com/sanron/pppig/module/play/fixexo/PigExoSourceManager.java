@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSourceFactory;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSourceFactory;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -19,13 +20,12 @@ import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheSpan;
 import com.google.android.exoplayer2.upstream.cache.CacheUtil;
+import com.google.android.exoplayer2.upstream.cache.ContentMetadata;
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.Util;
@@ -33,16 +33,17 @@ import com.google.android.exoplayer2.util.Util;
 import java.io.File;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
+import okhttp3.OkHttpClient;
 import tv.danmaku.ijk.media.exo2.ExoMediaSourceInterceptListener;
-import tv.danmaku.ijk.media.exo2.source.GSYExoHttpDataSourceFactory;
 
 /**
  * Created by guoshuyu on 2018/5/18.
  */
 
-public class FixExoSourceManager {
+public class PigExoSourceManager {
 
     private static final String TAG = "ExoSourceManager";
 
@@ -66,11 +67,15 @@ public class FixExoSourceManager {
 
     private boolean isCached = false;
 
-    public static FixExoSourceManager newInstance(Context context, @Nullable Map<String, String> mapHeadData) {
-        return new FixExoSourceManager(context, mapHeadData);
+    private OkHttpClient mOkHttpClient;
+
+    private OkHttpClient mSkipSSLOkHttpClient;
+
+    public static PigExoSourceManager newInstance(Context context, @Nullable Map<String, String> mapHeadData) {
+        return new PigExoSourceManager(context, mapHeadData);
     }
 
-    protected FixExoSourceManager(Context context, Map<String, String> mapHeadData) {
+    protected PigExoSourceManager(Context context, Map<String, String> mapHeadData) {
         mAppContext = context.getApplicationContext();
         mMapHeadData = mapHeadData;
     }
@@ -261,25 +266,43 @@ public class FixExoSourceManager {
     }
 
     private DataSource.Factory getHttpDataSourceFactory(Context context, boolean preview) {
+        OkHttpDataSourceFactory dataSourceFactory;
         if (mSkipSSLChain) {
-            GSYExoHttpDataSourceFactory dataSourceFactory = new GSYExoHttpDataSourceFactory(Util.getUserAgent(context,
-                    TAG), preview ? null : new DefaultBandwidthMeter());
-            if (mMapHeadData != null && mMapHeadData.size() > 0) {
-                for (Map.Entry<String, String> header : mMapHeadData.entrySet()) {
-                    dataSourceFactory.getDefaultRequestProperties().set(header.getKey(), header.getValue());
-                }
-            }
-            return dataSourceFactory;
+            dataSourceFactory = new OkHttpDataSourceFactory(getSkipSSLOkHttpClient(), Util.getUserAgent(context,
+                    TAG), preview ? null : new DefaultBandwidthMeter.Builder(context).build());
+        } else {
+            dataSourceFactory = new OkHttpDataSourceFactory(getOkHttpClient(), Util.getUserAgent(context,
+                    TAG), preview ? null : new DefaultBandwidthMeter.Builder(context).build());
         }
-        DefaultHttpDataSourceFactory dataSourceFactory = new DefaultHttpDataSourceFactory(Util.getUserAgent(context,
-                TAG), preview ? null : new DefaultBandwidthMeter(), DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, true);
         if (mMapHeadData != null && mMapHeadData.size() > 0) {
             for (Map.Entry<String, String> header : mMapHeadData.entrySet()) {
                 dataSourceFactory.getDefaultRequestProperties().set(header.getKey(), header.getValue());
             }
         }
         return dataSourceFactory;
+    }
+
+    public OkHttpClient getSkipSSLOkHttpClient() {
+        if (mSkipSSLOkHttpClient == null) {
+            mSkipSSLOkHttpClient = getOkHttpClient().newBuilder()
+                    .sslSocketFactory(SSlUtil.getSSLSocketFactory(), SSlUtil.getTrustManager()[0])
+                    .hostnameVerifier(SSlUtil.getHostnameVerifier())
+                    .build();
+        }
+        return mOkHttpClient;
+    }
+
+    public OkHttpClient getOkHttpClient() {
+        if (mOkHttpClient == null) {
+            mOkHttpClient = new OkHttpClient.Builder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .followRedirects(true)
+                    .followSslRedirects(true)
+                    .build();
+        }
+        return mOkHttpClient;
     }
 
     /**
@@ -296,7 +319,7 @@ public class FixExoSourceManager {
                 if (cachedSpans.size() == 0) {
                     isCache = false;
                 } else {
-                    long contentLength = cache.getContentLength(key);
+                    long contentLength = ContentMetadata.getContentLength(cache.getContentMetadata(key));
                     long currentLength = 0;
                     for (CacheSpan cachedSpan : cachedSpans) {
                         currentLength += cache.getCachedLength(key, cachedSpan.position, cachedSpan.length);

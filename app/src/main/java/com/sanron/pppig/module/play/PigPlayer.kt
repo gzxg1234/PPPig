@@ -119,13 +119,6 @@ class PigPlayer : FixPlayer {
         super.init(context)
         enlargeImageRes = R.drawable.ic_fullscreen_white_24dp
         shrinkImageRes = R.drawable.ic_fullscreen_exit_white_24dp
-        post {
-            //init执行在基类构造方法里，此时dismissControlTime尚未初始化，需延迟设置
-            mProgressBar.setOnTouchListener { v, event ->
-                return@setOnTouchListener duration == 0
-            }
-            dismissControlTime = 4000
-        }
     }
 
     override fun getLayoutId(): Int {

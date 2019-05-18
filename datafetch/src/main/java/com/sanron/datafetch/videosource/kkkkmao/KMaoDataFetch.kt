@@ -62,14 +62,14 @@ class KMaoDataFetch : VideoDataFetch {
 
     override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
         return api
-                .url(item["link"] ?: "")
+                .url((item as KKMaoPlayItem).link ?: "")
                 .map { responseBody ->
                     return@map KKMaoParser.parsePlayPageUrl(responseBody.string())
                 }
     }
 
     override fun getVideoSource(item: PlayLine.Item): Observable<List<String>> {
-        val link: String? = item["link"]
+        val link = (item as KKMaoPlayItem).link
         return getVideoPlayPageUrl(item)
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap { playPageUrl ->

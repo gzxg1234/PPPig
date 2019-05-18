@@ -67,7 +67,7 @@ class MoyanDataFetch : VideoDataFetch {
     }
 
     override fun getVideoPlayPageUrl(item: PlayLine.Item): Observable<String> {
-        val videoPageUrl = item.get<String?>("link")
+        val videoPageUrl = (item as MoyanPlayItem).link
         return Observable.create(ObservableOnSubscribe<String> { emitter ->
             val cancellable = MoyanVideoUrlHelper.getVideoPageUrl(SourceManagerImpl.context, MoyanApi.BASE_URL + videoPageUrl, null, object : WebHelper.Callback {
                 override fun success(result: String) {

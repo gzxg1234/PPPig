@@ -1,10 +1,10 @@
 package com.sanron.pppig.base
 
-import androidx.lifecycle.Observer
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.Observer
 import com.sanron.pppig.util.runInMainIdle
 import com.sanron.pppig.util.showToast
 
@@ -32,6 +32,7 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
         super.onCreate(savedInstanceState)
         activity = this
         mDataBinding = DataBindingUtil.setContentView(this, getLayout())
+        mDataBinding?.lifecycleOwner = this
         mViewModel = createViewModel()
         mViewModel?.toastMsg?.observe(this, Observer {
             showToast(it)

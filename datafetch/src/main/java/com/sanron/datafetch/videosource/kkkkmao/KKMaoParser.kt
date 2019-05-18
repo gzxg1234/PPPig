@@ -259,9 +259,9 @@ object KKMaoParser {
                     playSource.name = titleE.ownText()
                 }
                 it.select(".plau-ul-list>li>a").forEach { itemE ->
-                    val item = PlayLine.Item()
+                    val item = KKMaoPlayItem()
                     item.name = itemE.attr("title")
-                    item["link"] = itemE.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
+                    item.link = itemE.attr("href").completeUrl(KMaoDataFetch.BASE_URL)
                     playSource.items?.add(item)
                 }
                 detail.mLine?.add(playSource)

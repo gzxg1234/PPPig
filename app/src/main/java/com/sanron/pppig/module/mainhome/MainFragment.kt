@@ -73,7 +73,6 @@ class MainFragment : LazyFragment<FragmentMainBinding, MainFragViewModel>() {
     }
 
     override fun initData() {
-        viewModel.getData()
     }
 
 

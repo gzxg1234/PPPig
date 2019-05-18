@@ -21,7 +21,7 @@ import java.nio.charset.Charset
  *Description:
  */
 class HaoquFetch : LiveDataFetch {
-    companion object{
+    companion object {
         const val BASE_URL = "http://m.haoqu.net"
     }
 
@@ -33,7 +33,7 @@ class HaoquFetch : LiveDataFetch {
     }
 
     override fun getCatItems(liveCat: LiveCat): Observable<List<LiveItem>> {
-        val link = liveCat.get<String?>("link")
+        val link = (liveCat as HaoquLiveCat).link
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
@@ -45,7 +45,7 @@ class HaoquFetch : LiveDataFetch {
     }
 
     override fun getPlayLineList(item: LiveItem): Observable<List<PlayLine>> {
-        val link = item.get<String?>("link")
+        val link = (item as HaoquLiveItem).link
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
@@ -57,7 +57,7 @@ class HaoquFetch : LiveDataFetch {
     }
 
     override fun getLiveSourceUrl(item: PlayLine.Item): Observable<List<String>> {
-        val link = "$BASE_URL/e/extend/tv.php?id=${item.get<String?>("id")}"
+        val link = "$BASE_URL/e/extend/tv.php?id=${(item as HaoquPlayItem).id}"
         return Observable.create(ObservableOnSubscribe<JSONObject> { emitter ->
             val task = HaoquUrlHelper.getVideoSource(SourceManagerImpl.context,
                     link, null, object : WebHelper.Callback {

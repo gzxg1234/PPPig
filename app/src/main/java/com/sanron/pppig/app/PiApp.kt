@@ -12,7 +12,7 @@ import com.kingja.loadsir.core.LoadSir
 import com.sanron.pppig.BuildConfig
 import com.sanron.pppig.base.state.ErrorSir
 import com.sanron.pppig.base.state.LoadingSir
-import com.sanron.pppig.module.play.PigVideoManager
+import com.sanron.pppig.module.play.fixexo.PigExoPlayerManager
 import com.shuyu.gsyvideoplayer.player.IjkPlayerManager
 import com.shuyu.gsyvideoplayer.player.PlayerFactory
 import com.tencent.bugly.crashreport.CrashReport
@@ -56,7 +56,7 @@ class PiApp : Application() {
     }
 
     private fun initGsyPlay() {
-        PlayerFactory.setPlayManager(PigVideoManager::class.java)
+        PlayerFactory.setPlayManager(PigExoPlayerManager::class.java)
         IjkPlayerManager.setLogLevel(if (BuildConfig.DEBUG) IjkMediaPlayer.IJK_LOG_INFO else IjkMediaPlayer.IJK_LOG_SILENT)
     }
 

@@ -101,7 +101,6 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
 
     override fun initView() {
         dataBinding.apply {
-            lifecycleOwner = this@HomeFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
             layoutManager = VirtualLayoutManager(context!!)
@@ -162,7 +161,6 @@ class HomeFragment : LazyFragment<FragmentHomeBinding, HomeVM>(), IMainChildFrag
                 adapters.add(bannerAdapter)
                 homeData?.categories?.forEachIndexed { index, homeCat ->
                     val binding = DataBindingUtil.inflate<ItemVideoListTitleBinding>(context!!.inflater, R.layout.item_video_list_title, dataBinding.recyclerView, false)
-                    binding.lifecycleOwner = this@HomeFragment
                     adapters.add(TitleAdapter(binding, homeCat, context!!.dp2px(12f)))
 
                     val videoAdapter = VideoAdapter(this@HomeFragment, homeCat.items)

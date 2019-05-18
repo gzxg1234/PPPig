@@ -3,11 +3,15 @@ package com.sanron.pppig.module.play
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Message
 import android.util.AttributeSet
 import android.view.*
 import android.widget.SeekBar
+import com.sanron.pppig.module.play.fixexo.PigExoMediaPlayer
+import com.sanron.pppig.module.play.fixexo.PigExoPlayerManager
+import com.sanron.pppig.util.CLog
 import com.shuyu.gsyvideoplayer.R
 import com.shuyu.gsyvideoplayer.utils.CommonUtil.hideNavKey
 import com.shuyu.gsyvideoplayer.utils.Debuger
@@ -21,7 +25,9 @@ import com.shuyu.gsyvideoplayer.video.base.GSYVideoView
  * 修复一些bug
  */
 open class FixPlayer : StandardGSYVideoPlayer {
-
+    companion object {
+        val TAG: String = FixPlayer::class.java.simpleName
+    }
 
     private var startHideControlAfterStopTracking = false
     private var trackingProgress = false
@@ -61,6 +67,17 @@ open class FixPlayer : StandardGSYVideoPlayer {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
+    @SuppressLint("ClickableViewAccessibility")
+    override fun init(context: Context?) {
+        super.init(context)
+        post {
+            //init执行在基类构造方法里，此时dismissControlTime尚未初始化，需延迟设置
+            mProgressBar.setOnTouchListener { v, event ->
+                return@setOnTouchListener isPlayingLive()
+            }
+            dismissControlTime = 4000
+        }
+    }
 
     override fun onBrightnessSlide(percent: Float) {
         mBrightnessData = (mContext as Activity).window.attributes.screenBrightness
@@ -80,11 +97,55 @@ open class FixPlayer : StandardGSYVideoPlayer {
         (mContext as Activity).window.attributes = lpa
     }
 
+    /**
+     * 当前是否为直播
+     */
+    private fun isPlayingLive(): Boolean {
+        return (gsyVideoManager.player as? PigExoPlayerManager)?.isLive == true
+    }
+
+    override fun onVideoResume() {
+        onVideoResume(!isPlayingLive())
+    }
+
+    override fun onVideoResume(seek: Boolean) {
+        mPauseBeforePrepared = false
+        if (mCurrentState == CURRENT_STATE_PAUSE) {
+            try {
+//                if (mCurrentPosition > 0 && getGSYVideoManager() != null) {
+                if (mCurrentPosition >= 0 && gsyVideoManager != null) {
+                    if (seek) {
+                        gsyVideoManager.seekTo(mCurrentPosition)
+                    }
+                    gsyVideoManager.start()
+                    setStateAndUi(CURRENT_STATE_PLAYING)
+                    if (mAudioManager != null && !mReleaseWhenLossAudio) {
+                        mAudioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    }
+                    mCurrentPosition = 0
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+    }
 
     override fun startDismissControlViewTimer() {
         cancelDismissControlViewTimer()
         taskHandler.sendEmptyMessageDelayed(hideControl, mDismissControlTime.toLong())
     }
+
+
+    override fun onError(what: Int, extra: Int) {
+        super.onError(what, extra)
+        //hls协议播放特别是直播时经常会出现此异常，此时重新prepare即可
+        if (what == PigExoMediaPlayer.MEDIA_ERROR_BEBIND_LIVE_WINDOW) {
+            CLog.i(TAG, "收到BehindLiveWindowException，尝试重新播放")
+            startPlayLogic()
+        }
+    }
+
 
     override fun cancelDismissControlViewTimer() {
         taskHandler.removeMessages(hideControl)

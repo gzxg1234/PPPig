@@ -17,9 +17,9 @@ object HaoquParser {
         val items = mutableListOf<LiveItem>()
         Jsoup.parse(html)?.let {
             it.select(".list-box.J-medal>.xhbox>li>a")?.forEach {
-                val item = LiveItem()
+                val item = HaoquLiveItem()
                 item.name = it.ownText()
-                item["link"] = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
+                item.link = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
                 items.add(item)
             }
         }
@@ -33,9 +33,9 @@ object HaoquParser {
                 val playLine = PlayLine()
                 playLine.name = e.ownText()
                 playLine.items = mutableListOf()
-                val item = PlayLine.Item().apply {
+                val item = HaoquPlayItem().apply {
                     name = "直播"
-                    set("id", e.attr("value"))
+                    id = e.attr("value")
                 }
                 playLine.items?.add(item)
                 playLineList.add(playLine)
@@ -48,9 +48,9 @@ object HaoquParser {
         val cats = mutableListOf<LiveCat>()
         Jsoup.parse(html)?.let {
             it.select(".nav-box>.J-tabset>li>a")?.forEach {
-                val cat = LiveCat()
+                val cat = HaoquLiveCat()
                 cat.name = it.ownText()
-                cat["link"] = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
+                cat.link = it.attr("href").completeUrl(HaoquFetch.BASE_URL)
                 if (cat.name?.contains("省级") == true) {
                     return@forEach
                 }

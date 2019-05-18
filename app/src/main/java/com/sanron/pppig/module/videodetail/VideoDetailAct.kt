@@ -66,7 +66,6 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
                 .setLayoutBelowStatusBar(true)
                 .setPaddingTop(dataBinding.flTopWrap)
                 .setPaddingTop(dataBinding.coordinator)
-        dataBinding.lifecycleOwner = this@VideoDetailAct
         dataBinding.model = viewModel
         dataBinding.ivBack.setOnClickListener {
             ActivityCompat.finishAfterTransition(this@VideoDetailAct)

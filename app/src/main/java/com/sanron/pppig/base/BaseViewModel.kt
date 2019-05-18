@@ -14,9 +14,11 @@ import io.reactivex.disposables.Disposable
  */
 open class BaseViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val mCompositeDisposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
-    private val mCompositeMap = mutableMapOf<String, Disposable>()
+    private val compositeMap by lazy {
+        mutableMapOf<String, Disposable>()
+    }
 
     val toastMsg = SingleLiveEvent<String>()
 
@@ -26,11 +28,7 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     val rxShowLoading = SingleLiveEvent<Disposable>()
 
     private fun autoDispose(disposable: Disposable) {
-        if (!mCompositeDisposable.isDisposed) {
-            mCompositeDisposable.add(disposable)
-        } else {
-            disposable.dispose()
-        }
+        compositeDisposable.add(disposable)
     }
 
 
@@ -48,8 +46,8 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
         return ObservableTransformer { upstream ->
             upstream.doOnSubscribe { disposable ->
                 tag?.let {
-                    mCompositeMap.remove(tag)?.dispose()
-                    mCompositeMap.put(tag, disposable)
+                    compositeMap.remove(tag)?.dispose()
+                    compositeMap.put(tag, disposable)
                 }
                 autoDispose(disposable)
             }
@@ -57,8 +55,8 @@ open class BaseViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     override fun onCleared() {
-        mCompositeMap.clear()
-        mCompositeDisposable.clear()
+        compositeMap.clear()
+        compositeDisposable.clear()
         super.onCleared()
     }
 }

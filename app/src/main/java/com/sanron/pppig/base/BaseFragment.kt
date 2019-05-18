@@ -63,6 +63,7 @@ abstract class BaseFragment<T : ViewDataBinding, M : BaseViewModel> : androidx.f
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if (mDataBinding == null) {
             mDataBinding = DataBindingUtil.inflate(inflater, getLayout(), container, false)
+            mDataBinding?.lifecycleOwner = this
             mViewModel = createViewModel()
             initView()
         }

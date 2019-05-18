@@ -7,6 +7,6 @@ import com.sanron.datafetch_interface.BaseBean
  *Time:2019/5/16
  *Description:
  */
-class LiveItem : BaseBean() {
+open class LiveItem : BaseBean() {
     var name: String? = ""
 }

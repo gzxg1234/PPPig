@@ -221,9 +221,9 @@ object MoyanParser {
                         playSource.name = it.ownText().trim()
                     }
                     playSource.items = it.select(".stui-pannel_bd>ul.stui-content__playlist>li>a")?.map {
-                        return@map PlayLine.Item().apply {
+                        return@map MoyanPlayItem().apply {
                             name = it.ownText()
-                            set("link", it.attr("href"))
+                            link = it.attr("href")
                         }
                     }?.toMutableList()
                     detail.mLine?.add(playSource)

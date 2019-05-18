@@ -8,7 +8,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.sanron.datafetch.*
-import com.sanron.datafetch_interface.video.bean.PlayLine
 
 /**
  * Author:sanron
@@ -55,10 +54,10 @@ object Ika112MediaSearch {
     }
 
 
-    fun search(context: Context, playItem: PlayLine.Item, callback: Callback): Cancellable {
+    fun search(context: Context, playItem: IkaPlayItem, callback: Callback): Cancellable {
 
-        val pageUrl = playItem.get<String?>("pageUrl")
-        val url = playItem.get<String?>("url")
+        val pageUrl = playItem.pageUrl
+        val url = playItem.url
         val webView = WebViewPool.acquire(context)
         val task = Task(callback, webView)
 

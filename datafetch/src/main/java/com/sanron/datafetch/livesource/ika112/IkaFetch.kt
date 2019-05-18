@@ -31,7 +31,7 @@ class IkaFetch : LiveDataFetch {
     }
 
     override fun getCatItems(liveCat: LiveCat): Observable<List<LiveItem>> {
-        val link = liveCat.get<String?>("link")
+        val link = (liveCat as IkaLiveCat).link
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
@@ -43,7 +43,7 @@ class IkaFetch : LiveDataFetch {
     }
 
     override fun getPlayLineList(item: LiveItem): Observable<List<PlayLine>> {
-        val link = item.get<String?>("url")
+        val link = (item as IkaLiveItem).link
         if (link.isNullOrEmpty()) {
             return Observable.just(emptyList())
         } else {
@@ -52,7 +52,7 @@ class IkaFetch : LiveDataFetch {
                         val list = IkaParser.parsePlayLine(String(it.bytes(), Charset.forName("utf-8")))
                         list.forEach {
                             it.items?.forEach {
-                                it.set("pageUrl", link)
+                                (it as IkaPlayItem).pageUrl = link
                             }
                         }
                         return@map list
@@ -63,7 +63,7 @@ class IkaFetch : LiveDataFetch {
     override fun getLiveSourceUrl(item: PlayLine.Item): Observable<List<String>> {
         return Observable.create(ObservableOnSubscribe<List<String>> { emitter ->
             val task = Ika112MediaSearch.search(SourceManagerImpl.context,
-                    item, object : Ika112MediaSearch.Callback {
+                    item as IkaPlayItem, object : Ika112MediaSearch.Callback {
                 override fun success(result: List<String>) {
                     emitter.onNext(result)
                     emitter.onComplete()

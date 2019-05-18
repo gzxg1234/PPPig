@@ -73,7 +73,6 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
     @SuppressLint("SetTextI18n")
     override fun initView() {
         dataBinding.apply {
-            lifecycleOwner = this@SearchFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
             recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)

@@ -69,7 +69,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 .setStatusBarColor(0x60000000)
                 .setLayoutBelowStatusBar(true)
                 .setPaddingTop(dataBinding.playerView.getTopBar())
-        dataBinding.lifecycleOwner = this
         dataBinding.model = viewModel
         initPlayer()
         setupObserver()

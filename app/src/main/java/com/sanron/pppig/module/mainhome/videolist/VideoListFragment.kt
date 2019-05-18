@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -15,6 +13,8 @@ import android.view.animation.TranslateAnimation
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
@@ -77,7 +77,6 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
     @SuppressLint("SetTextI18n")
     override fun initView() {
         dataBinding.apply {
-            lifecycleOwner = this@VideoListFragment
             model = viewModel
             recyclerView.pauseFrescoOnScroll()
             recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
