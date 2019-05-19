@@ -108,9 +108,8 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     private fun preParseNextVideoUrl() {
         if (autoNext.value == true
                 && currentItemPos.value != currentItemList.value!!.size - 1) {
-            currentItemList.value!![currentItemPos.value!! + 1]?.let { nextItem ->
+            currentItemList.value!![currentItemPos.value!! + 1].let { nextItem ->
                 videoUrlCache[nextItem]?.let {
-                    videoSourceList.value = it
                     return
                 }
 
@@ -127,10 +126,10 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     }
 
     private fun getPlaySourceUrl(item: PlayLine.Item): Observable<List<String>> {
-        if (playType == PlayerAct.TYPE_LIVE) {
-            return liveSource.dataFetch.getLiveSourceUrl(item)
+        return if (playType == PlayerAct.TYPE_LIVE) {
+            liveSource.dataFetch.getLiveSourceUrl(item)
         } else {
-            return videoSource.dataFetch.getVideoSource(item)
+            videoSource.dataFetch.getVideoSource(item)
         }
     }
 
