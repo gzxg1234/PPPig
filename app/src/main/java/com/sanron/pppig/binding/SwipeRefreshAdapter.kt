@@ -1,9 +1,7 @@
 package com.sanron.pppig.binding
 
-import androidx.lifecycle.Observer
 import androidx.databinding.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.sanron.pppig.common.PageLoader
 
 /**
  *Author:sanron
@@ -11,18 +9,18 @@ import com.sanron.pppig.common.PageLoader
  *Description:
  */
 
-@InverseBindingMethods(InverseBindingMethod(type = androidx.swiperefreshlayout.widget.SwipeRefreshLayout::class, attribute = "android:refreshing"))
+@InverseBindingMethods(InverseBindingMethod(type = SwipeRefreshLayout::class, attribute = "android:refreshing"))
 object SwipeRefreshAdapter {
     @JvmStatic
     @InverseBindingAdapter(attribute = "android:refreshing", event = "android:refreshingAttrChanged")
-    fun getRefreshing(view: androidx.swiperefreshlayout.widget.SwipeRefreshLayout): Boolean {
+    fun getRefreshing(view: SwipeRefreshLayout): Boolean {
         return view.isRefreshing
     }
 
     @JvmStatic
     @BindingAdapter(value = ["android:onRefresh", "android:refreshingAttrChanged"], requireAll = false)
-    fun setOnRefreshListener(view: androidx.swiperefreshlayout.widget.SwipeRefreshLayout,
-                             onRefreshListener: androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener?,
+    fun setOnRefreshListener(view: SwipeRefreshLayout,
+                             onRefreshListener: SwipeRefreshLayout.OnRefreshListener?,
                              refreshingAttrChanged: InverseBindingListener?) {
 
         if (refreshingAttrChanged == null) {
@@ -37,7 +35,7 @@ object SwipeRefreshAdapter {
 
     @JvmStatic
     @BindingAdapter("android:refreshing")
-    fun setRefreshState(refreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout, refresh: Boolean) {
+    fun setRefreshState(refreshLayout: SwipeRefreshLayout, refresh: Boolean) {
         if (!refreshLayout.isAttachedToWindow && refresh) {
             refreshLayout.postDelayed({
                 refreshLayout.isRefreshing = refresh

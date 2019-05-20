@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Observer
-import com.sanron.pppig.util.runInMainIdle
 import com.sanron.pppig.util.showToast
 
 /**
@@ -20,6 +19,8 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
     private var mDataBinding: T? = null
 
     private var mViewModel: M? = null
+
+    private var initedData = false
 
     protected abstract fun getLayout(): Int
 
@@ -37,11 +38,15 @@ abstract class BaseActivity<T : ViewDataBinding, M : BaseViewModel> : AppCompatA
         mViewModel?.toastMsg?.observe(this, Observer {
             showToast(it)
         })
-        runInMainIdle(this) {
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!initedData) {
+            initedData = true
             initData()
         }
     }
-
 
     var dataBinding: T
         private set(value) {}

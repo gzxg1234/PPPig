@@ -16,6 +16,8 @@ import com.sanron.pppig.R
 abstract class CBaseAdapter<T, V : BaseViewHolder>(val context: Context, layoutResId: Int, data: List<T>? = null)
     : BaseQuickAdapter<T, V>(layoutResId, data) {
 
+    override fun convert(helper: V, item: T?) {
+    }
 
     init {
         setLoadMoreView(CLoadMoreView())

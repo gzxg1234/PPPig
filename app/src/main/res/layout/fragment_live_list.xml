@@ -9,7 +9,8 @@
 
     </data>
 
-    <FrameLayout
+    <com.sanron.pppig.widget.loadlayout.LoadLayout
+        android:id="@+id/load_layout_first"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -28,17 +29,23 @@
 
             </androidx.recyclerview.widget.RecyclerView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list_item"
+            <com.sanron.pppig.widget.loadlayout.LoadLayout
+                android:id="@+id/load_layout_second"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:adapterData="@{model.itemList}"
                 android:background="@color/white">
 
-            </androidx.recyclerview.widget.RecyclerView>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/list_item"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adapterData="@{model.itemList}">
+
+                </androidx.recyclerview.widget.RecyclerView>
+            </com.sanron.pppig.widget.loadlayout.LoadLayout>
 
         </LinearLayout>
 
-    </FrameLayout>
+    </com.sanron.pppig.widget.loadlayout.LoadLayout>
 </layout>

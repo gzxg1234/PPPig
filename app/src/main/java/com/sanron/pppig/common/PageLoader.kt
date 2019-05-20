@@ -1,10 +1,14 @@
 package com.sanron.pppig.common
 
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.DiffUtil
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.sanron.datafetch_interface.video.bean.PageData
 import com.sanron.pppig.base.BaseObserver
+import com.sanron.pppig.base.state.LoadState
 import com.sanron.pppig.binding.RecyclerViewAdapter
 import com.sanron.pppig.util.SingleLiveEvent
 import com.sanron.pppig.util.main
@@ -25,13 +29,11 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
         value = mutableListOf()
     }
 
-    val refreshing = SingleLiveEvent<Boolean>().apply {
-        value = false
-    }
+    val refreshing = SingleLiveEvent<Boolean>()
 
-    val loadMoreState = MutableLiveData<Int>().apply {
-        value = RecyclerViewAdapter.STATE_COMPLETE
-    }
+    val loadState = SingleLiveEvent<Int>()
+
+    val loadMoreState = MutableLiveData<Int>()
 
     var diffResult = SingleLiveEvent<DiffUtil.DiffResult>()
 
@@ -43,12 +45,24 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
 
     var scrollToTop = SingleLiveEvent<Void>()
 
+
+    /**
+     * 刷新数据
+     */
     fun refresh() {
-        refreshing.value = true
         loadData(true)
     }
 
-    fun loadMore() {
+    /**
+     * 重置数据状态
+     */
+    fun reset() {
+        loadState.value = LoadState.LOADING
+        listData.value?.clear()
+        refreshing.value = false
+    }
+
+    internal fun loadMore() {
         loadData(false)
     }
 
@@ -66,10 +80,19 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
                         super.onSubscribe(d)
                         disposable?.dispose()
                         disposable = d
+                        if (refresh) {
+                            refreshing.value = true
+                            if (loadState.value != LoadState.SUCCESS) {
+                                loadState.value = LoadState.LOADING
+                            }
+                        }
                     }
 
                     override fun onNext(t: PageData<T>) {
                         super.onNext(t)
+                        if (loadState.value != LoadState.SUCCESS) {
+                            loadState.value = LoadState.SUCCESS
+                        }
                         if (refresh) {
                             listData.value?.clear()
                         }
@@ -94,60 +117,13 @@ class PageLoader<T>(private val fetch: (page: Int) -> Observable<PageData<T>>) :
                         if (!refresh) {
                             loadMoreState.value = RecyclerViewAdapter.STATE_FAIL
                         }
+                        if (loadState.value != LoadState.SUCCESS) {
+                            loadState.value = LoadState.ERROR
+                        }
                         refreshing.value = false
                         showToast(MsgFactory.get(e))
                     }
                 })
     }
 
-}
-
-
-fun PageLoader<*>.bindRecyclerView(lifecycleOwner: LifecycleOwner, recyclerView: androidx.recyclerview.widget.RecyclerView) {
-    if (recyclerView.adapter == null || recyclerView.adapter !is BaseQuickAdapter<*, *> || lifecycleOwner == null) {
-        return
-    }
-    (recyclerView.adapter as BaseQuickAdapter<Any?, *>).let { adapter ->
-        adapter.setNewData(this.listData.value)
-        if (this.diffCallback == null) {
-            (this as PageLoader<Any>).listData.observe(lifecycleOwner, Observer {
-                adapter.notifyDataSetChanged()
-            })
-        } else {
-            this.diffResult.observe(lifecycleOwner, Observer {
-                it?.dispatchUpdatesTo(adapter)
-            })
-        }
-        this.scrollToTop.observe(lifecycleOwner, Observer {
-            recyclerView.scrollToPosition(0)
-        })
-        this.loadMoreState.observe(lifecycleOwner, Observer {
-            when (it) {
-                RecyclerViewAdapter.STATE_FAIL -> adapter.loadMoreFail()
-                RecyclerViewAdapter.STATE_END -> adapter.loadMoreEnd()
-                else -> {
-                    adapter.loadMoreComplete()
-                }
-            }
-        })
-        adapter.setOnLoadMoreListener({
-            this.loadMore()
-        }, recyclerView)
-    }
-}
-
-fun PageLoader<*>.bindRefreshLayout(lifecycleOwner: LifecycleOwner, refreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout) {
-    refreshLayout.setOnRefreshListener {
-        this.refreshing.value = true
-        this.refresh()
-    }
-    this.refreshing.observe(lifecycleOwner, Observer {
-        if (!refreshLayout.isAttachedToWindow && it == true) {
-            refreshLayout.postDelayed({
-                refreshLayout.isRefreshing = true
-            }, 100)
-            return@Observer
-        }
-        refreshLayout.isRefreshing = it ?: false
-    })
 }

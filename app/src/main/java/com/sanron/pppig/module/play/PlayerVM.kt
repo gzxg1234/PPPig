@@ -11,6 +11,7 @@ import com.sanron.datafetch_interface.video.VideoSource
 import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
+import com.sanron.pppig.base.state.LoadState
 import com.sanron.pppig.common.MsgFactory
 import com.sanron.pppig.data.AppPref
 import com.sanron.pppig.data.FetchManager
@@ -50,7 +51,7 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
     //用户当前播放源
     val currentItem = MutableLiveData<PlayLine.Item>()
 
-    val loading = MutableLiveData<Boolean>()
+    val parseState = MutableLiveData<Int>()
 
     val videoSourceList = MutableLiveData<List<String>>()
 
@@ -86,6 +87,10 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
             liveSource = FetchManager.getLiveSourceById(intent.getStringExtra(PlayerAct.ARG_SOURCE_ID)
                     ?: "")!!
         }
+    }
+
+    fun retryParse() {
+        changePlayItem(currentItemPos.value!!)
     }
 
     fun changePlayItem(itemPos: Int) {
@@ -145,24 +150,24 @@ class PlayerVM(application: Application) : BaseViewModel(application) {
                     .main()
                     .compose(autoDispose("getVideoSourceUrl"))
                     .doOnSubscribe {
-                        loading.value = true
-                    }
-                    .doFinally {
-                        loading.value = false
+                        parseState.value = LoadState.LOADING
                     }
                     .subscribe(object : BaseObserver<List<String>>() {
                         override fun onNext(t: List<String>) {
                             super.onNext(t)
                             videoSourceList.value = t
                             if (t.isNullOrEmpty()) {
+                                parseState.value = LoadState.ERROR
                                 toastMsg.value = "未解析到可用播放资源"
                             } else {
                                 videoUrlCache[currentItem] = t
+                                parseState.value = LoadState.SUCCESS
                             }
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
+                            parseState.value = LoadState.ERROR
                             toastMsg.value = MsgFactory.get(e)
                         }
                     })

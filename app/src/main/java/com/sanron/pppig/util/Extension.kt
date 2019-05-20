@@ -1,21 +1,22 @@
 package com.sanron.pppig.util
 
 import android.animation.Animator
+import android.content.Context
+import android.os.AsyncTask
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.animation.Animation
+import android.view.inputmethod.InputMethodManager
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import androidx.databinding.Observable
+import androidx.databinding.ObservableField
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
-import android.content.Context
-import androidx.databinding.Observable
-import androidx.databinding.ObservableField
-import android.os.AsyncTask
-import android.os.Handler
-import android.os.Looper
-import android.os.MessageQueue
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
-import android.view.LayoutInflater
-import android.view.animation.Animation
 import com.sanron.pppig.BR
 import me.jessyan.autosize.utils.AutoSizeUtils
 
@@ -32,23 +33,6 @@ fun Context.getColorCompat(@ColorRes id: Int): Int {
 
 val MainHandler by lazy {
     Handler(Looper.getMainLooper())
-}
-
-/**
- * 当主线程空闲时执行
- */
-fun runInMainIdle(lifecycleOwner: LifecycleOwner?,run: () -> Unit) {
-    val idleHandler = MessageQueue.IdleHandler {
-        run()
-        false
-    }
-    lifecycleOwner?.lifecycle?.addObserver(object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        fun destroy() {
-            Looper.myQueue().removeIdleHandler(idleHandler)
-        }
-    })
-    Looper.myQueue().addIdleHandler(idleHandler)
 }
 
 /**
@@ -100,4 +84,9 @@ fun <T> ObservableField<T>.addOnChangeCallback(callback: (value: T?) -> Unit) {
             }
         }
     })
+}
+
+fun Context.hideInput(view: View) {
+    val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    im.hideSoftInputFromWindow(view.windowToken, 0)
 }

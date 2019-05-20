@@ -7,15 +7,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseViewHolder
-import com.kingja.loadsir.core.LoadService
-import com.kingja.loadsir.core.LoadSir
 import com.sanron.datafetch_interface.live.bean.LiveCat
 import com.sanron.datafetch_interface.live.bean.LiveItem
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.CBaseAdapter
 import com.sanron.pppig.base.LazyFragment
-import com.sanron.pppig.base.state.bindStateValue
+import com.sanron.pppig.binding.bindStateValue
 import com.sanron.pppig.databinding.FragmentLiveListBinding
 import com.sanron.pppig.module.play.PlayerAct
 import com.sanron.pppig.util.getColorCompat
@@ -26,19 +24,6 @@ import com.sanron.pppig.util.getColorCompat
  *Description:
  */
 class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
-    private val catLoadService: LoadService<Any> by lazy {
-        LoadSir.getDefault().register(dataBinding.llContent) {
-            viewModel.loadCatList()
-        }
-    }
-    private val itemLoadService: LoadService<Any> by lazy {
-        LoadSir.getDefault().register(dataBinding.listItem) {
-            viewModel.loadItemList()
-        }.apply {
-            loadLayout.setBackgroundColor(context!!.getColorCompat(R.color.white))
-        }
-    }
-
     companion object {
         fun new(liveSourceId: String): LiveListFragment {
             return LiveListFragment().apply {
@@ -61,8 +46,14 @@ class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
 
     override fun initView() {
         dataBinding.model = viewModel
-        catLoadService.bindStateValue(this, viewModel.catLoadingState)
-        itemLoadService.bindStateValue(this, viewModel.itemLoadingState)
+        dataBinding.loadLayoutFirst.bindStateValue(this, viewModel.catLoadingState)
+        dataBinding.loadLayoutSecond.bindStateValue(this, viewModel.itemLoadingState)
+        dataBinding.loadLayoutFirst.setOnReloadListener {
+            viewModel.loadCatList()
+        }
+        dataBinding.loadLayoutSecond.setOnReloadListener {
+            viewModel.loadItemList()
+        }
         dataBinding.listCat.layoutManager = LinearLayoutManager(context)
         LiveCatAdapter(context!!).apply {
             viewModel.currentCatPos.observe(this@LiveListFragment, Observer {
@@ -102,9 +93,9 @@ class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
                 notifyItemChanged(field)
             }
 
-        override fun convert(helper: BaseViewHolder, item: LiveCat) {
+        override fun convert(helper: BaseViewHolder, item: LiveCat?) {
             val text = helper.getView<TextView>(R.id.tv_name)
-            text.text = item.name
+            text.text = item?.name
             if (selectedPos == helper.adapterPosition) {
                 text.setTextColor(context.getColorCompat(R.color.colorPrimary))
                 helper.itemView.setBackgroundColor(context.getColorCompat(R.color.white))
@@ -118,9 +109,9 @@ class LiveListFragment : LazyFragment<FragmentLiveListBinding, LiveListVM>() {
 
     class LiveItemAdapter(context: Context)
         : CBaseAdapter<LiveItem, BaseViewHolder>(context, R.layout.item_live_cat) {
-        override fun convert(helper: BaseViewHolder, item: LiveItem) {
+        override fun convert(helper: BaseViewHolder, item: LiveItem?) {
             val text = helper.getView<TextView>(R.id.tv_name)
-            text.text = item.name
+            text.text = item?.name
         }
     }
 }

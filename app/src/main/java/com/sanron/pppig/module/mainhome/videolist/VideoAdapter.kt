@@ -18,7 +18,7 @@ import com.sanron.pppig.databinding.ItemVideoBinding
 class VideoAdapter(context: Context, var lifecycleOwner: LifecycleOwner, data: List<VideoItem>?)
     : CBaseAdapter<VideoItem, BaseViewHolder>(context, R.layout.item_video, data) {
 
-    override fun convert(helper: BaseViewHolder, item: VideoItem) {
+    override fun convert(helper: BaseViewHolder, item: VideoItem?) {
         val dataBinding = DataBindingUtil.bind<ItemVideoBinding>(helper.itemView)!!
         dataBinding.model ?: run {
             dataBinding.model = ItemVideoVM(mContext.applicationContext as Application)

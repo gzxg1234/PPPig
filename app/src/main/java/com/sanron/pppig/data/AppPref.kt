@@ -1,6 +1,7 @@
 package com.sanron.pppig.data
 
 import android.annotation.SuppressLint
+import com.google.gson.reflect.TypeToken
 import com.sanron.pppig.app.PiApp
 
 /**
@@ -14,4 +15,5 @@ object AppPref {
     var autoPlayNext by AppSP("autoPlayNext", true)
 
     class AppSP<T>(name: String, default: T) : Preference<T>(PiApp.sInstance, "APP_CONFIG", name, default)
+
 }

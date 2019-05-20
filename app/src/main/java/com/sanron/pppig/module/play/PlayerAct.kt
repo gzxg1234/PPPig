@@ -17,7 +17,7 @@ import com.sanron.lib.StatusBarHelper
 import com.sanron.pppig.R
 import com.sanron.pppig.base.BaseActivity
 import com.sanron.pppig.base.CBaseAdapter
-import com.sanron.pppig.common.LoadingView
+import com.sanron.pppig.base.state.LoadState
 import com.sanron.pppig.databinding.ActivityPlayerBinding
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
@@ -50,10 +50,6 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         const val TYPE_LIVE = 1
     }
 
-    val loadingView: LoadingView by lazy {
-        LoadingView(this)
-    }
-
     override fun createViewModel(): PlayerVM {
         return ViewModelProviders.of(this).get(PlayerVM::class.java)
     }
@@ -82,13 +78,11 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             }
         })
 
-        viewModel.loading.observe(this, Observer {
-            it?.let {
-                if (it) {
-                    loadingView.show()
-                } else {
-                    loadingView.hide()
-                }
+        viewModel.parseState.observe(this, Observer {
+            when (it) {
+                LoadState.LOADING -> (dataBinding.playerView).showParseLoading()
+                LoadState.SUCCESS -> (dataBinding.playerView).showParseSuccess()
+                LoadState.ERROR -> (dataBinding.playerView).showParseError()
             }
         })
 
@@ -125,7 +119,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
         })
         viewModel.currentItem.observe(this, Observer {
             dataBinding.playerView.currentPlayer.release()
-            dataBinding.playerView.currentPlayer.onVideoReset()
+            dataBinding.playerView.onVideoReset()
         })
         viewModel.currentItemPos.observe(this, Observer {
             (dataBinding.viewPager.adapter as SourceAdapter).setSelectPos(
@@ -196,6 +190,9 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
             })
             backButton.setOnClickListener {
                 onBackPressed()
+            }
+            parseErrorView.setOnClickListener {
+                viewModel.retryParse()
             }
         }
     }
@@ -301,7 +298,7 @@ class PlayerAct : BaseActivity<ActivityPlayerBinding, PlayerVM>() {
                 notifyDataSetChanged()
             }
 
-        override fun convert(helper: BaseViewHolder?, item: PlayLine.Item?) {
+        override fun convert(helper: BaseViewHolder, item: PlayLine.Item?) {
             val text = helper!!.itemView as TextView
             text.text = item?.name
             text.isSelected = helper.adapterPosition == selectedPos

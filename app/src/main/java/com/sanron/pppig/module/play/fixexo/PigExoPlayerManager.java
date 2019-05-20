@@ -243,7 +243,7 @@ public class PigExoPlayerManager implements IPlayerManager {
         return false;
     }
 
-    public boolean isLive(){
+    public boolean isLive() {
         return mediaPlayer.isLive();
     }
 
@@ -257,7 +257,9 @@ public class PigExoPlayerManager implements IPlayerManager {
         long nowTimeStamp = System.currentTimeMillis();
         if (lastTimeStamp > 0 && lastTotalRxBytes > 0) {
             long calculationTime = (nowTimeStamp - lastTimeStamp);
-            speed = ((nowTotalRxBytes - lastTotalRxBytes) * 1000 / calculationTime);
+            if (calculationTime > 0) {
+                speed = ((nowTotalRxBytes - lastTotalRxBytes) * 1000 / calculationTime);
+            }
         }
         lastTimeStamp = nowTimeStamp;
         lastTotalRxBytes = nowTotalRxBytes;

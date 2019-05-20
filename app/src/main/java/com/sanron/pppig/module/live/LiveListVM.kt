@@ -9,7 +9,7 @@ import com.sanron.datafetch_interface.live.bean.LiveItem
 import com.sanron.datafetch_interface.video.bean.PlayLine
 import com.sanron.pppig.base.BaseObserver
 import com.sanron.pppig.base.BaseViewModel
-import com.sanron.pppig.base.state.State
+import com.sanron.pppig.base.state.LoadState
 import com.sanron.pppig.common.MsgFactory
 import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.util.SingleLiveEvent
@@ -53,19 +53,19 @@ class LiveListVM(application: Application) : BaseViewModel(application) {
                 .subscribe(object : BaseObserver<List<LiveCat>>() {
                     override fun onSubscribe(d: Disposable) {
                         super.onSubscribe(d)
-                        catLoadingState.value = State.LOADING
+                        catLoadingState.value = LoadState.LOADING
                     }
 
                     override fun onNext(t: List<LiveCat>) {
                         super.onNext(t)
                         catList.value = t
                         setCurrentCatPos(0)
-                        catLoadingState.value = State.SUCCESS
+                        catLoadingState.value = LoadState.SUCCESS
                     }
 
                     override fun onError(e: Throwable) {
                         super.onError(e)
-                        catLoadingState.value = State.ERROR
+                        catLoadingState.value = LoadState.ERROR
                         toastMsg.value = MsgFactory.get(e)
                     }
                 })
@@ -110,18 +110,18 @@ class LiveListVM(application: Application) : BaseViewModel(application) {
                         .subscribe(object : BaseObserver<List<LiveItem>>() {
                             override fun onSubscribe(d: Disposable) {
                                 super.onSubscribe(d)
-                                itemLoadingState.value = State.LOADING
+                                itemLoadingState.value = LoadState.LOADING
                             }
 
                             override fun onNext(t: List<LiveItem>) {
                                 super.onNext(t)
                                 itemList.value = t
-                                itemLoadingState.value = State.SUCCESS
+                                itemLoadingState.value = LoadState.SUCCESS
                             }
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                itemLoadingState.value = State.ERROR
+                                itemLoadingState.value = LoadState.ERROR
                                 toastMsg.value = MsgFactory.get(e)
                             }
                         })

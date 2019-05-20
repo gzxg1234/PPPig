@@ -61,8 +61,8 @@ class SelectSourceDialog(context: Context, val onChange: () -> Unit) : BaseDialo
                 notifyItemChanged(field)
             }
 
-        override fun convert(helper: BaseViewHolder?, item: VideoSource?) {
-            val tvName = helper?.getView<TextView>(R.id.tv_text)!!
+        override fun convert(helper: BaseViewHolder, item: VideoSource?) {
+            val tvName = helper.getView<TextView>(R.id.tv_text)!!
             val rb = helper.getView<RadioButton>(R.id.rb_check)!!
             tvName.text = item?.name
             if (selectedPos == helper.adapterPosition) {

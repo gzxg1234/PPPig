@@ -20,6 +20,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sanron.pppig.R
+import com.sanron.pppig.base.state.LoadState
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.util.limit
@@ -89,6 +90,13 @@ class PigPlayer : FixPlayer {
         }
     }
 
+    private val parseLoadingView: View by lazy {
+        findViewById<View>(R.id.fl_parse_loading)
+    }
+    public val parseErrorView: View by lazy {
+        findViewById<View>(R.id.fl_parse_error)
+    }
+
     private val activity = context as Activity
 
     fun getTopBar(): ViewGroup = mTopContainer
@@ -125,7 +133,26 @@ class PigPlayer : FixPlayer {
         return R.layout.pig_player_layout
     }
 
+    fun showParseLoading() {
+        parseLoadingView.visibility = View.VISIBLE
+        parseErrorView.visibility = View.GONE
+    }
+
+    fun showParseError() {
+        parseLoadingView.visibility = View.GONE
+        parseErrorView.visibility = View.VISIBLE
+        mTopContainer.visibility = View.VISIBLE
+    }
+
+    fun showParseSuccess() {
+        parseLoadingView.visibility = View.GONE
+        parseErrorView.visibility = View.GONE
+    }
+
     fun setPlayerViewModel(act: PlayerAct, vm: PlayerVM) {
+        if (!mIfCurrentIsFullscreen) {
+            return
+        }
         rvEpisodeItems.layoutManager = GridLayoutManager(context, 3)
         rvEpisodeItems.gap(context.dp2px(8f), context.dp2px(8f))
         itemAdapter.setNewData(vm.playLineList.value!![vm.currentPlayTab.value!!].items)
@@ -133,6 +160,13 @@ class PigPlayer : FixPlayer {
             vm.changePlayItem(position)
         }
         itemAdapter.bindToRecyclerView(rvEpisodeItems)
+        vm.parseState.observe(act, Observer {
+            when (it) {
+                LoadState.LOADING -> showParseLoading()
+                LoadState.SUCCESS -> showParseSuccess()
+                LoadState.ERROR -> showParseError()
+            }
+        })
         vm.currentItemPos.observe(act, Observer {
             it?.let {
                 itemAdapter.selectedPos = it
@@ -149,13 +183,16 @@ class PigPlayer : FixPlayer {
         switchAutoNext.setOnCheckedChangeListener { buttonView, isChecked ->
             vm.setAutoNext(isChecked)
         }
+        parseErrorView.setOnClickListener {
+            vm.retryParse()
+        }
     }
 
     override fun seekTo(position: Long) {
         super.seekTo(position.limit(0L, duration.toLong() - 1))
     }
 
-    fun hideAllControl() {
+    private fun hideAllControl() {
         if ((mCurrentState != GSYVideoView.CURRENT_STATE_NORMAL
                         && mCurrentState != GSYVideoView.CURRENT_STATE_ERROR
                         && mCurrentState != GSYVideoView.CURRENT_STATE_AUTO_COMPLETE)) {
@@ -205,10 +242,6 @@ class PigPlayer : FixPlayer {
 
     override fun dismissProgressDialog() {
         seekPosLayout.visibility = View.GONE
-    }
-
-    override fun setSeekOnStart(seekOnStart: Long) {
-        super.setSeekOnStart(seekOnStart)
     }
 
     override fun startProgressTimer() {

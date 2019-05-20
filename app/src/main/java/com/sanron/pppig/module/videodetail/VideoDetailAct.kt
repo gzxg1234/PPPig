@@ -224,8 +224,8 @@ class VideoDetailAct : BaseActivity<ActivityVideoDetailBinding, VideoDetailVM>()
 
     class ItemAdapter(context: Context) : CBaseAdapter<PlayLine.Item, BaseViewHolder>(context, R.layout.item_play_item) {
 
-        override fun convert(helper: BaseViewHolder?, item: PlayLine.Item?) {
-            val text = helper!!.itemView as TextView
+        override fun convert(helper: BaseViewHolder, item: PlayLine.Item?) {
+            val text = helper.itemView as TextView
             text.text = item?.name
         }
     }

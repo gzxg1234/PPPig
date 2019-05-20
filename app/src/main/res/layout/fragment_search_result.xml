@@ -8,7 +8,8 @@
             type="com.sanron.pppig.module.search.SearchVM" />
     </data>
 
-    <FrameLayout
+    <com.sanron.pppig.widget.loadlayout.LoadLayout
+        android:id="@+id/load_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -31,5 +32,5 @@
 
         </com.sanron.pppig.widget.PiRefreshLayout>
 
-    </FrameLayout>
+    </com.sanron.pppig.widget.loadlayout.LoadLayout>
 </layout>

@@ -19,18 +19,6 @@ import com.sanron.pppig.widget.SimpleSizeDrawable
  *Description:
  */
 
-fun View.gone() {
-    this.visibility = View.GONE
-}
-
-fun View.invisible() {
-    this.visibility = View.INVISIBLE
-}
-
-fun View.visible() {
-    this.visibility = View.VISIBLE
-}
-
 fun View.setPadding(paddingLeft: Int? = null, paddingTop: Int? = null, paddingRight: Int? = null, paddingBottom: Int? = null) {
     this.setPadding(paddingLeft ?: this.paddingLeft,
             paddingTop ?: this.paddingTop,
@@ -93,7 +81,9 @@ fun RecyclerView.gap(hGap: Int = 0, vGap: Int = 0) {
     }
 }
 
-
+/**
+ * EditText绑定清除按钮
+ */
 fun EditText.bindClear(view: View) {
     view.setOnClickListener {
         this.setText("")
@@ -114,3 +104,4 @@ fun EditText.bindClear(view: View) {
         }
     })
 }
+

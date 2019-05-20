@@ -7,27 +7,25 @@ import androidx.lifecycle.ViewModelProviders
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
-import com.sanron.pppig.common.bindRecyclerView
-import com.sanron.pppig.common.bindRefreshLayout
+import com.sanron.pppig.binding.bindPageLoader
 import com.sanron.pppig.databinding.FragmentSearchResultBinding
 import com.sanron.pppig.module.mainhome.IMainChildFragment
 import com.sanron.pppig.module.mainhome.videolist.VideoAdapter
 import com.sanron.pppig.util.dp2px
 import com.sanron.pppig.util.gap
 import com.sanron.pppig.util.pauseFrescoOnScroll
-import com.sanron.pppig.util.runInMainIdle
 
 /**
  *Author:sanron
  *Time:2019/4/16
  *Description:
  */
-class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IMainChildFragment {
+class SearchResultFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IMainChildFragment {
 
     companion object {
 
-        fun new(sourceId: String, word: String): SearchFragment {
-            return SearchFragment().apply {
+        fun new(sourceId: String, word: String): SearchResultFragment {
+            return SearchResultFragment().apply {
                 val args = Bundle(1)
                 args.putString("id", sourceId)
                 args.putString("word", word)
@@ -39,9 +37,7 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
     private lateinit var adapter: VideoAdapter
 
     override fun initData() {
-        runInMainIdle(this) {
-            viewModel.refresh()
-        }
+        viewModel.refresh()
     }
 
     override fun getLayout() = R.layout.fragment_search_result
@@ -58,6 +54,7 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
     }
 
     fun setWord(word: String) {
+        arguments?.putString("word", word)
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             viewModel.word = word
             adapter.data.clear()
@@ -78,16 +75,17 @@ class SearchFragment : LazyFragment<FragmentSearchResultBinding, SearchVM>(), IM
             recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
             recyclerView.gap(context!!.dp2px(8f), context!!.dp2px(8f))
 
-            adapter = VideoAdapter(context!!, this@SearchFragment, viewModel.pageLoader.listData.value)
+            adapter = VideoAdapter(context!!, this@SearchResultFragment, viewModel.pageLoader.listData.value)
             adapter.setOnItemClickListener { adapter1, view, position ->
                 startActivity(Intents.videoDetail(context!!, adapter.getItem(position)?.link, arguments?.getString("id")
                         ?: "" ?: ""))
             }
-            adapter.lifecycleOwner = this@SearchFragment
+            adapter.lifecycleOwner = this@SearchResultFragment
             adapter.bindToRecyclerView(recyclerView)
         }
-        viewModel.pageLoader.bindRecyclerView(this, dataBinding.recyclerView)
-        viewModel.pageLoader.bindRefreshLayout(this, dataBinding.refreshLayout)
+        dataBinding.refreshLayout.bindPageLoader(this, viewModel.pageLoader)
+        dataBinding.recyclerView.bindPageLoader(this, viewModel.pageLoader)
+        dataBinding.loadLayout.bindPageLoader(this, viewModel.pageLoader)
         viewModel.setSource(arguments?.getString("id") ?: "")
         viewModel.word = (arguments?.getString("word") ?: "")
     }

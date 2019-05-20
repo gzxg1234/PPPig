@@ -11,4 +11,5 @@
     <color name="textColor3">#999</color>
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
+    <color name="divider">#bdbdbd</color>
 </resources>

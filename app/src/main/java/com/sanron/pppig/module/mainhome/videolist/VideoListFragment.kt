@@ -18,8 +18,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.sanron.pppig.R
 import com.sanron.pppig.app.Intents
 import com.sanron.pppig.base.LazyFragment
-import com.sanron.pppig.common.bindRecyclerView
-import com.sanron.pppig.common.bindRefreshLayout
+import com.sanron.pppig.binding.bindPageLoader
 import com.sanron.pppig.data.FetchManager
 import com.sanron.pppig.databinding.FragmentVideoListBinding
 import com.sanron.pppig.module.mainhome.IMainChildFragment
@@ -45,14 +44,13 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
     }
 
     private lateinit var adapter: VideoAdapter
+
     private var bgAnim: ObjectAnimator? = null
 
 
     override fun initData() {
-        runInMainIdle(this) {
-            buildFilter()
-            refreshData()
-        }
+        buildFilter()
+        refreshData()
     }
 
     override fun getLayout() = R.layout.fragment_video_list
@@ -62,16 +60,15 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
     }
 
     override fun onReselect() {
-        viewModel.pageLoader.apply {
-            dataBinding.recyclerView.smoothScrollToPosition(0)
-            refresh()
-        }
+        dataBinding.recyclerView.smoothScrollToPosition(0)
+        viewModel.pageLoader.refresh()
     }
 
-    private fun refreshData() {
-        if (isActive) {
-            viewModel.pageLoader.refresh()
+    private fun refreshData(reset: Boolean = false) {
+        if (reset) {
+            viewModel.pageLoader.reset()
         }
+        viewModel.pageLoader.refresh()
     }
 
     @SuppressLint("SetTextI18n")
@@ -98,8 +95,9 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
                     setFilterWindowVisible(it)
                 }
             })
-            pageLoader.bindRecyclerView(this@VideoListFragment, dataBinding.recyclerView)
-            pageLoader.bindRefreshLayout(this@VideoListFragment, dataBinding.refreshLayout)
+            dataBinding.refreshLayout.bindPageLoader(this@VideoListFragment, pageLoader)
+            dataBinding.loadLayout.bindPageLoader(this@VideoListFragment, pageLoader)
+            dataBinding.recyclerView.bindPageLoader(this@VideoListFragment, pageLoader)
         }
     }
 
@@ -162,7 +160,7 @@ class VideoListFragment : LazyFragment<FragmentVideoListBinding, VideoListVM>(),
                     texts.add(n + ":" + v.name)
                 }
                 dataBinding.tvFilterDesc.text = TextUtils.join(" | ", texts.toTypedArray())
-                refreshData()
+                refreshData(true)
             }
             rgItems.check(0)
             onCheckedChange(rgItems, 0)

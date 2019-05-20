@@ -252,3 +252,8 @@
 -dontwarn tv.danmaku.ijk.**
 
 #end
+
+#LoadSir
+-dontwarn com.kingja.loadsir.**
+-keep class com.kingja.loadsir.** {*;}
+#end
